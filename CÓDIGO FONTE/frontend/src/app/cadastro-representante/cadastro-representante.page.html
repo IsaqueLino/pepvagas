@@ -1,0 +1,44 @@
+<ion-content id="main-content">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h2 class="title">Cadastro de Representante</h2>
+        </ion-card-header>
+        <ion-card-content>
+          <h1 class="title">Informações do Representante</h1>
+          <br>
+          <ion-item>
+            <ion-input [(ngModel)]="novoRepresentante.nome" label="Nome" labelPlacement="floating" placeholder="Informe o nome do Representante" maxlength="60"></ion-input>
+          </ion-item>
+          <br>
+          <h1 class="title">Informações da Conta</h1>
+          <br>
+          <ion-item>
+            <ion-input [(ngModel)]="novaConta.email" label="E-mail" labelPlacement="floating" placeholder="Informe o email da conta" maxlength="50" type="email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input [(ngModel)]="novaConta.senha" label="Senha" labelPlacement="floating" placeholder="Informe a senha da conta" type="password"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input [(ngModel)]="novaConta.confirmarSenha" label="Confirmar senha" labelPlacement="floating" placeholder="Confirme a senha digitada acima" type="password"></ion-input>
+          </ion-item>
+          <br>
+          <ion-row>
+            <ion-col size="6">
+              <ion-button class="butao" expand="block" (click)="onSubmit()">
+                Cadastrar Representante
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button class="botao-cancelar" color="danger" fill="outline" expand="block" (click)="cancelar()">
+                Cancelar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

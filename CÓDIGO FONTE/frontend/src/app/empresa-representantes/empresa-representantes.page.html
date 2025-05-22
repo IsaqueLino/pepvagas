@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h1 class="title"> Lista de Representantes </h1>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Email</th>
+                      <th>Empresa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr 
+                      *ngFor="let representante of paginatedListaRepresentante" 
+                      (click)="onRowClick(representante.idconta)"
+                      [class.selected]="representante.idconta === selectedIdConta">
+                      <td>{{ representante.nome }}</td>
+                      <td>{{ representante.conta?.email }}</td>
+                      <td>{{ representante.idEmpresa.nomeEmpresa }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</ion-button>
+                <ion-button (click)="nextPage()" [disabled]="(currentPage * itemsPerPage) >= listaRepresentantes.length">Próximo</ion-button>
+                <ion-button class="butao" (click)="confirmarExclusao()" class="botao-cancelar" color="danger" fill="outline">Excluir</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-row>
+            <ion-col size="6">
+              <ion-button id="open-modal" class="butao" expand="block" (click)="cadastrarRepresentante()">
+                Cadastrar Representante
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button [routerLink]="['/empresa-perfil']" color="light" expand="block">Voltar ao Perfil</ion-button>
+            </ion-col>
+          </ion-row>
+
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

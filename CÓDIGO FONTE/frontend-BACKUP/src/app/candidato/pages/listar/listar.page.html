@@ -1,0 +1,59 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab id="btn-add" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="adicionarNovoCandidato()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <div class="form-container">
+    <h1><b>Candidatos:</b></h1>
+    <ion-searchbar animated="true" placeholder="Nome" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarCandidatosPorNome()"></ion-searchbar>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let candidato of candidatos">
+        <ion-card class="no-margin">
+          <ion-card-header>
+            <div>
+              <ion-fab slot="fixed" horizontal="end" vertical="top">
+                <ion-fab-button>
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-list side="start">
+                  <ion-fab-button *ngIf="!candidato.deletedAt" color="danger"
+                    (click)="deletarCandidato(candidato.idCandidato)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf="candidato.deletedAt" color="success"
+                    (click)="reativarPerfil(candidato.idCandidato)">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button color="primary" (click)="navegarParaVisualizar(candidato.idCandidato)">
+                    <ion-icon name="eye"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf="!candidato.deletedAt" color="warning"
+                    (click)="navegarParaAlterar(candidato.idCandidato)">
+                    <ion-icon name="pencil"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab-list>
+              </ion-fab>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <b *ngIf="candidato.deletedAt" style="color: red;">Perfil Inativo</b><br>
+            <b>Nome:</b> {{candidato.nome}}<br>
+            <b>Email:</b> {{candidato.email}}<br>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumResultado" *ngIf="candidatos.length === 0 && termoPesquisa.trim() !== ''">
+    Nenhum candidato encontrado.
+  </div>
+
+</ion-content>

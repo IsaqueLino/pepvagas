@@ -1,0 +1,38 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <div class="web-padding">
+    <div class="container">
+      <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+        <ion-button mat-button shape="round" (click)="goBack()" color="dark">Voltar</ion-button>
+      </div>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title> Profissional Autônomo </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-row>
+            <ion-col size="12">
+              <ion-card-content class="job-card-content">
+                <ion-col>
+                  <div class="labels-container">
+
+                    <img *ngIf="prof.arquivoImagem" alt="Imagem" class="imagem"
+                      src="http://localhost:4001/images/{{prof.arquivoImagem}}" />
+
+                    <ion-label><b>Nome:</b> {{prof.nome}} </ion-label>
+                    <ion-label><b>Descrição:</b> {{prof.descricao}} </ion-label>
+                    <ion-label><b>Email:</b> {{prof.email}} </ion-label>
+                    <ion-label><b>Telefone:</b> {{prof.telefone}} </ion-label>
+                    <ion-label><b>Tipos de Serviço:</b> {{ servicos }} </ion-label>
+                  </div>
+                </ion-col>
+              </ion-card-content>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+</ion-content>

@@ -1,0 +1,166 @@
+<ion-content id="main-content">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-content>
+        <h1 style="text-align: center;">Perfil da Empresa</h1>
+        <br>
+        <h1 style="text-align: center;">Informações da Conta</h1>
+        <br>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input label="Email" labelPlacement="floating" [(ngModel)]="conta.email"
+              readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input type="password" label="Senha" labelPlacement="floating" value="..................."
+                readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      
+        <ion-row>
+          <ion-col>
+            <ion-button id="open-modal4" expand="block" class="butao">Alterar Senha</ion-button>
+          </ion-col>
+        </ion-row>
+          <br>
+          <h1 style="text-align: center;">Informações Gerais</h1>
+          <br>
+        <ion-row>
+          <ion-col>
+            <ion-item size="12">
+              <ion-input readonly [(ngModel)]="empresa.nomeEmpresa" label="Nome da Empresa" labelPlacement="floating" placeholder="Informe o nome da empresa" maxlength="60"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input readonly [value]="formatCnpj(empresa.cnpj)" label="CNPJ" labelPlacement="floating" placeholder="Informe o CNPJ da empresa" maxlength="60"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input readonly [(ngModel)]="empresa.email" label="E-mail de contato" labelPlacement="floating" placeholder="Nome da Empresa" maxlength="60"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+          <ion-button class="butao" expand="block" (click)="gerenciarRepresentantes()">
+            Gerenciar Representantes
+          </ion-button>
+          <br>
+          <h1 style="text-align: center;">Informações Complementares</h1>
+          <br>
+        <ion-row>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input readonly [value]="formatTelefone(empresa.telefone)" label="Telefone para contato" labelPlacement="floating" placeholder="Telefone de contato não informado" maxlength="60"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item>
+              <ion-input readonly [(ngModel)]="empresa.site" label="Website" labelPlacement="floating" placeholder="Website da Empresa não informado" maxlength="60"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+          <br>
+          <ion-row>
+            <ion-col size="6">
+              <ion-button id="open-modal3" class="butao" expand="block">
+                Alterar Informações
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" fill="outline" expand="block">
+                Desativar Conta
+              </ion-button>
+              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja desativar sua conta?"
+              [buttons]="actionSheetButtons"></ion-action-sheet>
+            </ion-col>
+          </ion-row>
+
+          <ion-modal #modal3 trigger="open-modal3" (willDismiss)="onWillDismiss($event)">
+            <ng-template>
+              <ion-toolbar>
+                <ion-buttons slot="start">
+                  <ion-button (click)="cancel()" >Voltar</ion-button>
+                </ion-buttons>
+                <ion-title style="text-align: center;">Alterar Informações</ion-title>
+                <ion-buttons slot="end">
+                  <ion-button  (click)="alterarEmpresa()" [strong]="true">Enviar</ion-button>
+                </ion-buttons>
+              </ion-toolbar>
+              <ion-content class="ion-padding">
+                <br>
+                <h2 style="text-align: center;">Informações Gerais</h2>
+      
+                <ion-item>
+                  <ion-input label="Nome" labelPlacement="floating" placeholder="Informe o nome"
+                  [(ngModel)]="empresaAlterada.nomeEmpresa"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-input readonly [maskito]="cnpjMask" [maskitoElement]="maskPredicate" [(ngModel)]="empresaAlterada.cnpj" label="CNPJ" labelPlacement="floating" placeholder="Informe o CNPJ da empresa" maxlength="60"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-input [(ngModel)]="empresaAlterada.email" label="E-mail de contato" labelPlacement="floating" placeholder="Nome da Empresa" maxlength="60"></ion-input>
+                </ion-item>
+                <br>
+                <h2 style="text-align: center;">Informações Complementares</h2>
+                <br>
+                <ion-item>
+                  <ion-input [maskito]="currentMask" [maskitoElement]="maskPredicate" [(ngModel)]="empresaAlterada.telefone" label="Telefone para contato" labelPlacement="floating" placeholder="Telefone de contato não informado" maxlength="60"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-input [(ngModel)]="empresaAlterada.site" label="Website" labelPlacement="floating" placeholder="Website da Empresa não informado" maxlength="60"></ion-input>
+                </ion-item>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+      
+          <ion-modal #modal4 trigger="open-modal4" (willDismiss)="onWillDismissPassword($event)">
+            <ng-template>
+              <ion-toolbar>
+                <ion-buttons slot="start">
+                  <ion-button (click)="cancelPassword()">Voltar</ion-button>
+                </ion-buttons>
+                <ion-title style="text-align: center;">Alterar Informações</ion-title>
+                <ion-buttons slot="end">
+                  <ion-button  (click)="confirmPassword()" [strong]="true">Enviar</ion-button>
+                </ion-buttons>
+              </ion-toolbar>
+              <ion-content class="ion-padding">
+                <br>
+                <h2 style="text-align: center;">Alterar Senha</h2>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.senhaAtual" type="password" label="Senha atual"  labelPlacement="floating" >
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.novaSenha" type="password" label="Senha nova" labelPlacement="floating">
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.confirmarSenha" type="password" label="Confirmar senha nova" labelPlacement="floating">
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+        </ion-card-content>
+        </ion-card>
+    </div>
+  </div>
+</ion-content>

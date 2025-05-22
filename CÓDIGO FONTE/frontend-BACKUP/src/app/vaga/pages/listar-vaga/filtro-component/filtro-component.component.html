@@ -1,0 +1,163 @@
+<ion-toolbar>
+  <h1>
+    Filtro de pesquisa
+  </h1>
+</ion-toolbar>
+
+<ion-grid>
+  <!-- Filtos da vaga, pode ter um botao que faz com que eles aparecam -->
+  <!-- O filtro destes campos vai acontecer quando o usario confirmar que quer eles     -->
+  <!--      area | salario | pcd-->
+  <!--      tipo | regime-->
+  <!--      modalidade | Horario(Não tem ainda)-->
+  <!--      Nivel escolaridade | Pos-graduacao (ambos não tem ainda)-->
+  <!--      cep | cidade | uf -->
+  <!--      cnh |Se pode ou não enviar curriculo-->
+  <!--      Botao de filtrar-->
+  <ion-row>
+    <ion-col size="12" size-md="6" size-lg="3">
+      <ion-button fill="outline" size="small" (click)="pesquisarArea($event)" class="btn-filtro">
+        <span class="text-filto" *ngIf="selected.area == ''">Áreas</span>{{selected.area}}
+        <ion-icon slot="start" *ngIf="selected.area == ''" name="hammer"></ion-icon>
+      </ion-button>
+    </ion-col>
+    <!--        <ion-col size="6" size-md="5" size-lg="5">-->
+    <!--          <p>Salario</p>-->
+    <!--         <ion-range-->
+    <!--          aria-label="Range da faixa salarial"-->
+    <!--          [dualKnobs]="true"-->
+    <!--          [pin]="true"-->
+    <!--          [min]="rangeOptions.min"-->
+    <!--          [max]="rangeOptions.max"-->
+    <!--          [step]="rangeOptions.step"-->
+    <!--          [(ngModel)]="selectedSalario"-->
+    <!--          (ionChange)="pesquisarSalario($event)"-->
+    <!--          >-->
+    <!--          <ion-label slot="start">R$ 0</ion-label>-->
+    <!--          <ion-label slot="end">R$ 10.0000</ion-label>-->
+
+    <!--         </ion-range>-->
+    <!--        </ion-col>-->
+    <ion-col size="3" size-md="2" size-lg="2">
+      <ion-item  aria-label="PCD" class="check">
+        <ion-checkbox label-placement="end" [(ngModel)]="selected.pcd">PCD</ion-checkbox>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row >
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-select [(ngModel)]="selected.tipo"
+                  class="form-control "
+                  label="Tipo de Vaga"
+                  interface="popover">
+        <<ion-select-option value="Estagio">Estágio</ion-select-option>
+        <ion-select-option value="Emprego">Emprego</ion-select-option>
+        <ion-select-option value="PJ">PJ</ion-select-option>
+      </ion-select>
+    </ion-col>
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-select [(ngModel)]="selected.regime"  [disabled]="!selected.tipo.includes('Emprego')"
+                  class="form-control "
+                  label="Regime"
+                  interface="popover">
+        <ion-select-option value="Efetivo">Efetivo</ion-select-option>
+        <ion-select-option value="Temporario">Temporário</ion-select-option>
+      </ion-select>
+    </ion-col>
+  </ion-row>
+  <ion-row >
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-select [(ngModel)]="selected.modalidade"
+                  class="form-control"
+                  label="Modalidade"
+                  interface="popover">
+        <ion-select-option value="Híbrido">Híbrido</ion-select-option>
+        <ion-select-option value="Remoto">Remoto</ion-select-option>
+        <ion-select-option value="Presencial">Presencial</ion-select-option>
+      </ion-select>
+    </ion-col>
+    <!--        <ion-col size="6" size-md="6" size-lg="6">-->
+    <!--          <ion-select [(ngModel)]="selectedHorario" class="select-filtro"-->
+    <!--                      interface="popover">-->
+    <!--            <ion-select-option value="">Horário</ion-select-option>-->
+    <!--            <ion-select-option value="Manha">Manhã</ion-select-option>-->
+    <!--            <ion-select-option value="Tarde">Tarde</ion-select-option>-->
+    <!--            <ion-select-option value="Noite">Noite</ion-select-option>-->
+    <!--          </ion-select>-->
+    <!--        </ion-col>-->
+  </ion-row>
+  <!--      <ion-row>-->
+  <!--        <ion-col size="6" size-md="6" size-lg="6">-->
+  <!--          <ion-select [(ngModel)]="selectedEscolaridade" class="select-filtro"-->
+  <!--                      interface="popover">-->
+  <!--            <ion-select-option value="">Escolaridade</ion-select-option>-->
+  <!--            <ion-select-option value="Ensino Fundamental">Ensino Fundamental</ion-select-option>-->
+  <!--            <ion-select-option value="Ensino Médio">Ensino Médio</ion-select-option>-->
+  <!--            <ion-select-option value="Ensino Superior">Ensino Superior</ion-select-option>-->
+  <!--          </ion-select>-->
+  <!--        </ion-col>-->
+  <!--        <ion-col size="6" size-md="6" size-lg="6">-->
+  <!--          <ion-select [(ngModel)]="selectedPosGraduacao" class="select-filtro"-->
+  <!--                      interface="popover">-->
+  <!--            <ion-select-option value="">Pós-Graduação</ion-select-option>-->
+  <!--            <ion-select-option value="Especialização">Especialização</ion-select-option>-->
+  <!--            <ion-select-option value="Mestrado">Mestrado</ion-select-option>-->
+  <!--            <ion-select-option value="Doutorado">Doutorado</ion-select-option>-->
+  <!--          </ion-select>-->
+  <!--        </ion-col>-->
+  <!--      </ion-row>-->
+  <ion-row >
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-select [(ngModel)]="selected.cnh"
+                  class="form-control"
+                  label="CNH"
+                  interface="popover">
+        <ion-select-option value="Sem">Não requer CNH</ion-select-option>
+        <ion-select-option value="ACC">Categoria ACC</ion-select-option>
+        <ion-select-option value="A">Categoria A</ion-select-option>
+        <ion-select-option value="B">Categoria B</ion-select-option>
+        <ion-select-option value="C">Categoria C</ion-select-option>
+        <ion-select-option value="D">Categoria D</ion-select-option>
+        <ion-select-option value="E">Categoria E</ion-select-option>
+      </ion-select>
+    </ion-col>
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-select [(ngModel)]="selected.curriculo"
+                  class="form-control"
+                  label="Pode enviar Currículo"
+                  interface="popover">
+        <ion-select-option value="Sim">Sim</ion-select-option>
+        <ion-select-option value="Não">Não</ion-select-option>
+      </ion-select>
+    </ion-col>
+  </ion-row>
+  <ion-row >
+    <ion-col size="6" size-md="6" size-lg="3">
+      <ion-input [(ngModel)]="selected.cep"
+                 class="form-control"
+                 placeholder="CEP"/>
+    </ion-col>
+    <ion-col size="6" size-md="6" size-lg="6">
+      <ion-input [(ngModel)]="selected.cidade"
+                 class="form-control"
+                 placeholder="Cidade"/>
+    </ion-col>
+    <ion-col size="6" size-md="6" size-lg="3">
+      <ion-select [(ngModel)]="selected.uf"
+                  class="form-control"
+                  label="UF"
+                  interface="popover">
+        <ion-select-option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</ion-select-option>
+
+      </ion-select>
+    </ion-col>
+  </ion-row>
+  <ion-row >
+    <ion-col size="6" size-md="6" size-lg="6" offset="3">
+      <ion-button fill="outline" (click)="sair($event)">
+        Filtrar
+        <ion-icon slot="start" name="filter"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+</ion-grid>

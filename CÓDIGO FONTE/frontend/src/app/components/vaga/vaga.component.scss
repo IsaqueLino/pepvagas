@@ -1,0 +1,85 @@
+.vaga {
+    border: 1px solid var(--ion-border-color);
+    border-radius: 10px;
+    padding: 20px 20px;
+    box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
+    background-color: var(--ion-card-background);
+    margin: 0px 8px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 300px;
+
+    cursor: pointer;
+}
+
+
+.badges {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.infos {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.infos p {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--ion-text-color);
+    opacity: 0.2;
+}
+
+.title {
+    font-weight: 500;
+    margin: 0;
+}
+
+.empresa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.infos-empresa {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: 100%;
+    gap: 12px;
+}
+
+.infos-empresa p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--ion-text-color);
+    opacity: 1;
+}
+
+.metadata {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.metadata p {
+    margin: 0;
+    font-size: 10px;
+}
+
+ion-img {
+    max-width: 50px;
+    max-height: 50px;
+    background-color: gray;
+    border-radius: 5px;
+}
+
+ion-badge {
+    --background: var(--ion-color-pep);
+}

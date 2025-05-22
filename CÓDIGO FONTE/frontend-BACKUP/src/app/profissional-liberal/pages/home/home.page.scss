@@ -1,0 +1,26 @@
+ion-toolbar {
+    --background: #15842a;
+    --color: rgb(255, 255, 255);
+}
+
+ion-content {
+    --background: #f4f4f4;
+    width: auto;
+}
+
+ion-button {
+    inline-size: 60%;
+    border-radius: 10px;
+    border: 1.6px;
+}
+
+a {
+    color: #15842a;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+#btn-user{
+    width: auto;
+}
+

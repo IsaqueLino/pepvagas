@@ -1,0 +1,54 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h1 class="title"> Profissionais Liberais/Autônomos </h1>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let prof of paginatedListaProfissionaisLiberais"
+                      (click)="onRowClick(prof.idconta)"
+                      [class.selected]="prof.idconta === selectedIdconta">
+                      <td>{{ prof.idconta }}</td>
+                      <td>{{ prof.email }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</ion-button>
+                <ion-button (click)="nextPage()" [disabled]="(currentPage * itemsPerPage) >= listaProfissionais.length">Próximo</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-row>
+        <ion-col size="6">
+          <ion-button *ngIf="isSelected" [routerLink]="['/profissional-detalhes']"  class="teste" (click)="verDetalhes()" color="success" expand="block">Ver Detalhes</ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Cancelar</ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,52 @@
+ion-toolbar {
+  --background: #15842a;
+  --color: rgb(255, 255, 255);
+}
+
+ion-content {
+  --background: #f4f4f4;
+  width: auto;
+}
+
+ion-button {
+  inline-size: 70%;
+  border-radius: 10px;
+  --border-width: 2px;
+  --background: #f4f4f4;
+  --border-color: #15842a;
+  --color: #15842a;
+}
+
+p, a {
+  color: #15842a;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.input {
+  --padding-start: 20px;
+  border-radius: 10px;
+  border: 2px solid black;
+  color: black;
+  inline-size: 70%;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+#btn{
+  margin-top: 3%;
+  margin-bottom: 3%;
+  border-radius: 10px;
+  --border-width: 2px;
+  background-color: #f4f4f4;
+  --border-color: #15842a;
+  --color: #15842a;
+}

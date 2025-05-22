@@ -1,0 +1,181 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVags"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+<!--  <div class="form-container">-->
+<!--    <h3><b>Dados do Representante:</b></h3>-->
+<!--    <ion-input label="Nome" labelPlacement="floating" class="input" type="text" [(ngModel)]="profissionalData.nome"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="E-mail" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.email"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-textarea label="Descrição" labelPlacement="floating" class="input" type="text"-->
+<!--                  [(ngModel)]="profissionalData.descricao"-->
+<!--                  [readonly]="true"-->
+<!--                  [autoGrow]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-list class="list-border">-->
+<!--      <ion-list-header>-->
+<!--        <h5><b>Lista de Contatos:</b></h5>-->
+<!--      </ion-list-header>-->
+<!--      <ng-container *ngIf="profissionalData.contatos">-->
+<!--        <ion-item *ngFor="let x of profissionalData.contatos; let i = index;">-->
+<!--          <ion-label>{{x.tipoContato}}: {{ x.contato }}</ion-label>-->
+<!--        </ion-item>-->
+<!--      </ng-container>-->
+<!--      <ion-item *ngIf="!profissionalData.contatos || profissionalData.contatos.length === 0">-->
+<!--        <ion-label>Nenhum contato.</ion-label>-->
+<!--      </ion-item>-->
+<!--    </ion-list>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Logradouro" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.lograduro"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Número" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.numero"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Complemento" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.complemento"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Cep" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.cep"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Cidade" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.cidade"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-input label="Estado" labelPlacement="floating" class="input" type="text"-->
+<!--               [(ngModel)]="profissionalData.uf"-->
+<!--               [readonly]="true"/>-->
+<!--    <div class="or-separator"></div>-->
+<!--    <ion-list class="list-border">-->
+<!--      <ion-list-header>-->
+<!--        <h5><b>Lista de Serviços:</b></h5>-->
+<!--      </ion-list-header>-->
+<!--      <ng-container *ngIf="profissionalData.tipoServicos">-->
+<!--        <ion-item *ngFor="let x of servicos; let i = index;">-->
+<!--          <ion-label>{{x.nome}}</ion-label>-->
+<!--        </ion-item>-->
+<!--      </ng-container>-->
+<!--      <ion-item *ngIf="!profissionalData.tipoServicos || profissionalData.tipoServicos.length === 0">-->
+<!--        <ion-label>Nenhum serviço.</ion-label>-->
+<!--      </ion-item>-->
+<!--    </ion-list>-->
+<!--    <div class="or-separator"></div>-->
+
+<!--    <ion-img *ngIf="img" [src]="img"></ion-img>-->
+<!--    <pdf-viewer *ngIf="pdfSrc" [src]="pdfSrc" [original-size]="false" [fit-to-page]="false"-->
+<!--                [render-text]="true" class="pdf"></pdf-viewer>-->
+
+<!--  </div>-->
+  <div class="form-container">
+    <h3>Cadastro de Profissional Liberal</h3>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.nome" required="true"
+                      [readonly]="true"
+          />
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+                     [(ngModel)]="profissionalData.email" required="true"
+                     [readonly]="true"
+          />
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- lista de contatos-->
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-list class="lista-contatos">
+            <ion-list-header style="text-align: center;">
+              <h5><b>Lista de Contatos:</b></h5>
+            </ion-list-header>
+            <ion-item *ngFor="let x of profissionalData.contatos; let i = index;">
+              <ion-label>{{x.tipoContato}}: {{x.contato}}</ion-label>
+            </ion-item>
+            <ion-item *ngIf="profissionalData.contatos.length === 0">
+              <ion-label>Nenhum contato.</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- Endereço-->
+        <ion-col size="12" size-md="4" size-lg="4">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text"
+                       [(ngModel)]="profissionalData.cep"
+                       [readonly]="true"/>
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Lograduro*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.lograduro" required="true"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="2" size-lg="2">
+          <ion-input label="Número*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.numero" required="true"
+                     maxlength="6"
+                     [readonly]="true"/>
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="5">
+          <ion-input label="Complemento(Opicional)" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.complemento"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="5">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.cidade" required="true"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="2" size-lg="2">
+          <ion-input label="Estado*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.uf" required="true"
+                     [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <!-- Lista de serviços -->
+          <ion-col size="12" size-md="12" size-lg="12">
+            <ion-list class="lista-contatos">
+              <ion-list-header style="text-align: center;">
+                <h5><b>Lista de Serviços:</b></h5>
+              </ion-list-header>
+              <ion-item *ngFor="let x of profissionalData.tipoServicos; let i = index;">
+                <ion-label>{{x.nome}}</ion-label>
+              </ion-item>
+              <ion-item *ngIf="profissionalData.tipoServicos.length === 0">
+                <ion-label>Nenhum Serviço.</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-col>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-textarea label="Descrição*" labelPlacement="floating" class="form-control-text" type="text"
+                        placeholder="Fale um pouco sobre o que voce faz." [counter]="true" maxlength="400"
+                        [(ngModel)]="profissionalData.descricao"
+                        [autoGrow]="true"
+                        [readonly]="true"
+                        ></ion-textarea>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </div>
+</ion-content>

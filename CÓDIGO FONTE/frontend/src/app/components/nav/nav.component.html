@@ -1,0 +1,78 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="header">
+    <ion-title>
+      <ion-img src="/assets/icon/logotipo.svg" class="clickable" (click)="goTo('home')" />
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleTheme()" fill="clear" class="switcher">
+        <ion-icon class="switcher-icon" *ngIf="!isDarkTheme" name="sunny-outline"></ion-icon>
+        <ion-icon class="switcher-icon" *ngIf="isDarkTheme" name="moon-outline"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="!isLogged" (click)="goToLogin()">Entrar</ion-button>
+
+      <ion-button *ngIf="isLogged" (click)="presentPopover($event)">Menu</ion-button>
+      <ion-popover #popover [isOpen]="isPopoverOpen" (didDismiss)="isPopoverOpen = false">
+        <ng-template>
+          <ion-content class="ion-padding popover">
+
+            <ion-button (click)="goTo('home')" expand="block">
+              <ion-icon slot="start" name="home-outline"></ion-icon>
+              Home
+            </ion-button>
+
+            <ion-button (click)="redirect()" expand="block" *ngIf=" this.userType == 'C' || this.userType == 'E' || this.userType == 'L' || this.userType == 'M' || this.userType == 'R' || this.userType == 'A' ">
+              <ion-icon slot="start" name="person-outline"></ion-icon>
+              Perfil
+            </ion-button>
+
+            <ion-button (click)="goTo('cadastro-vaga')" expand="block" *ngIf=" this.userType == 'A' || this.userType == 'M' || this.userType == 'R' || this.userType == 'E'">
+              <ion-icon slot="start" name="briefcase-outline"></ion-icon>
+              Publicar Vaga
+            </ion-button>
+
+            <ion-button (click)="goTo('minhas-vagas')" expand="block" *ngIf=" this.userType == 'A' || this.userType == 'M' || this.userType == 'R'">
+              <ion-icon slot="start" name="megaphone-outline"></ion-icon>
+              Minhas Vagas
+            </ion-button>
+
+            <ion-button (click)="goTo('tela-administrador')" expand="block" *ngIf="this.userType == 'A'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Administradores
+            </ion-button>
+
+            <ion-button (click)="goTo('listar-contas')" expand="block" *ngIf="this.userType == 'A'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Contas
+            </ion-button>
+
+            <ion-button (click)="goTo('listar-area')" expand="block" *ngIf="this.userType == 'A'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Areas
+            </ion-button>
+
+            <ion-button (click)="goTo('listar-profissionais-liberais')" expand="block" *ngIf="this.userType == 'A' || this.userType == 'M'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Profissionais Liberais/Autônomos
+            </ion-button>
+
+            <ion-button (click)="goTo('listar-tipo-servico')" expand="block" *ngIf="this.userType == 'M' || this.userType == 'A'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Tipos de Serviços
+            </ion-button>
+
+            <ion-button (click)="goTo('cadastro-equipe')" expand="block" *ngIf="this.userType == 'A'">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              Cadastrar Equipe
+            </ion-button>
+
+            <ion-button color="danger" class="sair" expand="block" *ngIf="isLogged" (click)="logout()">
+              <ion-icon slot="start" name="exit-outline"></ion-icon>
+              Sair
+            </ion-button>
+
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>

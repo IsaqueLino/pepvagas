@@ -1,0 +1,63 @@
+<ion-content id="main-content">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h2 class="title">Cadastro de Empresa</h2>
+        </ion-card-header>
+        <ion-card-content>
+          <h1 class="title">Informações Obrigatórias</h1>
+          <br>
+          <ion-row>
+              <ion-col size="12">
+            <ion-item>
+              <ion-input [(ngModel)]="novaEmpresa.nome" label="Nome" labelPlacement="floating" placeholder="Informe o nome da Empresa" maxlength="60" expand="block"></ion-input>
+            </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item >
+                <ion-input [(ngModel)]="novaEmpresa.cnpj" [maskito]="cnpjMask" [maskitoElement]="maskPredicate" label="CNPJ" labelPlacement="floating" placeholder="Informe o CNPJ da Empresa" expand="block"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6">
+              <ion-item>
+                <ion-input [(ngModel)]="novaEmpresa.email" label="E-mail para contato" labelPlacement="floating" placeholder="Informe o E-mail de contato da empresa" maxlength="50" expand="block"></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <br>
+          <h1 class="title">Informações Opcionais</h1>
+          <br>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>  
+                <ion-input [(ngModel)]="novaEmpresa.site" label="Site da empresa" labelPlacement="floating" placeholder="Informe o site da empresa" maxlength="45"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6">
+              <ion-item>
+                <ion-input [(ngModel)]="novaEmpresa.telefone" [maskito]="currentMask" [maskitoElement]="maskPredicate" label="Telefone para contato" labelPlacement="floating" placeholder="Informe o site da empresa"></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <br>
+          <ion-row>
+            <ion-col size="6">
+              <ion-button class="botao-cadastrar" expand="block" (click)="onSubmit()">
+                Cadastrar Empresa
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button class="botao-cancelar" color="danger" fill="outline" expand="block" (click)="deactivateAccount()">
+                Cancelar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,45 @@
+<ion-content [fullscreen]="true">
+
+  <div class="web-padding centralize">
+
+
+
+    <div class="form">
+
+      <div class="header">
+        <ion-img *ngIf="isDarkTheme"src="/assets/icon/logotipo.svg" />
+        <ion-img *ngIf="!isDarkTheme" src="/assets/icon/logotipo-white.svg" />
+        <p class="title">Bem-vindo ao PEP Vagas</p>
+        <p class="subTitle">Entre em uma conta ou registre-se</p>
+      </div>
+
+      <ion-item lines="none">
+        <ion-input label="Email" maxLength="50" [(ngModel)]="login.email" labelPlacement="floating" type="email" placeholder="Endereço de Email" id="email" />
+      </ion-item> 
+
+      <ion-item lines="none">
+        <ion-input label="Senha" [(ngModel)]="login.senha" labelPlacement="floating" type="password" placeholder="Senha">
+          <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <div class="forgot">
+        <a [routerLink]="['/recuperar-conta']">Esqueci minha senha</a>
+      </div>
+
+      <ion-button disabled={{this.isLoading}} expand="block" (click)="onSubmit()" class="button login">
+        {{ this.isLoading ? "Entrando" : "Entrar"}}
+      </ion-button>
+
+      <div class="register">
+        <p>Não tem uma conta? <a [routerLink]="['/cadastro-selecionar-tipo']">Registre-se</a></p>
+      </div>
+
+    </div>
+    <div>
+      <p>Baixe nosso App! <a href="http://vagas.pep2.ifsp.edu.br/api/files/PEPVagas.apk">PEPVagas</a></p>
+    </div>
+  </div>
+
+
+</ion-content>

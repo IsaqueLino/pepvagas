@@ -1,0 +1,29 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Dados do Representante</b></h3>
+    <ion-list lines="inset">
+      <ion-item>
+        <ion-label class="title">Nome</ion-label>
+        <ion-label slot="end" class="item-lista">{{representante?.nome}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Email</ion-label>
+        <ion-label slot="end" class="item-lista">{{representante?.email}}</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-button id="editar" class="btn-editar" fill="outline" (click)="toEditar()"><ion-icon name="create-outline"></ion-icon>Editar Perfil</ion-button>
+    <ion-button id="deletar" class="btn-deletar" fill="outline"><ion-icon name="trash-outline"></ion-icon>Desativar Conta</ion-button>
+    <ion-alert
+            trigger="deletar"
+            header="Desativar Conta"
+            message="Você tem certeza que deseja desativar sua conta?"
+            [buttons]="alertButtons"
+            (didDismiss)="setResult($event)"></ion-alert>
+  </div>
+
+</ion-content>
+

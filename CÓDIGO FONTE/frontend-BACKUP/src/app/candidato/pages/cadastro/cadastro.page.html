@@ -1,0 +1,408 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3>Cadastro de Candidado</h3>
+    <ion-grid>
+      <h5>Dados pessoais</h5>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.nome" required="true"
+          maxlength="45"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Data de Nascimento*" labelPlacement="floating" class="form-control" type="date"
+                     [(ngModel)]="cadidato.dataNascimento" required="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="CPF*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.cpf" required="true"
+                     [maskito]="maskService.cpfMask"
+                     [maskitoElement]="maskService.predicate"
+                     autocomplete="off" (keyup)="verificarCPF()"/>
+          <div style="width: 60%; height: 20px; font-size: 80%;" *ngIf="!cpfValido && cadidato.cpf.length > 0"
+               [ngStyle]="{'color': 'red'}">
+            CPF esta no formato errado
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="Gênero*" class="form-control" (ionChange)="onIonChange($event, 'genero')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option value="Masculino">Masculino</ion-select-option>
+            <ion-select-option value="Feminino">Feminino</ion-select-option>
+            <ion-select-option value="Outros">Outros</ion-select-option>
+            <ion-select-option value="Prefiro não informar">Prefiro não informar</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="9" size-lg="9">
+          <ion-input label="Nome Social (Opcional)" labelPlacement="floating" class="form-control"
+                     type="text"
+                     [(ngModel)]="cadidato.nomeSocial"
+                     maxlength="45"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+                     [(ngModel)]="cadidato.email" required="true"
+                     autocomplete="off" (keyup)="verificarEmail()"
+                     maxlength="45"
+          />
+          <div style="width: 80%; height: 20px; font-size: 80%; margin-top: 2px" *ngIf="!emailValido"
+               [ngStyle]="{'color': 'red'}">
+            Email esta no formato errado
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+
+          <ion-input label="Senha*" labelPlacement="floating" type="{{type}}"
+                     class="form-control"
+                     [(ngModel)]="cadidato.senha" required
+                     (keyup)="verificarRequisitosSenha()" autocomplete="off">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+                    class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                        (click)="showPassword()"
+                        name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+                    (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Confirme sua senha*" labelPlacement="floating" type="{{type}}"
+                     class="form-control"
+                     [(ngModel)]="checkSenha" required="true"
+                     autocomplete="off">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+                    class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                        (click)="showPassword()"
+                        name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+                    (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+
+        </ion-col>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.numberCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo um número entre 0 a 9
+          </div>
+
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.upperLowerCheck) ? 'green' : 'red'}">
+            Deve conter letras maiúsculas e minúsculas (a-Z)
+          </div>
+
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.specialCharCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo um caracter especial: (ex: !@#$%^&*_)
+          </div>
+
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.lengthCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo 6 caracteres
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text"
+                       [(ngModel)]="cadidato.cep"
+                       required="true" [maskito]="maskService.cepMask" [maskitoElement]="maskService.predicate"
+                       (keyup.enter)="buscarCep()"></ion-input>
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarCep()">
+              <ion-icon name="search-outline"></ion-icon>
+            </button>
+
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="5">
+          <ion-input label="Logradouro*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.logradouro" required="true"
+                     maxlength="60"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Numero*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.numero" required="true"
+                     maxlength="6"/>
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+
+        <ion-col size="12" size-md="12" size-lg="5">
+          <ion-input label="Complemento (Opcional)" labelPlacement="floating" class="form-control"
+                     type="text"
+                     [(ngModel)]="cadidato.complemento"
+                     maxlength="45"/>
+        </ion-col>
+        <ion-col size="12" size-md="9" size-lg="4">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.cidade" required="true"
+                     maxlength="45"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="UF*" class="form-control" [(ngModel)]="cadidato.uf" required
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option *ngFor="let uf of  ufs" [value]="uf">{{ uf }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- Contatos-->
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="Tipo de Contato*" class="form-control" [(ngModel)]="tipoContato"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option value="E-mail">E-mail</ion-select-option>
+            <ion-select-option value="Telefone">Telefone</ion-select-option>
+            <ion-select-option value="Celular">Celular</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="6">
+          <ion-input label="Contato" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="contato"
+                     (keyup)="verificarContato()"
+                     maxlength="45"
+          />
+
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="3">
+          <ion-button class="botao" fill="outline" (click)="adicionarContato()" [disabled]="!contatoValido">
+            Adicionar Contato
+            <ion-icon slot="start" name="add"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- lista de contatos-->
+        <ion-col size="12" size-md="6" size-lg="6" offset-md="3">
+          <ion-list class="lista-contatos">
+            <ion-list-header>
+              <h5><b>Lista de Contatos:</b></h5>
+            </ion-list-header>
+            <ion-item *ngFor="let x of cadidato.contatos; let i = index;">
+              <ion-label>{{x.tipoContato}}: {{x.contato}}</ion-label>
+              <ion-button class="btn-remover" id="removerContato" color="danger" (click)="removerContato(i)" slot="end"
+                          fill="outline">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+            <ion-item *ngIf="cadidato.contatos.length === 0">
+              <ion-label>Nenhum contato.</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <h5>Dados para Vagas</h5>
+      <ion-row>
+        <ion-col size="12" size-md="7" size-lg="6">
+          <ion-input label="Pretensão Salarial (R$)*" labelPlacement="floating" class="form-control" type="number"
+                     autocomplete="off"
+                     [(ngModel)]="cadidato.pretensaoSalarial" required="true"
+                     [disabled]="valorACombinar"
+              value=""/>
+          <ion-item>
+            <ion-checkbox slot="start" labelPlacement="end"
+                          (ionChange)="check($event, 'pretensaoSalarial', 'a combinar')">
+              Pretensão salarial a combinar
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="6">
+          <ion-item>
+            <ion-button class="botao" expand="block" fill="outline" size="default"
+                        (click)="openPopOver($event)" [disabled]="todasAreas">
+              Areas de Interesse*
+            </ion-button>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" labelPlacement="end" (ionChange)="check($event, 'areasInteresse', 'todas')">
+              Quero receber vagas de qualquer área
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Tipo de Vaga*" class="form-control" (ionChange)="onIonChange($event, 'tipoVaga')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [multiple]="true">
+            <ion-select-option value="Estágio">Estágio</ion-select-option>
+            <ion-select-option value="Emprego">Emprego</ion-select-option>
+            <ion-select-option value="PJ">Pessoa Jurídica</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Regime de Contratação*" class="form-control"
+                      (ionChange)="onIonChange($event, 'regime')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [multiple]="true"
+                      [disabled]="!this.cadidato.tipoVagaInteresse.includes('Emprego')">
+            <ion-select-option value="Efetivo">Efetivo</ion-select-option>
+            <ion-select-option value="Temporario">Temporário</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="CNH*" class="form-control" (ionChange)="onIonChange($event, 'cnh')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option value="Sem">Não Possuo</ion-select-option>
+            <ion-select-option value="ACC">Categoria ACC</ion-select-option>
+            <ion-select-option value="A">Categoria A</ion-select-option>
+            <ion-select-option value="B">Categoria B</ion-select-option>
+            <ion-select-option value="C">Categoria C</ion-select-option>
+            <ion-select-option value="D">Categoria D</ion-select-option>
+            <ion-select-option value="E">Categoria E</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="Modalidade*" class="form-control" (ionChange)="onIonChange($event, 'modalidade')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [multiple]="true">
+            <ion-select-option value="Presencial">Presencial</ion-select-option>
+            <ion-select-option value="Remoto">Remoto</ion-select-option>
+            <ion-select-option value="Híbrido">Híbrido</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="Disponibilidade*" class="form-control"
+                      (ionChange)="onIonChange($event, 'disponibilidade')"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [multiple]="true">
+            <ion-select-option value="Manhã">Manhã</ion-select-option>
+            <ion-select-option value="Tarde">Tarde</ion-select-option>
+            <ion-select-option value="Noite">Noite</ion-select-option>
+          </ion-select>
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Nível de Escolaridade*" class="form-control"
+                      (ionChange)="onSelectEscolaridade($event, true)"
+                      style="ion-select-popover {--width: auto;}"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+          >
+            <ion-select-option value="fundamentalI">Ensino Fundamental Incompleto</ion-select-option>
+            <ion-select-option value="fundamentalC">Ensino Fundamental Completo</ion-select-option>
+            <ion-select-option value="medioI">Ensino Médio Incompleto</ion-select-option>
+            <ion-select-option value="medioC">Ensino Médio Completo</ion-select-option>
+            <ion-select-option value="superiorI">Ensino Superior Incompleto</ion-select-option>
+            <ion-select-option value="superiorC">Ensino Superior Completo</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Pos-graduação" class="form-control"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [multiple]="true"
+                      [disabled]="!cadidato.nivelInstrucao.includes('superiorC')"
+                      (ionChange)="onSelectEscolaridade($event, false)">
+            <ion-select-option value="es">Especialização</ion-select-option>
+            <ion-select-option value="me">Mestrado</ion-select-option>
+            <ion-select-option value="dr">Doutorado</ion-select-option>
+            <ion-select-option value="pd">Pós-Doutorado</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="6">
+          <ion-item>
+            <ion-checkbox slot="start" labelPlacement="end" [(ngModel)]="cadidato.regiaoInteresse">
+              Deseja receber vagas em um cidade específica?
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text"
+                       [(ngModel)]="cadidato.cepInteresse"
+                       required="true" [maskito]="maskService.cepMask" [maskitoElement]="maskService.predicate"
+                       (keyup.enter)="buscarCepInteresse()"
+                       [disabled]="!cadidato.regiaoInteresse"></ion-input>
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarCepInteresse()" [disabled]="!cadidato.regiaoInteresse">
+              <ion-icon name="search-outline"></ion-icon>
+            </button>
+
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="4">
+          <ion-input label="Cidade de Interesse*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="cadidato.cidadeInteresse" required="true"
+                     [disabled]="!cadidato.regiaoInteresse"
+                     maxlength="45"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="4">
+          <ion-select label="UF de Interesse*" class="form-control" [(ngModel)]="cadidato.ufInteresse" required
+                      interface="popover" [interfaceOptions]="{alignment:'end'}"
+                      [disabled]="!cadidato.regiaoInteresse">
+            <ion-select-option *ngFor="let uf of  ufs" [value]="uf">{{ uf }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="3">
+          <ion-item>
+            <ion-checkbox slot="start" labelPlacement="end" (ionChange)="check($event, 'pcd', 'sim')">
+              PCD?
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col size="12" size-md="12" size-lg="3">
+          <ion-label [hidden]="!checkPcd">
+            Por favor, anexe o comprovante de PCD em PDF*.
+          </ion-label>
+          <div [hidden]="!checkPcd" class="upload">
+            <ion-item>
+              <input type="file" (change)="onFileChange($event, 'pcd')"/>
+            </ion-item>
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-label>Curriculo em PDF*</ion-label>
+          <div class="upload">
+            <ion-item>
+              <input type="file" (change)="onFileChange($event, 'curriculo')"/>
+            </ion-item>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button id="btn" fill="outline" (click)="cadastrarCandidato()">
+            Cadastrar
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+          </ion-button>
+
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button color="danger" id="btn-cancelar" fill="outline" (click)="cancelar()">
+            Cancelar
+            <ion-icon name="close"
+                      slot="start"></ion-icon>
+
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

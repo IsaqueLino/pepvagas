@@ -1,0 +1,17 @@
+<ion-toolbar>
+  <ion-searchbar animated="true" (ionInput)="handleInput($event)"></ion-searchbar>
+</ion-toolbar>
+
+<ion-list>
+  <ion-item class="ion-border" *ngFor="let item of itens.slice(0,5)" tappable>
+    <ion-checkbox [checked]="item.cheked" (ionChange)="selectItem($event,item)" slot="start" aria-label="Toggle task completion"></ion-checkbox>
+    <ion-label> {{item.nome}}</ion-label>
+  </ion-item>
+
+  <ion-button class="btn" (click)="closePopover()" slot="end">
+      <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
+  </ion-button>
+
+
+</ion-list>
+

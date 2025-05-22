@@ -1,0 +1,59 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="adicionarNovoRepresentante()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <div class="form-container">
+    <h1><b>Representantes</b></h1>
+    <ion-searchbar animated="true" placeholder="Nome" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarRepresentantesPorNome()"></ion-searchbar>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let representante of representantes">
+        <ion-card class="no-margin">
+          <ion-card-header>
+            <div>
+              <ion-fab slot="fixed" horizontal="end" vertical="top">
+                <ion-fab-button>
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-list side="start">
+                  <ion-fab-button *ngIf="!representante.deletedAt" color="danger"
+                    (click)="deletarRepresentante(representante.idRepresentante)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf="representante.deletedAt" color="success"
+                    (click)="reativarPerfil(representante.idRepresentante)">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button color="primary" (click)="navegarParaVisualizar(representante.idRepresentante)">
+                    <ion-icon name="eye"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf="!representante.deletedAt" color="warning"
+                    (click)="navegarParaAlterar(representante.idRepresentante)">
+                    <ion-icon name="pencil"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab-list>
+              </ion-fab>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <b *ngIf="representante.deletedAt" style="color: red;">Perfil Inativo</b><br>
+            <b>Nome:</b> {{representante.nome}}<br>
+            <b>Email:</b> {{representante.email}}<br>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumResultado" *ngIf="representantes.length === 0 && termoPesquisa.trim() !== ''">
+    Nenhum representante encontrado.
+  </div>
+
+</ion-content>

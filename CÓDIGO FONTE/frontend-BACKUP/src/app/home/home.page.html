@@ -1,0 +1,87 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button menu="main-menu"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>PEPVagas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button expand="block" id="menu">
+        <ion-icon name="menu" size="large"></ion-icon>
+      </ion-button>
+      <ion-popover #popover trigger="menu" triggerAction="click" size="auto">
+        <ng-template class="pop">
+          <ion-button fill="clear" id="btn-user" (click)="navegarParaLogin($event)" *ngIf="!userType">
+            <ion-icon name="person-circle-outline" size="large"></ion-icon>
+            Login
+          </ion-button>
+          <ion-button fill="clear" (click)="navegarParaCadastro($event)" *ngIf="!userType">
+            <ion-icon name="person-add-outline" size="large"></ion-icon>
+            Cadastrar
+          </ion-button>
+          <ion-button fill="clear" (click)="navegarParaServicos($event)">
+            <ion-icon name="construct-outline"></ion-icon>
+            Serviços
+          </ion-button>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h1><b>Vagas</b></h1>
+    <ion-searchbar animated="true" placeholder="Título da vaga" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarVagasPorTitulo()"></ion-searchbar>
+
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let vaga of vagas">
+        <ion-card class="vaga-card">
+          <!--<img alt="Silhouette of mountains" src="{{animal.foto_path}}" width="100%" height="200px"/>
+            --><ion-card-header>
+            <div>
+              <ion-fab slot="fixed" horizontal="end" vertical="top">
+                <ion-fab-button>
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-list side="start">
+
+                  <ion-fab-button color="primary" (click)="navegarParaVisualizar(vaga.idVaga)">
+                    <ion-icon name="eye"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab-list>
+              </ion-fab>
+            </div>
+            <ion-card-title>{{vaga.titulo_vaga}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <b *ngIf="vaga.deletedAt" style="color: red;">Vaga Inativa</b><br>
+            <div *ngIf="userType === 'Administrador'">
+              <b>ID:</b> {{vaga.idVaga}} <br>
+            </div>
+            <b>Publicado em:</b> {{formatarData(vaga.createdAt)}}<br>
+            <b>Data Limite: </b> {{formatarDataLimite(vaga.data_limite)}}<br>
+            <div>
+              <b>Tipo de Vaga: </b> {{vaga.tipo_vaga}}<br>
+              <div *ngIf="vaga.regime">
+                <b>Regime: </b> {{vaga.regime}} <br>
+              </div>
+              <b>Modalidade:</b> {{vaga.modalidade}}<br>
+
+            </div>
+            <b>Descrição:</b>
+            {{vaga.descricao}}
+            <br>
+            <p *ngIf="vaga.idAdministrador">Publicada pelo Administrador.<br></p>
+            <p *ngIf="vaga.idEquipe">Publicada pela Equipe PEPVagas.<br></p>
+            <p *ngIf="vaga.idEmpresa">Publicada por uma Empresa.<br></p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumaVaga" *ngIf="vagas.length === 0 && termoPesquisa.trim() !== ''">
+    Nenhuma vaga encontrada.
+  </div>
+</ion-content>

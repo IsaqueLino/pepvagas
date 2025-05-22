@@ -1,0 +1,82 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h1 class="title"> Listar Áreas </h1>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nome</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let area of paginatedListaTipo"
+                      (click)="onRowClick(area.idArea)"
+                      [class.selected]="area.idArea === selectedIdArea">
+                      <td>{{ area.idArea }}</td>
+                      <td>{{ area.nome }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ion-col>
+              <ion-row>
+              </ion-row>
+            </ion-row>
+            <ion-col>
+              <ion-button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</ion-button>
+              <ion-button (click)="nextPage()" [disabled]="(currentPage * itemsPerPage) >= listaArea.length">Próximo</ion-button>
+            </ion-col>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-row>
+        <ion-col size="3">
+          <ion-button class="teste" [routerLink]="['/cadastro-area']" expand="block">Cadastrar</ion-button>
+        </ion-col>
+        <ion-col size="3">
+          <ion-button class="teste" expand="block" (click)="validateAndOpenModal()">Alterar</ion-button>
+        </ion-col>
+        <ion-col size="3">
+          <ion-button class="teste" (click)="confirmarExclusao()" color="danger" expand="block">Excluir</ion-button>
+        </ion-col>
+        <ion-col size="3">
+          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Cancelar</ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+
+  <ion-modal #modal1 (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancelar()">Voltar</ion-button>
+        </ion-buttons>
+        <ion-title> Alterar Área </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="enviarAlteracao()" [strong]="true">Enviar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+      <ion-content class="ion-padding">
+        <form [formGroup]="area">
+          <ion-item>
+            <ion-input formControlName="nome" label="Nome" labelPlacement="floating" placeholder="Informe o novo nome para a área"></ion-input>
+          </ion-item>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

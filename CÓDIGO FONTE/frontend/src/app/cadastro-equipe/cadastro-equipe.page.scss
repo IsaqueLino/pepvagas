@@ -1,0 +1,62 @@
+ion-title{
+    text-align: center;
+}
+
+ion-content {
+    max-height: calc(100vh - 50px); 
+    overflow-y: auto; 
+  }
+
+ion-item {
+    --background: var(--ion-item-background);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px #BBB8B8 solid;
+    padding: 2px;
+}
+
+ion-card{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+ion-card-header{
+    padding-bottom: 30px;
+}
+
+ion-img {
+    max-width: 150px;
+}
+
+.header {
+    --background: var(--ion-color-pep);
+    color: white;
+}
+
+.container{
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    
+    width: 80%;
+    max-width: 1000px;  
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+
+.title{
+    text-align: center;
+}
+
+h1{
+    scale: 90%;
+}
+
+.botao-cancelar{
+    border-radius: 4px;
+}

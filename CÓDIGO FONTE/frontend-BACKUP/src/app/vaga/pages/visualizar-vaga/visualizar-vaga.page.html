@@ -1,0 +1,116 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Dados da Vaga</b></h3>
+    <ion-row style="text-align: center; display:block;margin-left: auto;margin-right: auto;">
+      <p *ngIf="vaga.idEmpresa">Publicada pela Empresa {{empresa?.nomeEmpresa}}</p>
+      <p *ngIf="vaga.idAdministrador">Publicada pelo Administrador.</p>
+      <p *ngIf="vaga.idEquipe">Publicada pela Equipe PEPVagas.</p>
+    </ion-row>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Título da Vaga*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.titulo_vaga" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Modalidade*" labelPlacement="floating" class="form-control" [(ngModel)]="vaga.modalidade"
+            [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Área de Atuação*" labelPlacement="floating" class="form-control" [(ngModel)]="area.nome"
+            [readonly]="true"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Tipo de Vaga*" labelPlacement="floating" class="form-control" [(ngModel)]="vaga.tipo_vaga"
+            [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Regime de Contratação*" labelPlacement="floating" class="form-control"
+            [(ngModel)]="regime" [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Salário (R$)*" labelPlacement="floating" class="form-control"
+            [maskito]="maskService.salaryMask" [maskitoElement]="maskService.predicate" [(ngModel)]="vaga.salario"
+            [readonly]="true" required></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="CEP*" labelPlacement="floating" class="form-control" [maskito]="maskService.cepMask"
+            [maskitoElement]="maskService.predicate" [(ngModel)]="cep" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="5">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.cidade" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="UF*" labelPlacement="floating" class="form-control" type="text" [(ngModel)]="vaga.uf"
+            [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Logradouro*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.logradouro" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Número*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.numero" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Complemento (Opcional)*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.complemento" [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Vaga para PCDs?*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="pcd" [readonly]="true" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="CNH*" labelPlacement="floating" class="form-control" type="text" [(ngModel)]="vaga.cnh"
+            [readonly]="true" required></ion-input>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Data limite da publicação*" labelPlacement="floating" class="form-control" type="date"
+            required [(ngModel)]="vaga.data_limite" [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Contato (Opcional)" placeholder="Adicione uma forma de contato que desejar"
+            labelPlacement="floating" class="form-control" type="text" [(ngModel)]="vaga.contato"
+            [readonly]="true"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Site (Opcional)" placeholder="Ex: www.minhaempresa.com" labelPlacement="floating"
+            class="form-control" type="text" [(ngModel)]="vaga.site" [readonly]="true"></ion-input>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="E-mail para os Curriculos (Opcional)" labelPlacement="floating" class="form-control"
+            type="email" [(ngModel)]="vaga.email_curriculo" [readonly]="true"></ion-input>
+        </ion-col>
+      </ion-row>
+
+      <ion-row style="margin-bottom: 2%;">
+        <ion-col size="12" size-md="2" size-lg="12">
+          <ion-textarea label="Descrição da Vaga*" labelPlacement="floating" class="form-control-text" type="text"
+            fil="outline" [counter]="true" maxlength="400" [(ngModel)]="vaga.descricao" [readonly]="true"
+            [autoGrow]="true" required></ion-textarea>
+          <div class="or-separator"></div>
+        </ion-col>
+      </ion-row>
+      <ion-row style="align-self: center;">
+          <ion-col size="12" size-md="6" size-lg="6">
+            <ion-button id="btn-candidatar"  fill="outline"  [disabled]="userType !== 'Candidato'"
+              (click)="Candidatar(vaga.idVaga)">Candidatar-se</ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6" size-lg="6">
+            <ion-button id="btn-candidatos" *ngIf="userType === 'Administrador' || userType === 'Equipe' || userType === 'Representante'|| userType === 'Empresa'"
+              fill="outline" (click)="navegarParaListarCandidatos(vaga.idVaga)">Candidatos</ion-button>
+          </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

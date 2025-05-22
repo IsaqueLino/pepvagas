@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "226682169584",
+    "project_id": "pepvagas-d195a",
+    "storage_bucket": "pepvagas-d195a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226682169584:android:e34648e4df5f13cfb7fa35",
+        "android_client_info": {
+          "package_name": "pep.vagas.id"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChh2Ig-6JDgeYQvNnyDiMrz1MgzlllzqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,210 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h1 class="title">Cadastro candidato</h1>
+        </ion-card-header>
+        <ion-card-content>
+          <h2 class="title">Informações Obrigatórias</h2>
+          <br>
+          <form [formGroup]="obrigatorio">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input formControlName="nome" label="Nome" labelPlacement="floating"
+                      placeholder="Informe o nome"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input formControlName="nomeSocial" label="Nome Social (opcional)" labelPlacement="floating"
+                      placeholder="Informe o nome social"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            <ion-grid>
+              <ion-row>
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input formControlName="dataNascimento" label="Data de Nascimento" labelPlacement="floating"
+                      placeholder="Informe a data de nascimento" type="date" max="{{ getMaxDate() }}"></ion-input>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input [maskito]="cpfMask" [maskitoElement]="maskPredicate" formControlName="cpf" label="CPF"
+                      labelPlacement="floating" placeholder="Informe o CPF" maxlength="14"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            <ion-grid>
+              <ion-row>
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="genero" label="Sexo" labelPlacement="floating">
+                      <ion-select-option value="f">Feminino</ion-select-option>
+                      <ion-select-option value="m">Masculino</ion-select-option>
+                      <ion-select-option value="n">Não informar</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="pcd" label="PCD" labelPlacement="floating">
+                      <ion-select-option value="1">Sim</ion-select-option>
+                      <ion-select-option value="0">Não</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </form>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <h2 class="title">Informações Opcionais</h2>
+        </ion-card-header>
+        <ion-card-content>
+          <form [formGroup]="opcional">
+            <ion-grid>
+              <ion-row>
+                <ion-col size="4">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="disponibilidade" label="Turno" labelPlacement="floating">
+                      <ion-select-option value="Diurno">Diurno</ion-select-option>
+                      <ion-select-option value="Noturno">Noturno</ion-select-option>
+                      <ion-select-option value="Misto">Misto</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-popover #cidadesPopover [isOpen]="isCidadesPopoverOpen" (didDismiss)="dismissCidadesPopover()">
+                    <ng-template>
+                      <ion-searchbar formControlName="cidadeInteresse" [debounce]="500"
+                        (ionInput)="handleCidadesFiltro($event)"></ion-searchbar>
+                      <ion-list [inset]="true" lines="none" class="flex">
+                        <ion-checkbox *ngFor="let cidade of cidadesFiltro" [value]="cidade" class="clickable"
+                          labelPlacement="end" justify="start" (ionChange)="checkboxChange($event)">
+                          <ion-item class="none-item">
+                            {{cidade}}
+                          </ion-item>
+                        </ion-checkbox>
+                      </ion-list>
+                    </ng-template>
+                  </ion-popover>
+
+                  <ion-item class="clickable flex-cidades" (click)="mostrarCidades($event)">
+                    <div class="flex-cidades">
+                      <p>Cidade(s) de Interesse</p>
+                      <p class="cidades-selecionadas">{{cidadesSelecionadasText}}</p>
+                    </div>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="vagaInteresse" label="Vaga de Interesse" labelPlacement="floating">
+                      <ion-select-option value="Estágio">Estágio</ion-select-option>
+                      <ion-select-option value="CLT">CLT</ion-select-option>
+                      <ion-select-option value="PJ">PJ</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+
+              <ion-row>
+                <ion-col size="4">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="niviInstrucao" label="Nivel de Instrução" labelPlacement="floating">
+                      <ion-select-option value="Ensino Médio Incompleto">Ensino Médio Incompleto</ion-select-option>
+                      <ion-select-option value="Ensino Médio Completo">Ensino Médio Completo</ion-select-option>
+                      <ion-select-option value="Curso Superior Incompleto">Curso Superior Incompleto</ion-select-option>
+                      <ion-select-option value="Curso Superior Completo">Curso Superior Completo</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="areas" multiple="true" label="Areas de interesse"
+                      labelPlacement="floating" (ionChange)="onAreaChange($event)">
+                      <ion-select-option *ngFor="let area of opcoes" [value]="area.id">{{ area.nome
+                        }}</ion-select-option>
+                      <ion-select-option value="outro">Cadastar nova área</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-item class="form-item">
+                    <ion-select formControlName="cnh" label="Tipo de CNH" labelPlacement="floating">
+                      <ion-select-option value="A">A</ion-select-option>
+                      <ion-select-option value="B">B</ion-select-option>
+                      <ion-select-option value="AB">AB</ion-select-option>
+                      <ion-select-option value="C">C</ion-select-option>
+                      <ion-select-option value="D">D</ion-select-option>
+                      <ion-select-option value="E">E</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+
+              <ion-row>
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input [maskito]="moneyMask" [maskitoElement]="maskPredicate"
+                      formControlName="pretensaoSalarial" label="Pretensão Salarial" labelPlacement="floating"
+                      placeholder="Informe a pretensão salarial"></ion-input>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="6">
+                  <ion-item class="form-item">
+                    <ion-input formControlName="telefone" [maskito]="phoneMask" [maskitoElement]="maskPredicate"
+                      label="Telefone" labelPlacement="floating" placeholder="Informe o telefone para contato"
+                      maxlength="15" type="tel"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            <ion-row>
+              <ion-col size="12">
+                <ion-button class="teste" expand="block" (click)="fileInput.click()">
+                  {{ selectedFile ? 'Currículo Selecionado: ' + selectedFile.name : 'Enviar novo currículo' }}
+                </ion-button>
+                <input type="file" #fileInput (change)="onFileSelected($event)" formControlName="curriculo"
+                  style="display: none;" accept=".pdf">
+              </ion-col>
+            </ion-row>
+          </form>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-row>
+        <ion-col size="6">
+          <ion-button class="teste" expand="block" (click)="onSubmit()">
+            Cadastrar
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button class="teste" color="light" expand="block" [routerLink]="['/login']">
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,148 @@
+ion-img {
+  width: 25px;
+  margin-left: 15px
+}
+
+.content {
+  background-color: red;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.search {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+
+  margin-bottom: 15px;
+}
+
+.search ion-button {
+  height: 100%;
+}
+
+ion-searchbar.custom {
+  --background: var(--ion-card-background);
+  --border-radius: 6px;
+  --padding-inline-start: 0px;
+}
+
+ion-icon.switcher-icon {
+  color: var(--ion-color-pep);
+}
+
+ion-list {
+  --background: none;
+}
+
+ion-item {
+  --background: none;
+}
+
+.job-card-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 0px;
+}
+
+.tags {
+  margin-bottom: 1px;
+  /* Espaçamento entre as tags e o conteúdo principal */
+}
+
+.tags ion-chip {
+  border-radius: 10px;
+  /* Define o raio da borda */
+  padding: 5px 10px;
+  /* Adiciona espaçamento interno */
+  background-color: #00956b;
+  /* Define a cor de fundo como verde específico */
+  color: white;
+  /* Define a cor do texto como branco para garantir a visibilidade */
+  font-weight: bold;
+  /* Define o texto como negrito */
+}
+
+.job-details {
+  flex-grow: 1;
+}
+
+.logo {
+  max-width: 50px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.back-button {
+  position: relative;
+  //top: 10px;
+  //left: 20px;
+  z-index: 1000;
+  border-radius: 100%;
+  background-color: var(--ion-color-dark);
+  transition: transform 0.3s ease;
+}
+
+.back-button.hidden {
+  transform: translateY(-50px);
+}
+
+.back-button ion-icon {
+  color: var(--ion-color-light);
+}
+
+ion-radio {
+  margin-right: 5px;
+}
+
+.data {
+  text-align: right;
+}
+
+.duvida-button {
+  --background: white;
+  --border-radius: 0;
+  --border-color: #000;
+  --border-style: solid;
+  --box-shadow: 0 0.5px 1px 0 rgba(0, 0, 0, 0.25);
+  --color: black;
+
+  width: 1px;
+  height: 1px;
+  font-size: 10px;
+
+  //display: flex;
+  justify-content: center;
+  align-items: center;
+  //border-width: 1px;
+}
+
+.nome {
+  font-size: 12px;
+}
+
+.curriculo {
+  margin-left: 10px;
+  height: 45px;
+  vertical-align: center;
+  --background: var(--ion-color-pep);
+  color: white;
+  --border-radius: 8px;
+}
+
+.breakable {
+  white-space: pre-line;
+}
+
+.cor-botao {
+  --background: var(--ion-color-pep);
+  color: white;
+  --border-radius: 8px;
+}

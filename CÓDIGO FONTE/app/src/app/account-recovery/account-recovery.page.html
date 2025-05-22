@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-img src="assets/logotipo.svg" alt="Logotipo do PEP Vagas relacionado ao Instituto Federal" />
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="centralized">
+    <div class="header">
+      <p class="title">Recuperação de Conta</p>
+      <p class="subTitle">Digite o mesmo email utilizado durante a criação da sua conta.</p>
+    </div>
+    <div class="form">
+      <ion-input [(ngModel)]="this.email" label="Email" labelPlacement="floating" type="email"
+        placeholder="Digite seu Email"></ion-input>
+      <ion-button (click)="recoveryAccount()" expand="block">Recuperar conta</ion-button>
+      <ion-button (click)="cancel()" expand="block" color="light">Cancelar</ion-button>
+    </div>
+  </div>
+
+
+</ion-content>

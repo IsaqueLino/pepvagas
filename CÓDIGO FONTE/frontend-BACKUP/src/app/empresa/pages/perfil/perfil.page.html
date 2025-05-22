@@ -1,0 +1,64 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Dados da Empresa</b></h3>
+    <ion-list lines="inset">
+      <ion-item>
+        <ion-label class="title">Nome da Empresa</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.nomeEmpresa}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Email</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.email}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">CEP</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.cep}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Logradouro</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.logradouro}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Número</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.numero}}</ion-label>
+      </ion-item>
+      <ion-item *ngIf="empresa?.complemento">
+        <ion-label class="title">Complemento</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.complemento}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">UF</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.uf}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Cidade</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.cidade}}</ion-label>
+      </ion-item>
+      <ion-item *ngIf="empresa?.site">
+        <ion-label class="title">Site</ion-label>
+        <ion-label slot="end" class="item-lista">{{empresa?.site}}</ion-label>
+      </ion-item>
+      <ion-item *ngIf="empresa?.contatos && empresa.contatos.length > 0">
+        <p class="title">Contatos</p>
+        <ion-list lines="none" *ngIf="empresa?.contatos && empresa.contatos.length > 0">
+          <ion-item lines="none" *ngFor="let contato of empresa.contatos">
+            <ion-label slot="end" class="item-lista"><b>{{contato.tipoContato}}</b> {{contato.contato}}</ion-label>
+          </ion-item>
+        </ion-list>
+        <ion-label *ngIf="!empresa?.contatos || empresa.contatos.length === 0" class="item-lista">Nenhum contato
+          disponível</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-button id="editar" class="btn-editar" fill="outline" (click)="toEditar()"><ion-icon
+        name="create-outline"></ion-icon>Editar Perfil</ion-button>
+    <ion-button id="deletar" class="btn-deletar" fill="outline"><ion-icon name="trash-outline"></ion-icon>Desativar
+      Conta</ion-button>
+    <ion-alert trigger="deletar" header="Desativar Conta" message="Você tem certeza que deseja desativar sua conta?"
+      [buttons]="alertButtons" (didDismiss)="setResult($event)"></ion-alert>
+  </div>
+
+</ion-content>

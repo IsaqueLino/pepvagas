@@ -1,0 +1,44 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVags"></app-cabecalho>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{profissionalData.nome}}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div>
+                O endereço do profissional é: {{profissionalData.logradouro}}, {{profissionalData.numero}} <span *ngIf="profissionalData.complemento">- {{profissionalData.complemento}}</span> - {{profissionalData.cidade}} - {{profissionalData.estado}}
+              </div>
+              <div>
+                {{profissionalData.descricao}}
+                <hr/>
+              </div>
+              <div>
+                Serviços prestados:
+                <ion-list>
+                  <ion-item class="list-item" *ngFor="let s of profissionalData.servicos">
+                    <span>• {{s.nome}}</span>
+                  </ion-item>
+                </ion-list>
+              </div>
+              <div>
+                Meios de contato:
+                <ion-list>
+                  <ion-item class="list-item" *ngFor="let c of profissionalData.contatos">
+                    <span>• {{c.tipoContato}}: {{c.contato}}</span>
+                  </ion-item>
+                </ion-list>
+              </div>
+
+
+            </ion-card-content>
+          </ion-card>
+    <ion-img *ngIf="img" [src]="img"></ion-img>
+    <pdf-viewer *ngIf="pdfSrc" [src]="pdfSrc" [original-size]="false" [fit-to-page]="false"
+                [render-text]="true" class="pdf"></pdf-viewer>
+
+  </div>
+</ion-content>

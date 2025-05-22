@@ -1,0 +1,294 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div *ngIf="userType === 'Administrador' || userType === 'Equipe' || userType === 'Representante'">
+    <ion-fab vertical="bottom" horizontal="end">
+      <ion-fab-button (click)="adicionarNovaVaga()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+  <div class="form-container">
+    <h1 *ngIf="userType === 'Empresa' || userType === 'Representante'"><b>Vagas da Empresa</b></h1>
+    <h1 *ngIf="userType === 'Administrador'"><b>Vagas da Plataforma</b></h1>
+    <h1 *ngIf="userType === 'Candidato' || userType === ''"><b>Vagas</b></h1>
+    <h1 *ngIf="userType === 'Equipe'"><b>Vagas da Equipe</b></h1>
+    <ion-grid style="width: 100%">
+      <ion-row>
+        <ion-col size="12" size-md="10" size-lg="10">
+          <ion-searchbar animated="true" placeholder="Título da vaga" show-clear-button="focus" [debounce]="250"
+            [(ngModel)]="termoPesquisa" (ionInput)="filtrarVagasPorTitulo()">
+          </ion-searchbar>
+        </ion-col>
+        <ion-col size="3" size-md="2" size-lg="2">
+          <ion-button style="height: 60%; margin-top: 10%;" fill="outline" id="open-filtro">
+            <ion-icon name="funnel" title="Filtro"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-modal class="mod" id="flitro" #modal trigger="open-filtro" (willDismiss)="filtro($event, 'filtrar')">
+        <ng-template>
+          <ion-toolbar>
+            <ion-title>Filtro de Pesquisa</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="modal.dismiss()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12" size-md="6" size-lg="6">
+                <ion-button fill="outline" size="small" (click)="pesquisarArea($event)" class="btn-filtro">
+                  <span class="text-filto" *ngIf="selected.area == ''">Áreas</span>{{selected.area}}
+                  <ion-icon slot="start" *ngIf="selected.area == ''" name="hammer"></ion-icon>
+                </ion-button>
+              </ion-col>
+              <ion-col size="12" size-md="6" size-lg="6">
+                <ion-item aria-label="Vagas para PCD" class="check">
+                  <ion-checkbox justify="start" label-placement="end" [(ngModel)]="selected.pcd">Vagas para PCD
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="6" size-md="6" size-lg="6">
+                <ion-select [(ngModel)]="selected.tipo" class="form-control" placeholder="Tipo de Vaga"
+                  interface="popover">
+                  <ion-select-option value="Estágio">Estágio</ion-select-option>
+                  <ion-select-option value="Emprego">Emprego</ion-select-option>
+                  <ion-select-option value="PJ">PJ</ion-select-option>
+                </ion-select>
+              </ion-col>
+              <ion-col size="6" size-md="6" size-lg="6">
+                <ion-select [(ngModel)]="selected.regime" [disabled]="!selected.tipo.includes('Emprego')"
+                  class="form-control " placeholder="Regime" interface="popover">
+                  <ion-select-option value="Efetivo">Efetivo</ion-select-option>
+                  <ion-select-option value="Temporario">Temporário</ion-select-option>
+                </ion-select>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="6" size-md="6" size-lg="6">
+                <ion-select [(ngModel)]="selected.modalidade" class="form-control" placeholder="Modalidade"
+                  interface="popover">
+                  <ion-select-option value="Híbrido">Híbrido</ion-select-option>
+                  <ion-select-option value="Remoto">Remoto</ion-select-option>
+                  <ion-select-option value="Presencial">Presencial</ion-select-option>
+                </ion-select>
+              </ion-col>
+              <ion-col size="6" size-md="6" size-lg="6">
+                <ion-select [(ngModel)]="selected.cnh" class="form-control" placeholder="CNH" interface="popover">
+                  <ion-select-option value="Sem">Não requer CNH</ion-select-option>
+                  <ion-select-option value="ACC">Categoria ACC</ion-select-option>
+                  <ion-select-option value="A">Categoria A</ion-select-option>
+                  <ion-select-option value="B">Categoria B</ion-select-option>
+                  <ion-select-option value="C">Categoria C</ion-select-option>
+                  <ion-select-option value="D">Categoria D</ion-select-option>
+                  <ion-select-option value="E">Categoria E</ion-select-option>
+                </ion-select>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+
+              <ion-col size="12" size-md="12" size-lg="12">
+                <ion-item aria-label="Vagas que recebem Currículo" class="check">
+                  <ion-checkbox justify="start" label-placement="end" [(ngModel)]="selected.curriculo">
+                    Vagas que podem receber currículo
+                  </ion-checkbox>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="6" size-md="6" size-lg="3">
+                <ion-input [(ngModel)]="selected.cep" class="form-control" placeholder="CEP" />
+              </ion-col>
+              <ion-col size="6" size-md="6" size-lg="6">
+                <ion-input [(ngModel)]="selected.cidade" class="form-control" placeholder="Cidade" />
+              </ion-col>
+              <ion-col size="6" size-md="6" size-lg="3">
+                <ion-select [(ngModel)]="selected.uf" class="form-control" placeholder="UF" interface="popover">
+                  <ion-select-option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</ion-select-option>
+
+                </ion-select>
+              </ion-col>
+            </ion-row>
+            <ion-buttons>
+              <ion-button class="btn-filtro" fill="outline" (click)="modal.dismiss()">
+                Filtrar
+                <ion-icon slot="start" name="filter"></ion-icon>
+              </ion-button>
+              <ion-button class="btn-filtro" fill="outline" (click)="limpar()">
+                Limpar
+                <ion-icon slot="start" name="trash"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-grid>
+        </ng-template>
+      </ion-modal>
+    </ion-grid>
+  </div>
+
+  <div *ngIf="userType === 'Candidato'">
+    <h2 class="form-container"><b>Vagas para Você</b></h2>
+    <div *ngIf="vagasToCandidate.length == 0 || vagasToCandidate == undefined"
+      style="text-align: center; margin-top: 10px; margin-bottom: 10px;">
+      Nenhuma vaga encontrada.
+    </div>
+    <ion-grid *ngIf="vagasToCandidate.length > 0">
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let vaga of vagasToCandidate">
+          <ion-card class="vaga-card">
+            <img alt="Silhouette of mountains" [src]="vaga.imagem"
+              style="width: 100%; height: 200px; object-fit: cover;" *ngIf="vaga.imagem">
+            <ion-card-header>
+              <img alt="Silhouette of mountains" [src]="vaga.imagem"
+                style="width: 100%; height: 200px; object-fit: cover;" *ngIf="vaga.imagem">
+              <div>
+                <ion-fab slot="fixed" horizontal="end" vertical="top">
+                  <ion-fab-button>
+                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-list side="start">
+                    <ion-fab-button
+                      *ngIf=" (userType === 'Administrador' && !vaga.deletedAt) ||
+                          (userType === 'Equipe' && !vaga.deletedAt && vaga.idEquipe?.toString() === userId) ||
+                          (userType === 'Representante' && !vaga.deletedAt && vaga.idRepresentante?.toString() === userId)"
+                      color="danger" (click)="darBaixaVaga(vaga.idVaga)">
+                      <ion-icon title="excluir" name="trash-outline"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button
+                      *ngIf=" (userType === 'Administrador' && vaga.deletedAt && vaga.idAdministradorExcluiu?.toString() === userId) ||
+                          (userType === 'Equipe' && vaga.deletedAt && vaga.idEquipeExcluiu?.toString() === userId) ||
+                          (userType === 'Representante' && vaga.deletedAt && vaga.idRepresentanteExcluiu?.toString() === userId)"
+                      color="success" (click)="reativarVaga(vaga.idVaga)">
+                      <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button color="primary" (click)="navegarParaVisualizar(vaga.idVaga)">
+                      <ion-icon name="eye"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button
+                      *ngIf=" (userType === 'Administrador' && !vaga.deletedAt && vaga.idAdministrador?.toString() === userId) ||
+                          (userType === 'Equipe' && !vaga.deletedAt && vaga.idEquipe?.toString() === userId) ||
+                          (userType === 'Representante' && !vaga.deletedAt && vaga.idRepresentante?.toString() === userId)"
+                      color="warning" (click)="alterarVaga(vaga.idVaga)">
+                      <ion-icon title="Alterar" name="pencil"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button color="secondary"
+                      *ngIf="userType === 'Administrador' || userType === 'Equipe' || userType === 'Representante'|| userType === 'Empresa'"
+                      (click)="navegarParaListarCandidatos(vaga.idVaga)">
+                      <ion-icon title="Visualizar Candidatos" name="people"></ion-icon>
+                    </ion-fab-button>
+                  </ion-fab-list>
+                </ion-fab>
+              </div>
+              <ion-card-title>{{vaga.titulo_vaga}}</ion-card-title>
+
+              <ion-chip *ngIf="vaga.idEmpresa">
+                <ion-avatar>
+                  <ion-img [src]="vaga.imagem"></ion-img>
+                </ion-avatar>
+                <ion-label>{{vaga.nomeEmpresa}}</ion-label>
+              </ion-chip>
+
+            </ion-card-header>
+            <ion-card-content>
+              <b *ngIf="vaga.deletedAt" style="color: red;">Vaga Inativa</b><br>
+              <b>Publicado:</b> {{formatarData(vaga.createdAt)}}<br>
+              <b>Data Limite:</b>{{formatarData(vaga.data_limite)}}<br>
+              <div>
+                <!-- tipo de vaga e regime na mesma linha -->
+                <b>Tipo de Vaga: </b> {{vaga.tipo_vaga}}<br>
+                <div *ngIf="vaga.tipo_vaga === 'Emprego' && vaga.regime">
+                  <b>Regime: </b> ({{vaga.regime}})
+                </div><br>
+                <b>Modalidade:</b> {{vaga.modalidade}}<br>
+                <p *ngIf="vaga.idAdministrador">Publicada pelo Administrador.<br></p>
+                <p *ngIf="vaga.idEquipe">Publicada pela Equipe PEPVagas.<br></p>
+                <p *ngIf="vaga.idEmpresa">Publicada por uma Empresa.<br></p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <h2 class="form-container" *ngIf="userType === 'Candidato'"><b>Outras Vagas:</b></h2>
+
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let vaga of vagas">
+        <ion-card class="vaga-card">
+          <img alt="Silhouette of mountains" [src]="vaga.imagem" style="width: 100%; height: 200px; object-fit: cover;"
+            *ngIf="vaga.imagem">
+          <ion-card-header>
+            <div>
+              <ion-fab slot="fixed" horizontal="end" vertical="top">
+                <ion-fab-button>
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-list side="start">
+                  <ion-fab-button
+                    *ngIf=" (userType === 'Administrador' && !vaga.deletedAt) ||
+                          (userType === 'Equipe' && !vaga.deletedAt && vaga.idEquipe?.toString() === userId) ||
+                          (userType === 'Representante' && !vaga.deletedAt && vaga.idRepresentante?.toString() === userId)"
+                    color="danger" (click)="darBaixaVaga(vaga.idVaga)">
+                    <ion-icon title="excluir" name="trash-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button
+                    *ngIf=" (userType === 'Administrador' && vaga.deletedAt && vaga.idAdministradorExcluiu?.toString() === userId) ||
+                          (userType === 'Equipe' && vaga.deletedAt && vaga.idEquipeExcluiu?.toString() === userId) ||
+                          (userType === 'Representante' && vaga.deletedAt && vaga.idRepresentanteExcluiu?.toString() === userId)"
+                    color="success" (click)="reativarVaga(vaga.idVaga)">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button color="primary" (click)="navegarParaVisualizar(vaga.idVaga)">
+                    <ion-icon name="eye"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf=" (userType === 'Administrador' && !vaga.deletedAt) ||
+                          (userType === 'Equipe' && !vaga.deletedAt) ||
+                          (userType === 'Representante' && !vaga.deletedAt)" color="warning"
+                    (click)="alterarVaga(vaga.idVaga)">
+                    <ion-icon title="Alterar" name="pencil"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button color="secondary"
+                    *ngIf="userType === 'Administrador' || userType === 'Equipe' || userType === 'Representante'|| userType === 'Empresa'"
+                    (click)="navegarParaListarCandidatos(vaga.idVaga)">
+                    <ion-icon title="Visualizar Candidatos" name="people"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab-list>
+              </ion-fab>
+            </div>
+            <ion-card-title>{{vaga.titulo_vaga}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <b *ngIf="vaga.deletedAt" style="color: red;">Vaga Inativa</b><br>
+            <b>Publicado:</b> {{formatarData(vaga.createdAt)}}<br>
+            <b>Data Limite:</b>{{formatarData(vaga.data_limite)}}<br>
+            <div>
+              <b>Tipo de Vaga: </b> {{vaga.tipo_vaga}}<br>
+              <div *ngIf="vaga.tipo_vaga === 'Emprego' && vaga.regime">
+                <b>Regime: </b> ({{vaga.regime}})
+              </div><br>
+              <br>
+              <b>Modalidade:</b> {{vaga.modalidade}}<br>
+              <b>Área de Atuação:</b> {{vaga.nomeArea}}<br>
+              <b>{{vaga.salario | currency:'BRL':'symbol':'1.2-2'}}</b><br>
+              <p *ngIf="vaga.descricao">{{vaga.descricao}}</p>
+              <p *ngIf="vaga.idAdministrador">Publicada pelo Administrador.<br></p>
+              <p *ngIf="vaga.idEquipe">Publicada pela Equipe PEPVagas.<br></p>
+              <p *ngIf="vaga.idEmpresa">Publicada por uma Empresa.<br></p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumaVaga" *ngIf="vagas.length === 0">
+    Nenhuma vaga encontrada.
+  </div>
+</ion-content>

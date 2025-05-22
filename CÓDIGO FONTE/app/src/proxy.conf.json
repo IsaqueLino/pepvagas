@@ -1,0 +1,6 @@
+{
+    "/api": {
+        "target": "http://vagas.pep2.ifsp.edu.br/api",
+        "secure": false
+    }
+}

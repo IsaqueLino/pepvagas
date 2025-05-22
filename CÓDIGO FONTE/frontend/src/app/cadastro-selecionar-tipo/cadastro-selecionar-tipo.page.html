@@ -1,0 +1,97 @@
+<ion-content [fullscreen]="true">
+
+  <div class="web-padding centralize">
+
+
+
+    <div class="form">
+
+        <div class="header">
+          <p class="title">Criação de Conta</p>
+          <p class="subTitle">Selecione o tipo de conta que deseja criar:</p>
+        </div>
+
+        <!--
+          <ion-card class="card-title-container">
+            <ion-card-header [routerLink]="['/cadastro-candidato']">
+              <ion-icon class="title-icon" name="person-outline"></ion-icon>
+              <ion-card-title>Sou um Candidato</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              Gostaria de poder me candidatar e pesquisar sobre oportunidades de tabalho.
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card class="card-title-container">
+            <ion-card-header [routerLink]="['/cadastro-candidato']">
+              <ion-icon class="title-icon" name="business-outline"></ion-icon>
+              <ion-card-title>Sou uma Empresa</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              Gostaria de publicar vagas e receber currículos de candidatos.
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card class="card-title-container">
+            <ion-card-header [routerLink]="['/cadastro-candidato']">
+              <ion-icon class="title-icon" name="briefcase-outline"></ion-icon>
+              <ion-card-title>Sou Autônomo</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              Gostaria de publicar meu trabalho e abrir vagas para receber currículos.
+            </ion-card-content>
+          </ion-card>
+        -->
+        <ion-list>
+          <ion-item (click)="onSubmit('C')">
+            <ion-row>
+              <ion-col size="1">
+                <ion-icon class="title-icon" name="person-outline"></ion-icon>
+              </ion-col>
+              <ion-col size="11">
+                <ion-title>Sou um Candidato</ion-title>
+              </ion-col>
+              <ion-col size="12">
+                <div> Gostaria de pesquisar oportunidades de tabalho e me candidatar. </div>
+              </ion-col>
+            </ion-row>
+          </ion-item>
+          <ion-item (click)="onSubmit('E')">
+            <ion-row>
+              <ion-col size="1">
+                <ion-icon class="title-icon" name="business-outline"></ion-icon>
+              </ion-col>
+              <ion-col size="11">
+                <ion-title>Sou uma Empresa</ion-title>
+              </ion-col>
+              <ion-col size="12">
+                <div class="item-description"> Gostaria de publicar vagas e receber currículos de candidatos. </div>
+              </ion-col>
+            </ion-row>
+          </ion-item>
+          <ion-item (click)="onSubmit('L')">
+            <ion-row>
+              <ion-col size="1">
+                <ion-icon class="title-icon" name="briefcase-outline"></ion-icon>
+              </ion-col>
+              <ion-col size="11">
+                <ion-title>Sou Profissional
+                  <br>Liberal/Autônomo</ion-title>
+              </ion-col>
+              <ion-col size="12">
+                <div class="item-description"> Gostaria de publicar meu trabalho. </div>
+              </ion-col>
+            </ion-row>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="block" color="light" [routerLink]="['/login']" class="button login">
+          Cancelar
+        </ion-button>
+    </div>
+  </div>
+
+
+</ion-content>

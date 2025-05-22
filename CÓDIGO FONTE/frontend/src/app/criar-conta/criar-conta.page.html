@@ -1,0 +1,40 @@
+<ion-content [fullscreen]="true">
+
+  <div class="web-padding centralize">
+
+
+
+    <div class="form">
+
+      <div class="header">
+        <p class="title">Criação de Conta</p>
+        <p class="subTitle">Crie uma conta utilizando seu melhor email e senha</p>
+      </div>
+
+      <ion-item lines="none">
+        <ion-input label="Email" [(ngModel)]="login.email" labelPlacement="floating" type="email" placeholder="Endereço de Email" id="email" />
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-input label="Senha" [(ngModel)]="login.senha" labelPlacement="floating" type="password" placeholder="Senha">
+          <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-input label="Confirmação de Senha" [(ngModel)]="login.confirmacaoSenha" labelPlacement="floating" type="password" placeholder="Senha">
+          <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <ion-button expand="block" (click)="onSubmit()" class="button login">
+        Continuar
+      </ion-button>
+      <ion-button expand="block" color="light" [routerLink]="['/login']" class="button login">
+        Cancelar
+      </ion-button>
+    </div>
+  </div>
+
+
+</ion-content>

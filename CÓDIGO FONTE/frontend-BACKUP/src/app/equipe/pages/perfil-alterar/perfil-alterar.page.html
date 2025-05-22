@@ -1,0 +1,117 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>PEPVagas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" id="btn-user">
+        <ion-icon name="person-circle-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+
+  <ion-tab-bar>
+    <ion-tab-button tab="alterar-nome" (click)="selectTab('alterar-nome')"
+      style="background-color: #338b59; color: white; font-weight: bold; border-radius: 10px; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; width: 100%;">
+      <strong><ion-label>Nome e email</ion-label></strong>
+    </ion-tab-button>
+
+    <ion-tab-button tab="alterar-senha" (click)="selectTab('alterar-senha')">
+      <strong><ion-label>Privacidade e senha</ion-label></strong>
+    </ion-tab-button>
+  </ion-tab-bar>
+
+  <div class="form-container" name="two-forms">
+    <div class="form-container" name="alterar-nome" *ngIf="selectedTab === 'alterar-nome'">
+      <ion-button fill="clear" id="btn-voltar" [routerLink]="['/perfil-equipe']">
+        <ion-icon name="arrow-back-outline" size="large"></ion-icon>
+      </ion-button>
+      <h3><b>Dados do Usuário</b></h3>
+      <ion-input label="Nome" labelPlacement="floating" class="input" type="text" [(ngModel)]="equipe.nome"></ion-input>
+      <div class="or-separator"></div>
+      <ion-input label="Email" labelPlacement="floating" class="input" type="text"
+        [(ngModel)]="equipe.email"></ion-input>
+      <div class="or-separator"></div>
+
+      <ion-input label="Confirme a senha" labelPlacement="floating" class="input" type="password"
+        (input)="onSenhaChange($event)"></ion-input>
+      <div class="or-separator"></div>
+
+      <ion-button id="btn-entrar" fill="outline" (click)="alterar()" disabled="{{equipe.nome === ''}}"><ion-icon
+          name="pencil" size="medium"></ion-icon>Alterar</ion-button>
+      <ion-button id="btn-cancelar" fill="outline" [routerLink]="['/home']"><ion-icon name="close"
+          size="medium"></ion-icon>Cancelar</ion-button>
+    </div>
+
+    <div class="form-container" name="alterar-senha" *ngIf="selectedTab === 'alterar-senha'">
+      <ion-button fill="clear" id="btn-voltar" [routerLink]="['/perfil-equipe']">
+        <ion-icon name="arrow-back-outline" size="large"></ion-icon>
+      </ion-button>
+      <h3><b>Alterar Senha:</b></h3>
+      <ion-input label="Senha Atual" labelPlacement="floating" class="input" type="password"
+        [(ngModel)]="senha.senhaAtual"></ion-input>
+      <div class="or-separator"></div>
+      <ion-item class="input">
+        <ion-input label="Nova Senha" labelPlacement="floating" type="{{type}}" [(ngModel)]="senha.novaSenha"
+          (keyup)="verificarRequisitosSenha()"></ion-input>
+        <div class="or-separator"></div>
+
+        <button *ngIf="!showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()">
+          <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()"
+            name="eye-off" style="font-size:25px;"></ion-icon></button>
+        <button *ngIf="showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()">
+          <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+        </button>
+      </ion-item>
+
+      <div style="width: 60%; height: 20px; font-size: 90%;"
+        [ngStyle]="{'color': (senhaRequisitos.numberCheck) ? 'green' : 'black'}">
+        Números entre 0 a 9
+      </div>
+
+      <div style="width: 60%; height: 20px; font-size: 90%;"
+        [ngStyle]="{'color': (senhaRequisitos.upperLowerCheck) ? 'green' : 'black'}">
+        Letras maiúsculas e minúsculas (a-Z)
+      </div>
+
+      <div style="width: 60%; height: 20px; font-size: 90%;"
+        [ngStyle]="{'color': (senhaRequisitos.specialCharCheck) ? 'green' : 'black'}">
+        Caracteres especiais: (exemplo: _ !@#$%^&*)
+      </div>
+
+      <div style="width: 60%; height: 20px; font-size: 90%;"
+        [ngStyle]="{'color': (senhaRequisitos.lengthCheck) ? 'green' : 'black'}">
+        Número mínimo de caracteres: 6
+      </div>
+
+      <div class="or-separator"></div>
+      <ion-item class="input">
+        <ion-input label="Confirmar Nova Senha" labelPlacement="floating" type="{{type}}" [(ngModel)]="confirmarSenha"
+          (keyup)="verificarSenhasIguais()" onchange="verificarSenhasIguais()"></ion-input>
+
+        <div class="or-separator"></div>
+
+        <button *ngIf="!showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()">
+          <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()"
+            name="eye-off" style="font-size:25px;"></ion-icon></button>
+        <button *ngIf="showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()">
+          <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+        </button>
+      </ion-item>
+
+      <div style="width: 60%; height: 20px; font-size: 90%;" [ngStyle]="{'color':'red'}" *ngIf="!checkSenha">
+        Senhas não conferem
+      </div>
+      <div class="or-separator"></div>
+      <ion-button id="btn-entrar" fill="outline" (click)="alterarSenha()"
+        disabled="{{equipe.nome === ''}}">Alterar</ion-button>
+      <ion-button id="btn-cancelar" fill="outline" [routerLink]="['/home']"><ion-icon name="close"
+          size="medium"></ion-icon>Cancelar</ion-button>
+    </div>
+  </div>
+</ion-content>

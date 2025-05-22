@@ -1,0 +1,81 @@
+<ion-app>
+  <ion-menu title="Menu" side="start" menuId="main-menu" contentId="main-content" *ngIf="userType && shouldShowMenu">
+      <ion-menu-toggle auto-hide="false">
+        <ion-item>
+          <!-- close menu -->
+          <h1> <ion-icon name="close-outline" style="cursor: pointer;" slot="start"></ion-icon></h1>
+          <h3 style="margin-left: 10px;"> <strong>Menu</strong>
+          </h3>
+        </ion-item>
+      </ion-menu-toggle>
+    <ion-content *ngIf="userType === 'Administrador'" class="ion-padding">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let p of adminPages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[p.url]" lines="none" detail="false" (click)="navigate(p.url)">
+            <ion-icon slot="start" [name]="p.icon"></ion-icon>
+            <ion-label>{{p.title}}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+    <ion-content *ngIf="userType === 'Equipe'">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let e of equipePages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[e.url]" lines="none" detail="false" (click)="navigate(e.url)">
+            <ion-icon slot="start" [name]="e.icon"></ion-icon>
+            <ion-label>{{e.title}}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+    
+    <ion-content *ngIf="userType === 'Empresa'">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let e of empresaPages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[e.url]" lines="none" detail="false" (click)="navigate(e.url)">
+            <ion-icon slot="start" [name]="e.icon"></ion-icon>
+            <ion-label>{{e.title}}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+    
+    <ion-content *ngIf="userType === 'Representante'">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let r of representantePages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[r.url]" lines="none" detail="true" (click)="navigate(r.url)">
+            <ion-icon slot="start" [name]="r.icon"></ion-icon>
+            <ion-label>{{r.title}}</ion-label>
+             </ion-item>
+            </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+    <ion-content *ngIf="userType === 'Candidato'">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let c of candidatoPages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[c.url]" lines="none" detail="true" (click)="navigate(c.url)">
+            <ion-icon slot="start" [name]="c.icon"></ion-icon>
+            <ion-label>{{c.title}}</ion-label>
+             </ion-item>
+            </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+    <ion-content *ngIf="userType === 'ProfissionalLiberal'">
+      <ion-list>
+        <ion-menu-toggle auto-hide="false" *ngFor="let e of profissionalPages">
+          <ion-item [routerDirection]="'root'" [routerLink]="[e.url]" lines="none" detail="true" (click)="navigate(e.url)">
+            <ion-icon slot="start" [name]="e.icon"></ion-icon>
+            <ion-label>{{e.title}}</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-app>

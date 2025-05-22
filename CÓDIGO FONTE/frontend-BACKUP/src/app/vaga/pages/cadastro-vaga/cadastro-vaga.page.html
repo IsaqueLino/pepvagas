@@ -1,0 +1,166 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+<ion-content [fullscreen]="true"> 
+  <div class="form-container">
+    <h3><b>Cadastro da Vaga</b></h3>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Título*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.titulo_vaga" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="Modalidade*" class="form-control" [(ngModel)]="vaga.modalidade" interface="popover"
+            required>
+            <ion-select-option value="Híbrido">Híbrido</ion-select-option>
+            <ion-select-option value="Remoto">Remoto</ion-select-option>
+            <ion-select-option value="Presencial">Presencial</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select id="selectArea" label="Área de Atuação*" class="form-control" interface="popover"
+            [(ngModel)]="vaga.idArea">
+            <ion-select-option *ngFor="let area of areas;" [value]="area.idArea">{{ area.nome }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="2" size-lg="4">
+          <ion-select label="Tipo de Vaga*" class="form-control" [(ngModel)]="vaga.tipo_vaga" interface="popover"
+            required>
+            <ion-select-option value="Estágio">Estágio</ion-select-option>
+            <ion-select-option value="Emprego">Emprego</ion-select-option>
+            <ion-select-option value="PJ">PJ</ion-select-option>
+            <ion-select-option value="CLT">CLT</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="Regime de Contratação*" class="form-control" [(ngModel)]="vaga.regime" interface="popover"
+          disabled="{{vaga.tipo_vaga != 'Emprego'}}" required>
+          <ion-select-option value="Efetivo">Efetivo</ion-select-option>
+          <ion-select-option value="Temporario">Temporário</ion-select-option>
+        </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="  Salário (R$)*" labelPlacement="floating" class="form-control" autocomplete="off"
+            type="number" [(ngModel)]="vaga.salario" required></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text" [(ngModel)]="vaga.cep"
+              required="true" [maskito]="maskService.cepMask" [maskitoElement]="maskService.predicate"
+              (keyup.enter)="buscarCep()"></ion-input>
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarCep()">
+              <ion-icon name="search-outline" title="buscar CEP"></ion-icon>
+            </button>
+
+          </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="5" size-lg="5">
+          <div class="input-group">
+            <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+              [(ngModel)]="vaga.cidade" required></ion-input>
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="UF*" class="form-control" [(ngModel)]="vaga.uf" interface="popover" required>
+            <ion-select-option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="  Logradouro*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.logradouro" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Número*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.numero" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Complemento (Opcional)" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="vaga.complemento"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="Vaga para PCDs? *" class="form-control" [(ngModel)]="vaga.pcd" interface="popover" required>
+            <ion-select-option [value]="1">Sim</ion-select-option>
+            <ion-select-option [value]="0">Não</ion-select-option>
+          </ion-select>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-select label="CNH*" class="form-control" [(ngModel)]="vaga.cnh" interface="popover" required>
+            <ion-select-option value="Não requer CNH">Não requer CNH</ion-select-option>
+            <ion-select-option value="ACC">Categoria ACC</ion-select-option>
+            <ion-select-option value="A">Categoria A</ion-select-option>
+            <ion-select-option value="B">Categoria B</ion-select-option>
+            <ion-select-option value="C">Categoria C</ion-select-option>
+            <ion-select-option value="D">Categoria D</ion-select-option>
+            <ion-select-option value="E">Categoria E</ion-select-option>
+          </ion-select>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="*Data limite da publicação" labelPlacement="floating" class="form-control" type="date" required
+            [(ngModel)]="vaga.data_limite"></ion-input> 
+    <div style="width: 60%; height: 20px; font-size: 90%;" *ngIf="compareDates(vaga.data_limite, dataAtual)"
+      [ngStyle]="{'color': 'red'}"> Data inválida </div>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Contato (Opcional)" placeholder="Adicione uma forma de contato que desejar"
+            labelPlacement="floating" class="form-control" type="text" [(ngModel)]="vaga.contato"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Site (Opcional)" placeholder="Ex: www.minhaempresa.com" labelPlacement="floating"
+          [(ngModel)]="vaga.site" class="form-control" type="text"></ion-input>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="{{ userType === 'Representante' ? 'E-mail para os Currículos*' : 'E-mail para os Currículos (Opcional)' }}"
+      placeholder="Insira o e-mail que receberá os currículos" labelPlacement="floating" class="form-control" type="email"
+      [(ngModel)]="vaga.email_curriculo" (keyup)="verificarEmail()"></ion-input>
+    <div style="width: 60%; height: 20px; font-size: 90%;" *ngIf="!emailValido && vaga.email_curriculo.length > 0"
+      [ngStyle]="{'color': 'red'}">
+      Email inválido
+    </div>
+        </ion-col>
+      </ion-row>
+
+    <ion-row>
+      <ion-col size="4" size-md="4" size-lg="5">
+          <ion-label >
+            Logo da vaga (Opcional)
+          </ion-label>
+          <input type="file" (change)="onFileChange($event)" accept="image/*" name="logo" id="logo" />
+
+      </ion-col>
+    </ion-row>
+
+      <ion-row>
+        <ion-col size="12" size-md="2" size-lg="12">
+          <ion-textarea label="Descrição da Vaga*" labelPlacement="floating" class="form-control-text" type="text" 
+            fil="outline" placeholder="Descreva sobre a vaga." [counter]="true" maxlength="400"
+            [counterFormatter]="customCounterFormatter" [(ngModel)]="vaga.descricao" [autoGrow]="true"
+            required></ion-textarea>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="3" size-md="2" size-lg="4">
+          <ion-button color="danger" fill="outline" (click)="cancelar()"><ion-icon name="close"
+            size="medium"></ion-icon>Cancelar</ion-button>
+        </ion-col>
+        <ion-col size="3" size-md="2" size-lg="4">
+          <ion-button
+          *ngIf="userType === 'Administrador' || userType === 'Equipe' || userType === 'Representante'"
+          fill="outline" (click)="cadastrarVaga()">Cadastrar</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

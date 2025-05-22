@@ -1,0 +1,41 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+
+  <div class="web-padding">
+    <ion-searchbar [debounce]="500" (ionInput)="handleFilter($event)" placeholder="Título da vaga"
+      show-clear-button="focus" class="custom"></ion-searchbar>
+
+    <h4 class="subtitle">Vagas criadas por você</h4>
+    <p class="subtitle">Clique em uma vaga para visualizar as opções</p>
+
+    <ion-popover #popoverVaga [isOpen]="isPopoverVagaOpen" (didDismiss)="isPopoverVagaOpen = false">
+      <ng-template>
+        <ion-content class="ion-padding">
+          
+          <ion-button (click)="verDetalhesVaga()" expand="block">Visualizar</ion-button>
+          <ion-button (click)="editarVaga()" expand="block">Editar</ion-button>
+          <ion-button (click)="confirmarExclusao()" expand="block">Excluir</ion-button>
+
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+
+    <ion-grid *ngIf="this.listaVagas.length > 0">
+      <ion-row>
+        <ion-col *ngFor="let vaga of listaVagas">
+          <app-vaga (click)="presentPopoverVaga($event, vaga.idVaga)" titulo={{vaga.titulo}} cidade={{vaga.cidade}} regime={{vaga.regime}} salario={{vaga.salario}}
+            pcd={{vaga.pcd}} tipo={{vaga.tipo}} data={{vaga.dataLimite}} logo={{vaga.logo}} empresa={{vaga.idEmpresa.nomeEmpresa}} />
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- (click)="verDetalhesVaga(vaga.idVaga)" -->
+
+
+    <div *ngIf="this.listaVagas.length === 0">
+      <p class="subtitle center">Não há nenhuma vaga publicada.</p>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,38 @@
+services:
+
+  pep-frontend:
+    build: ./frontend
+    container_name: pep-frontend
+    restart: always
+    ports:
+      - "3008:80"
+    depends_on:
+      - pep-backend
+
+  pep-backend:
+    build: ./backend
+    container_name: pep-backend
+    restart: always
+    ports:
+      - "3007:4001"
+    depends_on:
+      - database
+
+  database:
+    image: mysql:latest
+    container_name: mysql-pepvagas
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: SnFlaA9BAVCXNBZVtmOS4kgZlspmHNgeAVTcVS
+      MYSQL_DATABASE: db_pepvagas
+    volumes:
+      - ./dados:/var/lib/mysql
+    ports:
+      - "3017:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+    dados:

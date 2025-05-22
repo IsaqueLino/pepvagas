@@ -1,0 +1,112 @@
+<ion-content id="main-content">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-content>
+          <h1 style="text-align: center;">Perfil do Membro da Equipe</h1>
+        <br>
+        <h1 style="text-align: center;">Informações da Conta</h1>
+        <br>
+
+        <ion-item>
+          <ion-input label="Email" labelPlacement="floating" [(ngModel)]="conta.email"
+           readonly></ion-input>
+        </ion-item>
+      
+        <ion-item>
+          <ion-input type="password" label="Senha" labelPlacement="floating" value="..................."
+            readonly></ion-input>
+        </ion-item>
+      
+        <ion-row>
+          <ion-col>
+            <ion-button id="open-modal6" expand="block" class="butao">Alterar Senha</ion-button>
+          </ion-col>
+        </ion-row>
+
+          <h1 class="title">Informações Gerais</h1>
+          <br>
+          <ion-item>
+            <ion-input readonly [(ngModel)]="equipe.nome" label="Nome" labelPlacement="floating" placeholder="Informe o nome do Membro da Equipe" maxlength="60"></ion-input>
+          </ion-item>
+          <br>
+          <ion-row>
+            <ion-col size="6">
+              <ion-button id="open-modal5" class="butao" expand="block">
+                Alterar Informações
+              </ion-button>
+            </ion-col>
+            <ion-col size="6">
+              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" fill="outline" expand="block">
+                Desativar Conta
+              </ion-button>
+              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja desativar sua conta?"
+              [buttons]="actionSheetButtons"></ion-action-sheet>
+            </ion-col>
+          </ion-row>
+
+          <ion-modal #modal5 trigger="open-modal5" (willDismiss)="onWillDismiss($event)">
+            <ng-template>
+              <ion-toolbar>
+                <ion-buttons slot="start">
+                  <ion-button (click)="cancel()" >Voltar</ion-button>
+                </ion-buttons>
+                <ion-title style="text-align: center;">Alterar Informações</ion-title>
+                <ion-buttons slot="end">
+                  <ion-button  (click)="alterarEquipe()" [strong]="true">Enviar</ion-button>
+                </ion-buttons>
+              </ion-toolbar>
+              <ion-content class="ion-padding">
+                <br>
+                <h2 style="text-align: center;">Informações Gerais</h2>
+      
+                <ion-item>
+                  <ion-input label="Nome" labelPlacement="floating" placeholder="Informe o nome"
+                  [(ngModel)]="equipeAlterado.nome"></ion-input>
+                </ion-item>
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+      
+          <ion-modal #modal6 trigger="open-modal6" (willDismiss)="onWillDismissPassword($event)">
+            <ng-template>
+              <ion-toolbar>
+                <ion-buttons slot="start">
+                  <ion-button (click)="cancelPassword()">Voltar</ion-button>
+                </ion-buttons>
+                <ion-title style="text-align: center;">Alterar Informações</ion-title>
+                <ion-buttons slot="end">
+                  <ion-button  (click)="confirmPassword()" [strong]="true">Enviar</ion-button>
+                </ion-buttons>
+              </ion-toolbar>
+              <ion-content class="ion-padding">
+                <br>
+                <h2 style="text-align: center;">Alterar Senha</h2>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.senhaAtual" type="password" label="Senha atual"  labelPlacement="floating" >
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.novaSenha" type="password" label="Senha nova" labelPlacement="floating">
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+                <ion-item>
+                  <ion-input [(ngModel)]="novaSenha.confirmarSenha" type="password" label="Confirmar senha nova" labelPlacement="floating">
+                    <ion-input-password-toggle slot="end" color="success"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+      
+              </ion-content>
+            </ng-template>
+          </ion-modal>
+        </ion-card-content>
+        </ion-card>
+    </div>
+  </div>
+</ion-content>

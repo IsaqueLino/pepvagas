@@ -1,0 +1,297 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button icon="caret-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>PEPVagas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" id="btn-user">
+        <ion-icon name="person-circle-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!--  <div class="form-container">-->
+  <!--    <h3><b>Dados do Candidato:</b></h3>-->
+  <!--    <ion-input label="Nome" labelPlacement="floating" class="input" type="text" [(ngModel)]="candidatoData.nome"-->
+  <!--               [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Data de Nascimento" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.dataNascimento"-->
+  <!--               required [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="*CPF" labelPlacement="floating" class="input" type="text" [(ngModel)]="candidatoData.cpf"-->
+  <!--               [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Gênero" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.genero" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Nome Social" labelPlacement="floating" class="input" type="text"-->
+  <!--               *ngIf="candidatoData.nomeSocial"-->
+  <!--               [(ngModel)]="candidatoData.nomeSocial" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Email" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.email" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Cep" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.cep" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Estado" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.uf" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Cidade" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.cidade" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Logradouro" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.logradouro" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Número" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.numero" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Complemento" labelPlacement="floating" class="input" type="text"-->
+  <!--               *ngIf="candidatoData.complemento"-->
+  <!--               [(ngModel)]="candidatoData.complemento" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Pretensão Salarial" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.pretensaoSalarial" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-list class="list-border">-->
+  <!--      <ion-list-header>-->
+  <!--        <h5><b>Lista de Contatos:</b></h5>-->
+  <!--      </ion-list-header>-->
+  <!--      <ng-container *ngIf="candidatoData.contatos">-->
+  <!--        <ion-item *ngFor="let x of candidatoData.contatos; let i = index;">-->
+  <!--          <ion-label>{{x.tipoContato}}: {{ x.contato }}</ion-label>-->
+  <!--        </ion-item>-->
+  <!--      </ng-container>-->
+  <!--      <ion-item *ngIf="!candidatoData.contatos || candidatoData.contatos.length === 0">-->
+  <!--        <ion-label>Nenhum contato.</ion-label>-->
+  <!--      </ion-item>-->
+  <!--    </ion-list>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="CNH" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.cnh" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Tipo de Vaga" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.tipoVagaInteresse" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Regimes" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.regimeInteresse" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Horários" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.disponibilidade" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Modalidade" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.modalidadeInteresse" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <div *ngIf="candidatoData.regiaoInteresse">-->
+  <!--      <ion-input label="Cep" labelPlacement="floating" class="input" type="text"-->
+  <!--                 [(ngModel)]="candidatoData.cepInteresse" [readonly]="true"/>-->
+  <!--      <div class="or-separator"></div>-->
+  <!--      <ion-input label="UF" labelPlacement="floating" class="input" type="text"-->
+  <!--                 [(ngModel)]="candidatoData.ufInteresse" [readonly]="true"/>-->
+  <!--      <div class="or-separator"></div>-->
+  <!--      <ion-input label="Cidade" labelPlacement="floating" class="input" type="text"-->
+  <!--                 [(ngModel)]="candidatoData.cidadeInteresse" [readonly]="true"/>-->
+  <!--      <div class="or-separator"></div>-->
+  <!--    </div>-->
+  <!--    <ion-input label="Escolaridade" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="escolaridade" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="Áreas" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="candidatoData.areas" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+  <!--    <ion-input label="PCD" labelPlacement="floating" class="input" type="text"-->
+  <!--               [(ngModel)]="pcd" [readonly]="true"/>-->
+  <!--    <div class="or-separator"></div>-->
+
+
+  <!--  </div>-->
+  <div class="form-container">
+    <h3>Visualizar dados do Candidado</h3>
+    <ion-grid>
+      <h5>Dados pessoais</h5>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.nome"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Data de Nascimento" labelPlacement="floating" class="form-control" type="date"
+                     [(ngModel)]="candidatoData.dataNascimento"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="CPF*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.cpf"
+                    [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="3" size-lg="3">
+         <ion-input label="Gênero" labelPlacement="floating" class="form-control" type="text"
+                    [(ngModel)]="candidatoData.genero"
+                    [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="9" size-lg="9">
+          <ion-input label="Nome Social (Opcional)" labelPlacement="floating" class="form-control"
+                     type="text"
+                     [(ngModel)]="candidatoData.nomeSocial"
+                     [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+                     [(ngModel)]="candidatoData.email" required="true"
+                     [readonly]="true"
+          />
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text"
+                       [(ngModel)]="candidatoData.cep"
+                        [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="5">
+          <ion-input label="Logradouro*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.logradouro" required="true"
+                      [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="Numero*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.numero" required="true"
+                      [readonly]="true"/>
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+
+        <ion-col size="12" size-md="12" size-lg="5">
+          <ion-input label="Complemento (Opcional)" labelPlacement="floating" class="form-control"
+                     type="text"
+                     [(ngModel)]="candidatoData.complemento"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="9" size-lg="4">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.cidade" required="true"
+                      [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-input label="UF*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.uf" required="true"
+                      [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- lista de contatos-->
+        <ion-col size="12" size-md="12" size-lg="6">
+          <ion-list class="lista-contatos">
+            <ion-list-header>
+              <h5><b>Lista de Contatos:</b></h5>
+            </ion-list-header>
+            <ion-item *ngFor="let x of candidatoData.contatos; let i = index;">
+              <ion-label>{{x.tipoContato}}: {{x.contato}}</ion-label>
+            </ion-item>
+            <ion-item *ngIf="candidatoData.contatos.length === 0">
+              <ion-label>Nenhum contato.</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <h5>Dados para Vagas</h5>
+      <ion-row>
+        <ion-col size="12" size-md="7" size-lg="6">
+          <ion-input label="Pretensão Salarial*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.pretensaoSalarial" required="true"
+                     [disabled]="valorACombinar"
+          [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="6">
+          <ion-input label="Áreas de Interesse*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="areas" required="true"
+                     [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Tipo de Vaga*" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.tipoVagaInteresse"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Regime de Contratação*" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.regimeInteresse"
+                     [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="CNH" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.cnh"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Modalidade*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.modalidadeInteresse"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="Horários*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.disponibilidade"
+                     [readonly]="true"
+          />
+        </ion-col>
+
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nivel de Escolaridade" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.nivelInstrucao"
+                     [readonly]="true"/>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Pós-Graduação" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="pos"
+                     [readonly]="true"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="6">
+          <ion-item>
+            <ion-checkbox slot="start" labelPlacement="end" [(ngModel)]="candidatoData.regiaoInteresse">
+              Deseja receber vagas em um cidade específica?
+            </ion-checkbox>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="4" size-lg="4">
+          <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.cepInteresse"
+                     [disabled]="!candidatoData.regiaoInteresse"
+                     [readonly]="true"
+          />
+        </ion-col>
+        <ion-col size="12" size-md="5" size-lg="4">
+          <ion-input label="Cidade de Interesse*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.cidadeInteresse" required="true"
+                     [disabled]="!candidatoData.regiaoInteresse"
+                     maxlength="45"/>
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="4">
+          <ion-input label="UF de Interesse*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="candidatoData.ufInteresse" required="true"
+                     [disabled]="!candidatoData.regiaoInteresse"
+                     readonly="true"/>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

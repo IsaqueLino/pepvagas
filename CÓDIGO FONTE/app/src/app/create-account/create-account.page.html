@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-img src="assets/logotipo.svg" alt="Logotipo do PEP Vagas relacionado ao Instituto Federal" />
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="content">
+    <div class="form">
+
+      <div class="header">
+        <p class="title">Criação de conta</p>
+      </div>
+
+      <ion-item lines="none">
+        <ion-input email [(ngModel)]="login.email" type="email" placeholder="Endereço de Email" id="email" />
+      </ion-item>
+
+      <ion-item lines="none">
+        <app-show-hide-password>
+          <ion-input [(ngModel)]="login.senha" type="password" placeholder="Senha" />
+        </app-show-hide-password>
+      </ion-item>
+
+      <ion-item lines="none">
+        <app-show-hide-password>
+          <ion-input [(ngModel)]="login.senhaConfirmacao" type="password" placeholder="Confirmação de Senha" />
+        </app-show-hide-password>
+      </ion-item>
+
+      <div class="buttons">
+        <ion-button expand="block" class="button" (click)="submitAccount()">
+          Continuar <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+        <ion-button (click)="goBack()" expand="block" color="light" class="button">
+          Voltar
+        </ion-button>
+      </div>
+
+
+
+    </div>
+  </div>
+</ion-content>

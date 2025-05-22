@@ -1,0 +1,19 @@
+<ion-content [fullscreen]="true">
+
+  <div class="web-padding centralize">
+    
+    <div class="form">
+      <div class="header">
+        <p class="title">Recuperação de Conta</p>
+        <p class="subTitle">Digite o mesmo email utilizado durante a criação da sua conta.</p>
+      </div>
+
+      <ion-input [(ngModel)]="this.email" label="Email" labelPlacement="floating" type="email"
+        placeholder="Digite seu Email"></ion-input>
+      <ion-button (click)="recoveryAccount()" expand="block">Recuperar conta</ion-button>
+      <ion-button (click)="cancel()" expand="block" color="light">Cancelar</ion-button>
+    </div>
+  </div>
+
+
+</ion-content>

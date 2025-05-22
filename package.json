@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "luxon": "^3.4.4",
+    "ng2-currency-mask": "^13.0.3",
+    "ngx-mask": "^17.0.8"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2"
+  }
+}

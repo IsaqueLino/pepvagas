@@ -1,0 +1,279 @@
+a {
+  color: var(--ion-color-pep);
+  text-decoration: none;
+}
+
+p {
+  color: gray;
+}
+
+.form {
+  padding: 35px;
+  background-color: var(--ion-color-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+  max-width: 400px;
+  height: 500px;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 20px;
+  box-shadow: 2px 2px 20px 1px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+ion-item {
+  --background: var(--ion-item-background);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  border: 1px #bbb8b8 solid;
+  padding: 2px;
+}
+
+ion-button.login {
+  --background: var(--ion-color-pep);
+  --padding-top: 18px;
+  --padding-bottom: 18px;
+}
+
+ion-button {
+  --background: var(--ion-color-pep);
+  height: 60px;
+  --box-shadow: none;
+}
+
+ion-content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 56px;
+}
+
+ion-img {
+  width: 220px;
+}
+
+.divider {
+  border-top: 1px solid #bbb;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+ion-card-title {
+  font-size: 50px;
+  color: var(--ion-text-color);
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+}
+
+.subTitle {
+  margin-top: 5px;
+}
+
+.register {
+  text-align: center;
+}
+
+.forgot {
+  text-align: end;
+  margin-bottom: 10px;
+}
+
+.full {
+  height: 100vh;
+}
+
+.centralize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.web-padding {
+  width: 100%;
+  padding: 0 5%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.card-title-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.title-icon {
+  font-size: 24px;
+  margin-right: 10px;
+  color: green;
+}
+
+ion-card-title {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.banner {
+  display: block;
+  margin: 0 auto;
+  width: 80%;
+  margin-top: 20px;
+}
+
+.logo {
+  width: 100px;
+}
+
+.labels-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+ion-label {
+  font-size: 16px;
+}
+
+ion-card-title {
+  font-size: 24px;
+}
+
+.job-description {
+  font-size: 18px;
+  margin-top: 16px;
+}
+
+.nome {
+  font-size: 18px;
+}
+
+ion-button {
+  font-size: 16px;
+}
+
+.duvida-button {
+
+  background-color: var(--ion-color-white,#bbb);
+  --background: white;
+  --border-radius: 0;
+  --border-color: #000;
+  --border-style: solid;
+  --box-shadow: 0 0.5px 1px 0 rgba(0, 0, 0, 0.25);
+  --color: black;
+  width: 1px;
+  height: 1px;
+  font-size: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.job-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  margin-right: 16px;
+}
+
+.company-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-link {
+  margin-top: 8px;
+  color: var(--ion-color-primary);
+  text-decoration: none;
+}
+
+.location-and-date {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.apply-button-container {
+  //position: fixed;
+  padding-top: 20px;
+  padding-bottom: 10px;
+  bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  //transform: translateX(-50%);
+  //z-index: 1000;
+}
+
+.login-message {
+  font-size: 25px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.centralize-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Se desejar ocupar a altura total da viewport ou do elemento pai */
+  height: 100%;
+  width: 100%;
+}
+.radio-group-inline {
+  display: flex;
+  //flex-direction: row;
+  //align-items: center;
+}
+
+.radio-group-inline ion-item ion-label {
+  white-space: nowrap;
+  --inner-padding-end: unset;
+  padding-right: 20px;
+  min-width: 200px;
+}
+
+.item{
+  white-space: nowrap;
+  padding-right: 20px;
+}
+
+.curriculo{
+  margin-left: 10px;
+  height: 45px;
+  vertical-align: center;
+}
+
+.radinhos{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.curriculo-enviar{
+  display: flex;
+}
+
+.breakable {
+  white-space: pre-line;
+}

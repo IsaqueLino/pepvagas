@@ -1,0 +1,169 @@
+
+ion-card {
+    border: 2px solid white;
+    --border-radius: 10px;
+    --box-shadow: 4 20px 20px 0 rgba(0, 0, 0, 0.2);
+    --color: #fff;
+    --padding-bottom: 20px;
+    --padding-top: 20px;
+    font-size: 1.5em;
+    font-family: 'Roboto', sans-serif;
+  width: 100%;
+  height: 100%;
+}
+
+ion-card:hover {
+    border: 2px solid;
+    border-color: #15842a;
+    --color: #fff;
+}
+
+ion-fab-button {
+    --background: #15842a;
+    --color: #fff;
+    --box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+}
+
+ion-toolbar {
+    --background: #15842a;
+    --color: rgb(255, 255, 255);
+}
+
+ion-content {
+    --background: #f4f4f4;
+}
+
+ion-button {
+    width: 100%;
+    /* Define a largura dos botões para 100% */
+    border-radius: 10px;
+    --border-width: 2px;
+    --background: #f4f4f4;
+    --border-color: #15842a;
+    --color: #15842a;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    /* Centraliza conteúdo verticalmente */
+}
+
+ion-card-header{
+    padding: 40px;
+}
+
+ion-card-content {
+    color: black;
+}
+
+ion-fab-button::part(native) {
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    color: white;
+}
+
+ion-fab-button::part(native):hover::after {
+    background-color: #15842a;
+}
+
+ion-fab-button::part(native):active::after {
+    background-color: #15842a;
+}
+
+ion-fab {
+    position: fixed;
+}
+
+h1 {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+a {
+    color: #15842a;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+ion-card-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+ion-icon {
+    margin-right: 2%;
+}
+
+.input {
+    margin-top: 5%;
+    --padding-start: 20px;
+    border-radius: 10px;
+    border: 2px solid black;
+    color: black;
+    max-inline-size: 60%;
+    width: 100%;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+#nenhumaVaga{
+    text-align: center;
+}
+
+.or-separator {
+    margin: 10px 0;
+    color: #888;
+    font-weight: bold;
+}
+
+.vaga-card {
+    margin: 0px; /* ajuste a margem conforme necessário */
+}
+
+ion-searchbar{
+    text-align: center;
+}
+
+#nenhumaCandidato{
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    ion-label {
+        padding-left: 0;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    ion-searchbar{
+        width: 100%;
+    }
+
+    ion-item, ion-label {
+        width: auto;
+    }
+
+    ion-card, ion-col{
+        width: 100%;
+        max-inline-size: 100%;
+    }
+
+    ion-searchbar{
+        width: 100%;
+    }
+
+    .vaga-card {
+        margin-left: 40px;
+        margin: 5px; /* Ajuste a margem conforme necessário para telas menores */
+    }
+}

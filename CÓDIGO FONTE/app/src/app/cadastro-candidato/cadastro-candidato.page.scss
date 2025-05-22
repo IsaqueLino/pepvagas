@@ -1,0 +1,77 @@
+ion-title{
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+}
+
+ion-img{
+    width: 220px;
+}
+
+ion-button {
+    --padding-top: 18px;
+    --background: var(--ion-color-pep);
+    --padding-bottom: 18px;
+}
+
+.container{
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    
+    width: 80%;
+    max-width: 1000px;  
+}
+
+ion-item {
+    --background: var(--ion-item-background);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px #BBB8B8 solid;
+    padding: 2px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0;
+}
+
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-cidades {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 40px;
+
+    .cidades-selecionadas{
+        text-wrap: nowrap;
+        text-overflow: clip;
+    }
+}
+
+.none-item {
+    border: none;
+}
+
+ion-header{
+    background-color: var(--ion-color-pep);
+    box-shadow: none;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    height: 10rem;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    height : 150px;
+    margin-bottom: 50px;
+}

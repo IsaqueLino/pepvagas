@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="adicionarNovaEmpresa()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <div class="form-container">
+    <h1><b>Empresas</b></h1>
+    <ion-searchbar animated="true" placeholder="Nome ou CNPJ" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarEmpresasPorNome()"></ion-searchbar>
+  </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let empresa of empresas">
+          <ion-card class="no-margin">
+            <ion-card-header>
+              <div>
+                <ion-fab slot="fixed" horizontal="end" vertical="top">
+                  <ion-fab-button>
+                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-list side="start">
+                    <ion-fab-button *ngIf="!empresa.deletedAt" color="danger" (click)="deletarEmpresa(empresa.idEmpresa)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button *ngIf="empresa.deletedAt" color="success" (click)="reativarPerfil(empresa.idEmpresa)">
+                      <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button color="primary" (click)="navegarParaVisualizar(empresa.idEmpresa)">
+                      <ion-icon name="eye"></ion-icon>
+                    </ion-fab-button>
+                    <ion-fab-button *ngIf="!empresa.deletedAt" color="warning" (click)="navegarParaAlterar(empresa.idEmpresa)">
+                      <ion-icon name="pencil"></ion-icon>
+                    </ion-fab-button>
+                  </ion-fab-list>
+                </ion-fab>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <b *ngIf="empresa.deletedAt" style="color: red;">Perfil Inativo</b><br>
+              <b>ID:</b> {{empresa.idEmpresa}}<br>
+              <b>Nome da Empresa:</b> {{empresa.nomeEmpresa}}<br>
+              <b>Email:</b> {{empresa.email}}<br>
+              <b>CNPJ:</b> {{formatarCNPJ(empresa.cnpj)}}<br>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <div id="nenhumResultado" *ngIf="empresas.length === 0 && termoPesquisa.trim() !== ''">
+      Nenhuma empresa encontrada.
+    </div>
+
+</ion-content>

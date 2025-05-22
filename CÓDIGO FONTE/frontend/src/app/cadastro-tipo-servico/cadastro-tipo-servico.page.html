@@ -1,0 +1,31 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+  <div class="content">
+    <div class="container">
+      <ion-card>
+        <ion-card-header>
+          <h1 class="title"> Cadastro de Tipo de Serviço </h1>
+        </ion-card-header>
+        <ion-card-content>
+          <form [formGroup]="obrigatorio">
+            <ion-item>
+              <ion-input formControlName="nome" label="Nome" labelPlacement="floating" placeholder="Informe o nome do tipo do serviço"></ion-input>
+            </ion-item>
+          </form>
+        </ion-card-content>
+      </ion-card>
+      <ion-row>
+        <ion-col size="6">
+          <ion-button class="teste" expand="block" (click)="onSubmit()">
+            Cadastrar
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button class="teste" color="light" expand="block" [routerLink]="['/listar-tipo-servico']">
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+</ion-content>

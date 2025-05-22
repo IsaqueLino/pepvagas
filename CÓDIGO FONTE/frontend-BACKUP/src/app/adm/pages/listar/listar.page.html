@@ -1,0 +1,69 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab id="btn-add" vertical="bottom" horizontal="end">
+    <ion-fab-button title="Cadastrar novo" (click)="adicionarNovoAdmin()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <div class="form-container">
+    <h1><b>Administradores</b></h1>
+    <ion-searchbar animated="true" placeholder="Nome" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarAdministradoresPorNome()"></ion-searchbar>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let admin of administradores">
+        <ion-card class="no-margin">
+          <ion-card-header>
+            <div>
+              <ion-fab slot="fixed" horizontal="end" vertical="top">
+                <ion-fab-button title="opções">
+                  <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                </ion-fab-button>
+                <ion-fab-list side="start">
+                  <ion-fab-button title="Excluir" *ngIf="!admin.deletedAt&&admin.idAdministrador!=1&&admin.idAdministrador!=id" color="danger" (click)="deletarADM(admin.idAdministrador)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button *ngIf="admin.deletedAt" color="success"
+                    (click)="reativarPerfil(admin.idAdministrador)">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button title="Visualizar" color="primary"
+                    (click)="navegarParaVisualizar(admin.idAdministrador)">
+                    <ion-icon name="eye"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button title="Alterar" *ngIf="!admin.deletedAt" color="warning" (click)="navegarParaAlterar(admin.idAdministrador)">
+                    <ion-icon name="pencil"></ion-icon>
+                  </ion-fab-button>
+                </ion-fab-list>
+              </ion-fab>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <b *ngIf="admin.deletedAt" style="color: red;">Perfil Inativo</b><br>
+            <b>Nome:</b> {{admin.nome}}<br>
+            <b>Email:</b> {{admin.email}}<br>
+          </ion-card-content>
+          <ion-item-divider></ion-item-divider>
+          <ion-card-content>
+            <!--
+              Antes o {nome} apresentava apenas o ultimo nome encontrado naquele for each.
+            -->
+            <div *ngIf="admin.updateBy">
+              <b>Alterado por:</b> {{admin.updateBy}}<br>
+            </div>
+            <b>Data de criação:</b> {{admin.createdAt | date: 'dd/MM/yyyy'}}<br>
+            <b>Data de alteração:</b> {{admin.updatedAt | date: 'dd/MM/yyyy'}}<br>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumResultado" *ngIf="administradores.length === 0 && termoPesquisa.trim() !== ''">
+    Nenhum administrador encontrado.
+  </div>
+
+</ion-content>

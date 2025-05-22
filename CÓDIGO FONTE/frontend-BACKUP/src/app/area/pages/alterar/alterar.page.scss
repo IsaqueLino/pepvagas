@@ -1,0 +1,66 @@
+ion-toolbar {
+    --background: #15842a;
+    --color: rgb(255, 255, 255);
+}
+
+ion-content {
+    --background: #f4f4f4;
+    width: auto;
+}
+
+ion-row{
+    width: 100%;
+    inline-size: 60%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+ion-button {
+    inline-size: 100%;
+    border-radius: 10px;
+    --border-width: 0.4px;
+    --background: #f4f4f4;
+    --border-color: #15842a;
+    --color: #15842a;
+}
+
+.btn-show-pass {
+    z-index: 999;
+    color: #15842a;
+    cursor: pointer;
+    position: relative;
+    display: inline;
+    float: right;
+    margin-top: 12px;
+    margin-right: 7px;
+    background-color: white;
+}
+
+.form-container {
+    margin-top: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+
+    h3 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+}
+
+.form-control {
+    min-height: 60px !important;
+    max-height: 60px !important;
+    --padding-start: 10px !important;
+    --padding-bottom: 8px !important;
+}
+
+@media(max-width: 768px){
+    ion-row{
+        width: 100%;
+        inline-size: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}

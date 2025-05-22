@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "421649749104",
+    "project_id": "auth-pepvagas",
+    "storage_bucket": "auth-pepvagas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421649749104:android:51f4bd06db859e866010b5",
+        "android_client_info": {
+          "package_name": "br.edu.ifsp.pep.pepvagas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421649749104-nd8q2j33skcel43gq4kg7sfgi3v08dd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQjrKsa1t0C8sGPwxjv-BIJtRhKcUuWEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421649749104-nd8q2j33skcel43gq4kg7sfgi3v08dd1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421649749104:android:6302b0a0d5e072da6010b5",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421649749104-nd8q2j33skcel43gq4kg7sfgi3v08dd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQjrKsa1t0C8sGPwxjv-BIJtRhKcUuWEU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421649749104-nd8q2j33skcel43gq4kg7sfgi3v08dd1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

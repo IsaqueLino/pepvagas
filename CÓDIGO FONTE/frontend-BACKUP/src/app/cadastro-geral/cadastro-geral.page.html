@@ -1,0 +1,17 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Opções de Cadastro:</b></h3>
+    <div class="or-separator"></div>
+    <ion-button class="btn-entrar" fill="outline" (click)="navigate(1)">Candidato</ion-button>
+    <div class="or-separator"></div>
+    <ion-button class="btn-entrar" fill="outline" (click)="navigate(2)">Empresa</ion-button>
+    <div class="or-separator"></div>
+    <ion-button class="btn-entrar" fill="outline" (click)="navigate(3)">Profissional Liberal</ion-button>
+  </div>
+</ion-content>
+

@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h1><b>Candidatos da Vaga</b></h1>
+    <ion-searchbar 
+      animated="true" 
+      placeholder="Pesquisar por Nome" 
+      show-clear-button="focus" 
+      [debounce]="250"
+      [(ngModel)]="termoPesquisa"
+      (ionChange)="filtrarPorNome()">
+    </ion-searchbar>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let candidato of vaga.candidatos">
+        <ion-card class="vaga-card">
+          <ion-card-header>
+            <ion-card-title>{{candidato.nome}}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-label>
+              <b>Nome:</b> {{candidato.nome}}<br>
+              <b>Email:</b> {{candidato.email}}<br>
+              <b>CEP:</b> {{ formatarCEP(candidato.cep) }}<br>
+              <b>UF:</b> {{candidato.uf}}<br>
+              <b>Cidade:</b> {{candidato.cidade}}<br>
+              <b>Logradouro:</b> {{candidato.logradouro}}<br>
+              <b>Número:</b> {{candidato.numero}}<br>
+              <div *ngIf="candidato.complemento"><b>Complemento:</b> {{candidato.complemento}}<br> </div>
+            </ion-label>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

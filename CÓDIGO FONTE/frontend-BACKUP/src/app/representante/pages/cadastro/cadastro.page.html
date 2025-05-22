@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Cadastro de Representante</b></h3>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome*" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="representante.nome" maxlength="45" (keyup)="bloquearNumeros($event)" required></ion-input>
+          <div style="width: 60%; height: 20px; font-size: 90%;" *ngIf="!nomeValido && representante.nome.length > 0"
+            [ngStyle]="{'color': 'red'}">
+            Nome inválido
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+            [(ngModel)]="representante.email" maxlength="45" (keyup)="verificarEmail()" required></ion-input>
+          <div style="width: 60%; height: 20px; font-size: 90%;" *ngIf="!emailValido && representante.email.length > 0"
+            [ngStyle]="{'color': 'red'}">
+            Email inválido
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Senha*" labelPlacement="floating" type="{{type}}" [(ngModel)]="representante.senha" required
+            (keyup)="verificarRequisitosSenha()" (keyup.enter)="cadastrarRepresentante()" autocomplete="off"
+            class="form-control">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+              class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                (click)="showPassword()" name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+              (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Confirme sua senha*" labelPlacement="floating" type="{{type}}" [(ngModel)]="checkSenha"
+            required (keyup.enter)="cadastrarRepresentante()" autocomplete="off" class="form-control">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+              class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                (click)="showPassword()" name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" item-right class="btn-show-pass"
+              (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos" [ngStyle]="{'color': (senhaRequisitos.numberCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo um número entre 0 a 9
+        </ion-col>  
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos" [ngStyle]="{'color': (senhaRequisitos.upperLowerCheck) ? 'green' : 'red'}">
+          Deve conter letras maiúsculas e minúsculas (a-Z)
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos" [ngStyle]="{'color': (senhaRequisitos.specialCharCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo um caracter especial: (ex: !@#$%^&*_)
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos" [ngStyle]="{'color': (senhaRequisitos.lengthCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo 6 caracteres
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button id="btn" fill="outline" style="width: 100%;" (click)="cadastrarRepresentante()">Cadastrar</ion-button>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button id="btn" color="danger" fill="outline" style="width: 100%;" (click)="cancelar()">
+            <ion-icon name="close" size="medium"></ion-icon>
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

@@ -1,0 +1,24 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+
+<ion-content [fullscreen]="true">
+  <div class="login-container">
+    <h3 style="text-align: center; color: #000000; text-align: center; margin-bottom: 20px;">Recuperação de Senha</h3>
+    <ion-input label="Email" (input)="onEmailChange($event)" labelPlacement="floating" class="input" type="email"></ion-input>
+
+    <ion-select (ionChange)="onTipoUsuarioChange($event)" class="input" interface="popover"
+    placeholder="Selecione um tipo de usuário" required>
+    <ion-select-option value="Candidato">Candidato</ion-select-option>
+    <ion-select-option value="Equipe">Equipe</ion-select-option>
+    <ion-select-option value="Empresa">Empresa</ion-select-option>
+    <ion-select-option value="Representante">Representante</ion-select-option>
+    <ion-select-option value="ProfissionalLiberal">Profissional Liberal</ion-select-option>
+    <ion-select-option value="default"></ion-select-option>
+  </ion-select>
+
+    <ion-button id="btn" fill="outline" (click)="recuperarSenha()">Recuperar Senha</ion-button>
+    <p style="cursor: pointer;"><a (click)="voltar()">Voltar ao Login</a></p>
+  </div>
+</ion-content>

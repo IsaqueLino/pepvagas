@@ -1,0 +1,238 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVags"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3>Alterar <span [hidden]="tipoUsuario == 'ProfissionalLiberal'">Perfil</span>
+      <span [hidden]="tipoUsuario == 'Administrador'">os Dados do profissional</span>
+    </h3>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.nome" required="true"
+                      [value]="profissional ? profissional.nome : ''"/>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+                     [(ngModel)]="profissionalData.email" required="true"
+                     autocomplete="off" (keyup)="verificarEmail()"
+                     [value]="profissional ? profissional.email : ''"
+          />
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Senha Nova*" labelPlacement="floating" type="{{type}}}"
+                     class="form-control"
+                     [(ngModel)]="profissionalData.senha" required
+                     (keyup)="verificarRequisitosSenha()" autocomplete="off">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+                    class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                        (click)="showPassword()"
+                        name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+                    (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Confirme a senha nova*" labelPlacement="floating" type="{{type}}"
+                     class="form-control"
+                     [(ngModel)]="checkSenha" required="true"
+                     autocomplete="off">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+                    class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                        (click)="showPassword()"
+                        name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+                    (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.numberCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo um número entre 0 a 9
+          </div>
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.upperLowerCheck) ? 'green' : 'red'}">
+            Deve conter letras maiúsculas e minúsculas (a-Z)
+          </div>
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.specialCharCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo um caracter especial: (ex: !@#$%^&*_)
+          </div>
+          <div class="senhaRequisitos"
+               [ngStyle]="{'color': (senhaRequisitos.lengthCheck) ? 'green' : 'red'}">
+            Deve conter no mínimo 6 caracteres
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- Contatos-->
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-select label="Tipo de Contato*" class="form-control" [(ngModel)]="tipoContato"
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option value="E-mail">E-mail</ion-select-option>
+            <ion-select-option value="Telefone">Telefone</ion-select-option>
+            <ion-select-option value="Celular">Celular</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Contato" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="contato"
+                     (keyup)="verificarContato()"
+          />
+
+        </ion-col>
+        <ion-col size="12" size-md="3" size-lg="3">
+          <ion-button fill="outline" expand="block" class="bit_areas" (click)="adicionarContato()" [disabled]="!contatoValido">
+            Adicionar Contato
+            <ion-icon slot="start" name="add"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- lista de contatos-->
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-list class="lista-contatos">
+            <ion-list-header style="text-align: center;">
+              <h5><b>Lista de Contatos:</b></h5>
+            </ion-list-header>
+            <ion-item *ngFor="let x of profissionalData.contatos; let i = index;">
+              <ion-label>{{x.tipoContato}}: {{x.contato}}</ion-label>
+              <ion-button class="btn-remover" id="removerContato" color="danger" (click)="removerContato(i)" slot="end"
+                          fill="outline">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+            <ion-item *ngIf="profissionalData.contatos.length === 0">
+              <ion-label>Nenhum contato.</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <!-- Endereço-->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text" [(ngModel)]="profissionalData.cep"
+                       required="true" [maskito]="maskService.cepMask" [maskitoElement]="maskService.predicate"
+                       (keyup.enter)="buscarCep()"></ion-input>
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarCep()">
+              <ion-icon name="search-outline"></ion-icon>
+            </button>
+
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Lograduro*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.logradouro" required="true"
+                     [value]="profissional ? profissional.logradouro : ''"
+          />
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="2">
+          <ion-input label="Número*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.numero" required="true"
+                     [value]="profissional ? profissional.numero : ''"
+                     maxlength="6"/>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="5">
+          <ion-input label="Complemento(Opicional)" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.complemento"
+                    [value]="profissional ? profissional.complemento: ''"/>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="5">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text"
+                     [(ngModel)]="profissionalData.cidade" required="true"
+                     [value]="profissional ? profissional.cidade : ''"
+          />
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="2">
+          <ion-select label="UF*" class="form-control" [(ngModel)]="profissionalData.uf" required
+                      interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <h5><b>Adicionar Serviços Oferecidos*:</b></h5>
+          <ng-select class="select"
+                     [items]="servicos$ | async"
+                     [addTag]="true"
+                     [multiple]="true"
+                     [hideSelected]="true"
+                     [trackByFn]="trackByFn"
+                     [loading]="servicosLoading"
+                     [addTagText]="'Adicionar novo serviço'"
+                     typeToSearchText="Por favor entre com o nome do serviço."
+                     [typeahead]="servicosInput$"
+                     [(ngModel)]="selectedServicos">
+            <ng-template ng-multi-label-tmp let-items="items" let-clear="clear">
+              <div class="ng-value" *ngFor="let item of items | slice:0:1">
+                <span class="ng-value-label">{{item}}</span>
+                <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">x</span>
+              </div>
+              <div class="ng-value" *ngIf="items.length == 0">
+                <span class="ng-value-label">Os seus serviços oferecidos</span>
+              </div>
+              <div class="ng-value" *ngIf="items.length > 1">
+                <span class="ng-value-label">{{items.length - 1}} mais...</span>
+              </div>
+            </ng-template>
+          </ng-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <h5><b>Novo arquivo de portfolio*:</b></h5>
+          Adicione um arquivo de Portfolio para o seu perfil.<br/>
+          O arquivo cadastro anterior será substituido.<br/>
+          Formatos aceitos: .jpeg e .pdf.
+          Tamanho máximo: 100MB
+          <ion-item>
+            <input type="file" (change)="onFileChange($event)"/>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-textarea label="Descrição*" labelPlacement="floating" class="form-control-text" type="text"
+                        placeholder="Fale um pouco sobre o que voce faz." [counter]="true" maxlength="400"
+                        [counterFormatter]="customCounterFormatter" [(ngModel)]="profissionalData.descricao"
+                        [autoGrow]="true"
+                        required></ion-textarea>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button fill="outline" (click)="alterarProfisional()">
+            Alterar
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+          </ion-button>
+
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button fill="outline" color="danger" (click)="cancelar()">
+            Cancelar
+            <ion-icon name="close" slot="start"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
+
+    </ion-grid>
+  </div>
+</ion-content>
+

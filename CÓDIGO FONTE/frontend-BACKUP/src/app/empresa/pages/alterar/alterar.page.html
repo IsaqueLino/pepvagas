@@ -1,0 +1,227 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Cadastro de Empresa</b></h3>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Nome da Empresa*" labelPlacement="floating" class="form-control" type="text"
+            [value]="empresa ? empresa.nomeEmpresa : ''" maxlength="45" [(ngModel)]="nomeEmpresaNovo"
+            required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Email*" labelPlacement="floating" class="form-control" type="email"
+            [value]="empresa ? empresa.email : ''" maxlength="45" [(ngModel)]="emailNovo" (keyup)="verificarEmail()"
+            required></ion-input>
+          <div style="width: 60%; height: 20px; font-size: 90%" *ngIf="!emailValido && empresa.email.length > 0"
+            [ngStyle]="{'color': 'red'}">
+            Email inválido
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="CNPJ*" labelPlacement="floating" class="form-control" type="text"
+            [value]="empresa ? empresa.cnpj: ''" maxlength="18" [(ngModel)]="cnpjNovo" 
+            [maskito]="maskService.cnpjMask" [maskitoElement]="maskService.predicate" required/>
+        </ion-col>
+        <ion-col>
+          <ion-input label="Site da Empresa (Opcional)" labelPlacement="floating" class="form-control" type="text"
+            maxlength="45" [value]="empresa ? empresa.site : ''" [(ngModel)]="siteNovo"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Senha*" labelPlacement="floating" type="{{type}}" [(ngModel)]="senhaNova" required
+            (keyup)="verificarRequisitosSenha()" (keyup.enter)="alterarEmpresa()" autocomplete="off"
+            class="form-control">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+              class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                (click)="showPassword()" name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+              (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Confirme sua senha*" labelPlacement="floating" type="{{type}}" [(ngModel)]="checkSenha"
+            required (keyup.enter)="alterarEmpresa()" autocomplete="off" class="form-control">
+            <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+              class="btn-show-pass">
+              <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right
+                (click)="showPassword()" name="eye-off" style="font-size:25px;"></ion-icon>
+            </button>
+            <button *ngIf="showPass" ion-button clear color="dark" type="button" item-right class="btn-show-pass"
+              (click)="showPassword()">
+              <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+            </button>
+          </ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos"
+          [ngStyle]="{'color': (senhaRequisitos.numberCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo um número entre 0 a 9
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos"
+          [ngStyle]="{'color': (senhaRequisitos.upperLowerCheck) ? 'green' : 'red'}">
+          Deve conter letras maiúsculas e minúsculas (a-Z)
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos"
+          [ngStyle]="{'color': (senhaRequisitos.specialCharCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo um caracter especial: (ex: !@#$%^&*_)
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12" class="senhaRequisitos"
+          [ngStyle]="{'color': (senhaRequisitos.lengthCheck) ? 'green' : 'red'}">
+          Deve conter no mínimo 6 caracteres
+        </ion-col>
+      </ion-row>
+      <ion-row style="margin-top: 5%;">
+        <ion-col size="12" size-md="12" size-lg="12">
+          <h5 style="text-align: center;"><b>Localização:</b></h5>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <div class="input-group">
+            <ion-input label="CEP*" labelPlacement="floating" class="form-control" type="text" [value]="empresa ? empresa.cep : ''" [(ngModel)]="cepNovo"
+              required="true" maxlength="9" [maskito]="maskService.cepMask" [maskitoElement]="maskService.predicate"
+              (keyup.enter)="buscarCep()"></ion-input>
+            <button class="btn btn-outline-secondary" type="button" (click)="buscarCep()">
+              <ion-icon name="search-outline"></ion-icon>
+            </button>
+          </div>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Logradouro*" labelPlacement="floating" class="form-control" type="text" maxlength="60"
+            [value]="empresa ? empresa.logradouro: ''" [(ngModel)]="logradouroNovo" required></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Número*" labelPlacement="floating" class="form-control" type="text" maxlength="6"
+            [value]="empresa ? empresa.numero: ''" [(ngModel)]="numeroNovo" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Complemento (Opcional)" labelPlacement="floating" class="form-control" type="text"
+            maxlength="45" [value]="empresa ? empresa.complemento: ''" [(ngModel)]="complementoNovo"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Cidade*" labelPlacement="floating" class="form-control" type="text" maxlength="45"
+            [value]="empresa ? empresa.cidade: ''" [(ngModel)]="cidadeNova" required></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="*UF" labelPlacement="floating" class="form-control" [(ngModel)]="ufNova" okText="OK"
+            cancelText="CANCELAR" required interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option *ngFor="let uf of ufs" [value]="uf">{{ uf }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row style="margin-top: 5%;">
+        <ion-col size="12" size-md="12" size-lg="12">
+          <h5 style="text-align: center;"><b>Área de Atuação:</b></h5>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="!criarNovaAreaSelecionada">
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Pesquisar por área" labelPlacement="floating" [(ngModel)]="searchTerm" class="form-control"
+            (ionChange)="filterAreas()"></ion-input>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Área de Atuação*" labelPlacement="floating" okText="OK" cancelText="CANCELAR"
+            class="form-control" [(ngModel)]="idAreaNovo" interface="popover" [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option *ngFor="let area of filteredAreas" [value]="area.idArea">{{ area.nome
+              }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-input *ngIf="criarNovaAreaSelecionada" label="Nome da Área" labelPlacement="floating"
+            class="form-control" type="text" [(ngModel)]="novaAreaNome"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-button *ngIf="criarNovaAreaSelecionada" fill="outline" style="width: 100%;"
+            (click)="salvarNovaArea()">Cadastrar Área</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-button fill="outline" style="width: 100%;" (click)="criarNovaArea()">
+            {{ criarNovaAreaSelecionada ? 'Cancelar' : 'Criar Nova Área' }}
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row style="margin-top: 5%;">
+        <ion-col size="12" size-md="12" size-lg="12">
+          <h5 style="text-align: center;"><b>Adicionar Contatos (Opcional):</b></h5>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-select label="Tipo de Contato" class="form-control" [(ngModel)]="tipoContato" interface="popover"
+            [interfaceOptions]="{alignment:'end'}">
+            <ion-select-option value="E-mail">E-mail</ion-select-option>
+            <ion-select-option value="Telefone">Telefone</ion-select-option>
+            <ion-select-option value="Celular">Celular</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-input label="Contato" labelPlacement="floating" class="form-control" type="text"
+            [(ngModel)]="contato"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-button fill="outline" style="width: 100%;" (click)="adicionarContato()">Adicionar Contato</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-md="12" size-lg="12">
+          <ion-list>
+            <ion-list-header style="text-align: center;">
+              <h5><b>Lista de Contatos:</b></h5>
+            </ion-list-header>
+            <ion-item *ngFor="let x of contatosNovos; let i = index;">
+              <ion-label>{{x.tipoContato}}: {{x.contato}}</ion-label>
+              <ion-button style="width: 20%;" color="danger" (click)="removerContato(i)" slot="end" fill="outline">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+            <ion-item *ngIf="empresa.contatos.length === 0">
+              <ion-label>Nenhum contato.</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row style="margin-top: 5%;">
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button id="btn" fill="outline" style="width: 100%;" (click)="alterarEmpresa()"><ion-icon name="pencil"
+              size="medium"></ion-icon>Alterar</ion-button>
+        </ion-col>
+        <ion-col size="12" size-md="6" size-lg="6">
+          <ion-button id="btn" color="danger" fill="outline" style="width: 100%;" (click)="cancelar()">
+            <ion-icon name="close" size="medium"></ion-icon>
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

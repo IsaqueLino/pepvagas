@@ -1,0 +1,45 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="login-container">
+    <h3 style="text-align: center;">Portal de Estágios e
+      Empregos</h3>
+    <ion-button fill="outline" (click)="handleGoogleSignIn()">
+      <img src="assets/icon/google.png" style="border-color:black; width: 20px; height: 20px; margin-right: 10px;">
+      <ion-label>Entrar com Google</ion-label>
+    </ion-button>
+    <div class="or-separator">ou</div>
+    <ion-input label="Email" (input)="onEmailChange($event)" labelPlacement="floating" class="input"
+      type="email"></ion-input>
+    <div class="or-separator"></div>
+    <ion-input label="Senha" labelPlacement="floating" type="{{type}}" (input)="onSenhaChange($event)" class="input"
+      (keyup.enter)="autenticar()">
+
+      <button *ngIf="!showPass" ion-button clear color="green" type="button" item-right (click)="showPassword()"
+        class="btn-show-pass">
+        <ion-icon *ngIf="!showPass" ion-button clear color="dark" type="button" item-right (click)="showPassword()"
+          name="eye-off" style="font-size:25px;"></ion-icon></button>
+      <button *ngIf="showPass" ion-button clear color="dark" type="button" class="btn-show-pass" item-right
+        (click)="showPassword()">
+        <ion-icon name="eye" style="font-size:25px;"></ion-icon>
+      </button>
+    </ion-input>
+    <div class="or-separator"></div>
+    <ion-select (ionChange)="onTipoUsuarioChange($event)" class="input" interface="popover"
+      placeholder="Selecione um tipo de usuário" required>
+      <ion-select-option value="Candidato">Candidato</ion-select-option>
+      <ion-select-option value="Equipe">Equipe</ion-select-option>
+      <ion-select-option value="Empresa">Empresa</ion-select-option>
+      <ion-select-option value="Representante">Representante</ion-select-option>
+      <ion-select-option value="ProfissionalLiberal">Profissional Liberal</ion-select-option>
+      <ion-select-option value="default"></ion-select-option>
+    </ion-select>
+    <div class="or-separator"></div>
+
+    <ion-button id="btn-entrar" fill="outline" (click)="autenticar()">Entrar</ion-button>
+    <p style="cursor: pointer;"><a (click)="criarConta()">Sem conta? Crie uma</a></p>
+    <p style="cursor: pointer;"><a (click)="recuperarSenha()">Esqueci minha senha</a></p>
+  </div>
+</ion-content>

@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-fab id="btn-add" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="adicionarNovaArea()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <div class="form-container">
+    <h1><b>Áreas</b></h1>
+    <ion-searchbar animated="true" placeholder="Nome" show-clear-button="focus" [debounce]="250"
+      [(ngModel)]="termoPesquisa" (ionInput)="filtrarAreasPorNome()"></ion-searchbar>
+  </div>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let area of areas">
+        <ion-card class="no-margin">
+          <ion-card-header>
+          <div>
+            <ion-fab slot="fixed" horizontal="end" vertical="top">
+              <ion-fab-button>
+                <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+              </ion-fab-button>
+              <ion-fab-list side="start">
+                <ion-fab-button color="danger" (click)="deletarArea(area.idArea)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-fab-button> 
+                <ion-fab-button color="warning" (click)="navegarParaAlterar(area.idArea)">
+                  <ion-icon name="pencil"></ion-icon>
+                </ion-fab-button>
+              </ion-fab-list>
+            </ion-fab>
+          </div>
+          </ion-card-header>
+          <ion-card-content>
+            <b>ID:</b> {{area.idArea}}<br>
+            <b>Nome da Área:</b> {{area.nome}}<br>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div id="nenhumResultado" *ngIf="areas.length === 0 && termoPesquisa.trim() !== ''">
+    Nenhuma área encontrada.
+  </div>
+
+</ion-content>

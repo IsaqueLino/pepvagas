@@ -1,0 +1,101 @@
+<ion-header [translucent]="true">
+  <app-cabecalho titulo="PEPVagas"></app-cabecalho>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="form-container">
+    <h3><b>Olá, <span
+      *ngIf="candidatoData.nomeSocial == '' || !candidatoData.nomeSocial">{{candidatoData.nome}}</span> {{candidatoData.nomeSocial}}
+      esse é seu perfil:</b></h3>
+    <ion-list lines="inset">
+      <ion-item>
+        <ion-label class="title">Nome</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.nome}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">CPF</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.cpf}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Data de nascimento</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.dataNascimento}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Email</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.email}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Endereço</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.logradouro}} {{candidatoData.numero}}
+          em {{candidatoData.cidade}} - {{candidatoData.uf}} cep {{candidatoData.cep}}</ion-label>
+      </ion-item>
+      <ion-item *ngIf="candidatoData.regiaoInteresse">
+        <ion-label class="title">Endereço de interece</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.regiaoInteresse}}
+          /{{candidatoData.ufInteresse}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Pretensão Salarial</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.pretensaoSalarial}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Área de Interesse</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.areas}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Escolaridade</ion-label>
+        <ion-label slot="end" class="item-lista">{{escolaridade}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Disponibilidade</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.disponibilidade}}</ion-label>
+      </ion-item>
+      <ion-item *ngIf="candidatoData.cnh=== 'Sem'">
+        <ion-label class="title">Cnh</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.cnh}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Tipo de Vaga</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.tipoVagaInteresse}} <span
+          [hidden]="candidatoData.regimeInteresse !== ''">{{candidatoData.regimeInteresse}}</span></ion-label>
+      </ion-item>
+      <ion-item *ngIf="candidatoData.regimeInteresse != ''">
+        <ion-label class="title">Regime</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.regimeInteresse}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title">Modalidade</ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.modalidadeInteresse}}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label class="title"><span>Categoria</span></ion-label>
+        <ion-label slot="end" class="item-lista">{{candidatoData.cnh}}</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-button class="btn-entrar" fill="outline" (click)="toEditar()">
+            Editar
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button id="deletar" class="btn-deletar" fill="outline">
+            Desativar Conta
+            <ion-icon name="trash-bin-outline" slot="start"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-alert
+      trigger="deletar"
+      header="Desativar Conta"
+      message="Voce tem certeza que deseja desativar sua conta? Uma vez desativada, ela podera ser recuperada fazendo login novamente."
+      [buttons]="alertButtons"
+      (didDismiss)="setResult($event)"
+    ></ion-alert>
+  </div>
+
+</ion-content>
+

@@ -1,0 +1,263 @@
+
+ion-toolbar {
+  --background: #15842a;
+  --color: rgb(255, 255, 255);
+}
+
+ion-content {
+  --background: #f4f4f4;
+  width: auto;
+}
+
+ion-item, ion-label{
+  --background: #f4f4f4;
+}
+
+.lista-contatos{
+  border: 0.6px solid rgba(107, 107, 107, 0.26) !important;
+  border-radius: 10px !important;
+  --margin-bottom: 0;
+  --margin-top: 0;
+}
+
+.lista-contatos ion-item{
+  --background: white !important;
+  background-color: white;
+
+
+}
+
+ion-button {
+  inline-size: 100%;
+  border-radius: 10px;
+  position: relative;
+  --border-width: 2px;
+  --border-color: #15842a;
+  --color: #15842a;
+}
+
+ion-label{
+  margin-top: 2%;
+  margin-bottom: 5%;
+}
+
+a {
+  color: #15842a;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  border: 2px solid black;
+  max-inline-size: 60%;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.currency-label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #f4f4f4;
+  padding: 0 5px;
+}
+
+.input {
+  --padding-start: 20px;
+  border-radius: 10px;
+  border: 2px solid black;
+  color: black;
+  max-inline-size: 60%;
+  width: 100%;
+}
+
+.or-separator {
+  margin: 10px 0;
+  color: #888;
+  font-weight: bold;
+}
+
+.form-container {
+
+  margin-top: 10px;
+  margin-left: 5%;
+  margin-right: 5%;
+
+  h3 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+}
+
+.form-control {
+
+  min-height: 60px !important;
+  max-height: 60px !important;
+  --padding-start: 10px !important;
+  --padding-bottom: 8px !important;
+}
+
+.form-control-text {
+
+  height: auto !important;
+  --padding-start: 10px !important;
+  --padding-bottom: 8px !important;
+  border: 0.6px solid rgba(107, 107, 107, 0.26) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+}
+
+#btn {
+  border-radius: 10px;
+  --border-width: 2px;
+  --background: #f4f4f4;
+  --border-color: #15842a;
+  --color: #15842a;
+}
+
+#btn-user {
+  width: auto;
+}
+
+/*label #select-label .select-wrapper {
+    padding-right: 100%;
+}*/
+
+/*
+.checkbox {
+    display: flex;
+    flex-direction: column;
+
+    #text-vaga {
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .checkbox-options {
+        display: flex;
+        align-items: center;
+
+        label {
+            display: flex;
+            align-items: center;
+            margin-right: 20px; // Adapte a margem conforme necessário
+
+            input[type="checkbox"] {
+                margin-right: 8px;
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+        .checkbox-options {
+            label {
+                margin-right: 10px; // Altere a margem para telas menores, se necessário
+            }
+        }
+    }
+}
+*/
+
+@media (max-width: 768px) {
+
+  ion-button {
+    inline-size: 90%;
+  }
+
+}
+
+ion-item{
+  --inner-border-width: 0;
+}
+
+.btn-show-pass {
+  z-index: 999;
+  color: #15842a;
+  cursor: pointer;
+  position: relative;
+  display: inline;
+  float: right;
+  margin-top: 12px;
+  margin-right: 7px;
+  background-color: white;
+}
+
+.senha-input{
+  background-color: white;
+
+  .item-inner{
+    border-radius: 10px;
+    border: 2px solid black;
+  }
+}
+
+.btn-remover{
+  max-inline-size: 30%;
+  width: 20%;
+}
+
+// Ng- Select
+.select{
+  max-height: 60px !important;
+  --padding-start: 10px !important;
+  --padding-bottom: 8px !important;
+  height: auto !important;
+  border: 0.6px solid rgba(107, 107, 107, 0.26) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+  background-color: white;
+}
+
+
+.ng-select.input-select {
+  padding-left: 20px ;
+  padding-top: 10px;
+  border-radius: 10px;
+  border: 2px solid black;
+  color: black;
+  max-inline-size: 60%;
+  width: 100%;
+}
+
+.ng-select.input-select ::ng-deep .ng-option {
+  background-color: #fff;
+  color: rebeccapurple;
+
+}
+
+.ng-value-label {
+  font-size: 14px;
+}
+
+.ng-value-icon{
+}
+
+.ng-value {
+  margin-right: 2px;
+}
+
+.ng-select ::ng-deep .ng-dropdown-panel  {
+  background: white;
+  border: 1px solid #DDE1E5;
+  border-radius: 2px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-size: 14px;
+  margin-top: 4px;
+  position: absolute;
+  width: 95%;
+}
+
+.ng-dropdown-panel{
+  color: red !important;
+}
+
+
+

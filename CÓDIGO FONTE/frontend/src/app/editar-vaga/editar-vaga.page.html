@@ -1,0 +1,192 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <ion-card>
+    <ion-card-header>
+      <h1>Editar Vaga</h1>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-input [(ngModel)]="vaga.titulo" label="Título" labelPlacement="floating"
+                placeholder="Informe o título da vaga"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-input  [maskito]="moneyMask" [maskitoElement]="maskPredicate" [(ngModel)]="vaga.salario" label="Salário" labelPlacement="floating"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-textarea  [(ngModel)]="vaga.descricao" [autoGrow]="true" label="Detalhes da vaga" labelPlacement="floating"
+                placeholder="Informe alguns detalhes sobre a vaga"></ion-textarea>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+              <ion-button class="pep" expand="block" (click)="logoInput.click()">
+                {{this.vaga.logo ? 'Logo Selecionada: ' + (this.vaga.logo.name ?? this.vaga.logoNome ) : "Enviar Logo"}}
+              </ion-button>
+              <input style="display: none;" type="file" #logoInput (change)="onLogoSelected($event)">
+          </ion-col>
+          <ion-col>
+              <ion-button class="pep" expand="block" (click)="bannerInput.click()">
+                {{this.vaga.banner ? 'Imagem Selecionada: ' + (this.vaga.banner.name ?? this.vaga.bannerNome ) : "Enviar Banner"}}
+              </ion-button>
+              <input style="display: none;" type="file" #bannerInput (change)="onBannerSelected($event)">
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-select [(ngModel)]="vaga.tipo"  aria-label="Turno" interface="popover" label="Turno">
+                <ion-select-option value="Diurno">Diurno</ion-select-option>
+                <ion-select-option value="Noturno">Noturno</ion-select-option>
+                <ion-select-option value="Misto">Misto</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-select [(ngModel)]="vaga.regime"  aria-label="Regime" interface="popover"
+                label="Regime">
+                <ion-select-option value="CLT">CLT</ion-select-option>
+                <ion-select-option value="PJ">PJ</ion-select-option>
+                <ion-select-option value="Estágio">Estágio</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-select [(ngModel)]="vaga.modalidade"  aria-label="Modalidade" interface="popover"
+                label="Modalidade">
+                <ion-select-option value="P">Presencial</ion-select-option>
+                <ion-select-option value="R">Remoto</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-select [(ngModel)]="vaga.idArea" required="true"  aria-label="Área da Vaga" interface="popover"
+                label="Área da Vaga" (ionChange)="onAreaChange($event)">
+                <ion-select-option *ngFor="let area of areas" [value]="area.idArea">{{ area.nome }}</ion-select-option>
+                <ion-select-option value="outro">Cadastar nova área</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-popover #cidadesPopover [isOpen]="isCidadesPopoverOpen" (didDismiss)="dismissCidadesPopover()">
+              <ng-template>
+                <ion-searchbar [(ngModel)]="cidadeProcurada" [debounce]="500" (ionInput)="handleCidadesFiltro($event)"></ion-searchbar>
+                <ion-list lines="none" class="flex">
+                  <ion-item class="clickable none-item" *ngFor="let cidade of cidadesFiltro" (click)="checkboxChange(cidade)">
+                    {{cidade}}
+                  </ion-item>
+                  <!-- <ion-checkbox  *ngFor="let cidade of cidadesFiltro" [value]="cidade" class="clickable" labelPlacement="end" justify="start" (ionChange)="checkboxChange($event)">
+                    <ion-item class="none-item">
+                      {{cidade}}
+                    </ion-item>
+                  </ion-checkbox> -->
+                </ion-list>
+              </ng-template>
+            </ion-popover>
+
+            <ion-item class="clickable flex-cidades" (click)="mostrarCidades($event)">
+              <div class="flex-cidades">
+                <p>Cidade</p>   
+                <p class="cidades-selecionadas">{{cidadeSelecionadasText}}</p>
+              </div>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item *ngIf="this.userType != 'E'">
+              <ion-select [(ngModel)]="vaga.idEmpresa"  aria-label="Empresa" interface="popover"
+                label="Empresa">
+                <ion-select-option *ngFor="let empresa of this.empresas"
+                  [value]="empresa.idconta">{{empresa.nomeEmpresa}}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-select [(ngModel)]="vaga.nivelInstrucao"  interface="popover"
+                aira-label="Nivel de Instrução" label="Nível de Instrução">
+                <ion-select-option value="ensino_medio_incompleto">Ensino Médio Incompleto</ion-select-option>
+                <ion-select-option value="ensino_medio_completo">Ensino Médio Completo</ion-select-option>
+                <ion-select-option value="curso_superior_incompleto">Curso Superior Incompleto</ion-select-option>
+                <ion-select-option value="curso_superior_completo">Curso Superior Completo</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-button class="pcd" id="hover-trigger"><ion-icon slot="icon-only"
+                  name="help-outline"></ion-icon></ion-button>
+              <ion-popover trigger="hover-trigger" triggerAction="click">
+                <ng-template>
+                  <ion-content class="ion-padding">
+                    PCD é a sigla que se refere às Pessoas com Deficiência. No contexto das empresas, o termo PCD é
+                    usado para
+                    identificar colaboradores que apresentam deficiência visual, motora, mental ou auditiva.
+                  </ion-content>
+                </ng-template>
+              </ion-popover>
+
+              <ion-select [(ngModel)]="vaga.pcd"  aria-label="PCD" interface="popover" label="PCD">
+                <ion-select-option value="1">Sim</ion-select-option>
+                <ion-select-option value="0">Não</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-input  [(ngModel)]="vaga.dataLimite" placeholder="Informe a data de encerramento da vaga"
+                label="Data de Encerramento" type="date" labelPlacement="floating"></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-input email [(ngModel)]="vaga.emailCurriculo" label="Email de Recebimento de Currículos"
+                type="email" labelPlacement="floating" placeholder="Informe o email de recebimento de currículos"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-input  [(ngModel)]="vaga.site" type="text" labelPlacement="floating"
+                label="Site da Empresa/Vaga"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-button expand="block" class="pep" (click)="onSubmit()">
+              Publicar Vaga
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button color="light" expand="block" class="pep" [routerLink]="['/home']">
+              Cancelar
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,105 @@
+a {
+    color: var(--ion-color-pep);
+    text-decoration: none;
+}
+
+p {
+    color: gray;
+}
+
+
+.form {
+    padding: 0 10px;
+    // background-color: red;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 90%;
+    max-width: 500px;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // background-color: blue;
+    width: 100%;
+}
+
+ion-item {
+    --background: var(--ion-item-background);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px #BBB8B8 solid;
+    padding: 2px;
+}
+
+ion-button {
+    --background: var(--ion-color-pep);
+    --padding-top: 18px;
+    --padding-bottom: 18px;
+}
+
+ion-content{
+    height: 100vh;
+}
+
+ion-header {
+    background-color: var(--ion-color-pep);
+    box-shadow: none;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    height: 10rem;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+ion-img{
+    width: 220px;
+}
+
+ion-input{
+    --font-size: 10px;
+}
+
+.divider{
+    border-top: 1px solid #bbb;
+}
+
+.header {
+    text-align: center;
+    margin-top: 6rem;
+}
+
+.title {
+    font-size: 24px;
+    color: var(--ion-text-color);
+    font-weight: 500;
+    margin: 0;
+}
+
+.subTitle {
+    margin-top: 5px;
+}
+
+.register {
+    text-align: center;
+}
+
+.forgot {
+    text-align: end;
+    margin-bottom: 10px;
+}
+
+.full{
+    height: 100vh;
+}
+
+.centralize{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}

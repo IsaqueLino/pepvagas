@@ -1,0 +1,79 @@
+ion-title{
+    text-align: center;
+}
+
+h1, h2{
+    text-align: center;
+}
+
+ion-content {
+    overflow-y: auto; 
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Alterado de 100% para 100vh */
+}
+
+ion-select {
+    max-height: 200px; /* Defina a altura máxima do dropdown */
+  }
+  
+  ion-select .select-interface-option {
+    overflow-y: overlay; /* Adicione a barra de rolagem vertical */
+    max-height: 200px; /* Ajuste a altura máxima */
+  }
+
+.teste {
+    --padding-top: 18px;
+    --background: var(--ion-color-pep);
+    --padding-bottom: 18px;
+}
+
+.container{
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    
+    width: 80%;
+    max-width: 1000px;  
+}
+
+ion-item {
+    --background: var(--ion-item-background);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px #BBB8B8 solid;
+    padding: 2px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0;
+}
+
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+}
+
+ion-img {
+    max-width: 150px;
+}
+
+.header {
+    --background: var(--ion-color-pep);
+    color: white;
+}
+
+.form-item {
+    width: 100%;
+    max-width: 100%;
+}
