@@ -15,8 +15,19 @@
           <br>
           <h1 class="title">Informações da Conta</h1>
           <br>
-          <ion-item>
-            <ion-input [(ngModel)]="novaConta.email" maxLength="50" label="E-mail" labelPlacement="floating" placeholder="Informe o email da conta" type="email"></ion-input>
+          <ion-item [class.invalid]="emailInvalid">
+            <ion-input 
+              [(ngModel)]="novaConta.email" 
+              maxLength="50" 
+              label="E-mail" 
+              labelPlacement="floating" 
+              placeholder="Informe o email da conta" 
+              type="email"
+              (ionChange)="validateEmail()">
+            </ion-input>
+            <ion-note *ngIf="emailInvalid" color="danger" slot="error">
+              Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-input [(ngModel)]="novaConta.senha" label="Senha" labelPlacement="floating" placeholder="Informe a senha da conta" type="password"></ion-input>
@@ -27,12 +38,12 @@
           <br>
           <ion-row>
             <ion-col size="6">
-              <ion-button class="botao-cadastrar" expand="block" (click)="onSubmit()">
+              <ion-button class="pep" expand="block" (click)="onSubmit()">
                 Cadastrar Membro
               </ion-button>
             </ion-col>
             <ion-col size="6">
-              <ion-button class="botao-cancelar" color="danger" fill="outline" expand="block" (click)="cancelar()">
+              <ion-button class="pep-cancelar" color="danger" expand="block" (click)="cancelar()">
                 Cancelar
               </ion-button>
             </ion-col>

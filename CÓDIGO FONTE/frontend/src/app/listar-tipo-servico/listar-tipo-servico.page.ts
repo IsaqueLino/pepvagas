@@ -46,30 +46,34 @@ export class ListarTipoServicoPage implements OnInit {
 
   onRowClick(idTipo: number) {
     this.selectedIdTipo = idTipo;
-    console.log('ID da área selecionada:', this.selectedIdTipo);
   }
 
   async carregarLista(){
     this.listaTipo = await this.tipoService.buscarTodosServicos()
 
-    console.log(this.listaTipo)
     
   }
 
   async validateAndOpenModal() {
     if (this.selectedIdTipo !== null) {
-      this.modal.present();
+      // Encontra o tipo selecionado na lista
+      const tipoSelecionado = this.listaTipo.find((t: any) => t.idTipoServico === this.selectedIdTipo);
+      
+      if (tipoSelecionado) {
+        // Preenche o formulário com o nome do tipo selecionado
+        this.tipoForm.patchValue({
+          nome: tipoSelecionado.nome
+        });
+        
+        this.modal.present();
+      }
     } else {
-      const toast = await this.toastController.create({
-        message: 'Selecione uma tipo se serviço para poder alterar.',
-        duration: 2000,
-        position: 'bottom'
-      });
-      toast.present();
+      this.exibirMensagem("Selecione um tipo de serviço para poder alterar.")
     }
   }
 
   async cancelar(){
+    this.tipoForm.reset(); // Limpa o formulário
     this.modal.dismiss(null, 'cancel');
   }
 
@@ -82,57 +86,68 @@ export class ListarTipoServicoPage implements OnInit {
     this.currentPage++;
   }
 
+  // Recarregar a lista toda vez que a página for reexibida
+  ionViewWillEnter() {
+    this.carregarLista();
+  }
+
   previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
     }
   }
 
-  async excluir(){
-    if(this.selectedIdTipo != null){
+  async excluir() {
+    if (this.selectedIdTipo != null) {
       const idString: string = String(this.selectedIdTipo);
       const resposta = await this.tipoService.excluir(idString);
-      console.log(resposta);
-      this.carregarLista();
-      this.modal2.dismiss(null, 'cancel');
+      
+      if (resposta.status === 200) {
+        this.carregarLista();  // Recarrega a lista após a exclusão
+  
+        const toast = await this.toastController.create({
+          message: 'Tipo de serviço excluído com sucesso!',
+          duration: 2000,
+          position: 'bottom'
+        });
+        toast.present();
+        this.selectedIdTipo = null;
+      }
+    }
+  }
+  
 
+  async enviarAlteracao() {
+    if (this.tipoForm.value["nome"] == null) {
       const toast = await this.toastController.create({
-        message: 'Área excluída com sucesso.',
+        message: 'O novo nome tem que ser informado para realizar a alteração.',
         duration: 2000,
         position: 'bottom'
       });
       toast.present();
+      return;
     }
-
-  }
-
-  async enviarAlteracao(){
-
-    if(this.tipoForm.value["nome"] == null){
-      const toast = await this.toastController.create({
-        message: 'O novo nome tem que ser informado para realizar a alteração',
-        duration: 2000,
-        position: 'bottom'
-      });
-      toast.present();
-
-      return
-    }
-
-    if(this.selectedIdTipo !== null){
-
-      let idString : string = String(this.selectedIdTipo)
-
-      const resposta = this.tipoService.atualizarTipo(idString, this.tipoForm.value["nome"])
-
-      console.log(resposta)
-
-      this.modal.dismiss(null, 'cancel');
-
-      this.carregarLista()
-
+  
+    if (this.selectedIdTipo !== null) {
+      let idString: string = String(this.selectedIdTipo);
+  
+      const resposta = await this.tipoService.atualizarTipo(idString, this.tipoForm.value["nome"]);
+  
+      if (resposta.status === 200) {
+        this.tipoForm.reset(); // Limpa o formulário
+        this.modal.dismiss(null, 'cancel');
+        this.carregarLista();
+  
+        const toast = await this.toastController.create({
+          message: 'Tipo de serviço alterado com sucesso!',
+          duration: 2000,
+          position: 'bottom'
+        });
+        toast.present();
+      }
     }
   }
+  
   onWillDismissPassword(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>
     if (ev.detail.role === 'confirm') {
@@ -151,7 +166,7 @@ export class ListarTipoServicoPage implements OnInit {
 
   async confirmarExclusao() {
     if (this.selectedIdTipo == null) {
-      this.exibirMensagem("Selecione um representante")
+      this.exibirMensagem("Selecione um tipo de serviço.")
       return;
     }
 

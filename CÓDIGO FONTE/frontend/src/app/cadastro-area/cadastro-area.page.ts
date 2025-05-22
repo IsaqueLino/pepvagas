@@ -14,8 +14,6 @@ export class CadastroAreaPage implements OnInit {
 
   obrigatorio: FormGroup;
 
-
-  public isDarkTheme: boolean = false
   public isLogged: boolean = false
 
   constructor(private formBuilder: FormBuilder, private authService: AuthService,private navController: NavController, private toastController: ToastController, private areaService : AreaService) { 
@@ -29,10 +27,19 @@ export class CadastroAreaPage implements OnInit {
   }
 
   ngOnInit() {
-    this.handleTheme()
+    this.checkTheme()
 
     if (this.authService.getJwt()){
       this.isLogged = true
+    }
+  }
+
+  private checkTheme() {
+    const theme = localStorage.getItem('theme')
+    if (theme == 'dark') {
+      document.body.setAttribute('color-scheme', 'dark')
+    } else {
+      document.body.setAttribute('color-scheme', 'light')
     }
   }
 
@@ -40,25 +47,6 @@ export class CadastroAreaPage implements OnInit {
     this.authService.logout()
     this.navController.navigateForward('login')
   }
-
-  toggleTheme() {
-    if (this.isDarkTheme)
-      this.isDarkTheme = false
-    else
-      this.isDarkTheme = true
-
-    this.handleTheme()
-  }
-
-  private handleTheme() {
-    if (this.isDarkTheme) {
-      document.body.setAttribute('color-scheme', 'dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.body.setAttribute('color-scheme', 'light')
-      localStorage.setItem('theme', 'light')
-    }
-  } 
 
   async presentToast(message: string) {
     const toast = await this.toastController.create({
@@ -83,12 +71,14 @@ export class CadastroAreaPage implements OnInit {
     }
 
     const response = await this.areaService.cadastrarArea(this.obrigatorio.value["nome"])
-    console.log(response)
 
     if(response.status == 201){
-      this.presentToast("Área cadastrada com sucesso")
+      this.presentToast("Área cadastrada com sucesso!")
       this.obrigatorio.reset()
     }
+
+    // Navegar de volta para a página de listagem de áreas
+    this.navController.back(); // Volta para a página anterior
 
   }
 

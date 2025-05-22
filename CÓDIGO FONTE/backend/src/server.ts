@@ -4,7 +4,7 @@ import { DataSource } from "typeorm";
 import { AppDataSource } from "./database/data-source";
 import routes from "./routes";
 import { errors } from "celebrate";
-import admin, { initializeApp  } from 'firebase-admin'
+import admin, { initializeApp } from 'firebase-admin'
 import * as serviceAccount from '../firebase-sdk.json'
 import path from "path";
 
@@ -15,7 +15,9 @@ const app = express();
 
 app.use(express.json());
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+}));
 app.use(routes);
 
 AppDataSource.initialize().then(c => {
@@ -23,18 +25,20 @@ AppDataSource.initialize().then(c => {
   c.runMigrations();
   runBackend();
 })
-.catch(e => {
-  console.error(`Failed to create a connection:`);
-  console.error(e);
-});
+  .catch(e => {
+    console.error(`Failed to create a connection:`);
+    console.error(e);
+  });
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as any),
- });
+  credential: admin.credential.cert(serviceAccount as any),
+});
 
 function runBackend() {
   const app = express();
-  app.use(cors())
+  app.use(cors({
+    origin: '*',
+  }));
   app.use(express.json());
   app.use(routes);
   app.use(errors());

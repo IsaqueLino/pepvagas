@@ -4,6 +4,7 @@ import { AuthService } from '../services/auth.service';
 import { VagaService } from '../services/vaga.service';
 import { CandidatoService } from '../services/candidato.service';
 import { environment } from 'src/environments/environment';
+import { ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-detalhes-vaga',
@@ -12,7 +13,7 @@ import { environment } from 'src/environments/environment';
 })
 export class DetalhesVaga implements OnInit {
 
-  public vaga: any;
+  public vaga: any = {};
   public candidato: any;
   private id: string = ''
   public selectedFile: File | null = null;
@@ -21,6 +22,8 @@ export class DetalhesVaga implements OnInit {
   public dataExpira: any;
   public salario: any;
   public isEnvironment: boolean = false;
+  public fromCandidaturas: boolean = false; 
+
 
   public isDarkTheme: boolean = false
 
@@ -29,7 +32,8 @@ export class DetalhesVaga implements OnInit {
     private authService: AuthService,
     private navigationController: NavController,
     private vagaService: VagaService,
-    private candidatoService: CandidatoService
+    private candidatoService: CandidatoService,
+    private route: ActivatedRoute,
   ) {
     this.getUser();
   }
@@ -42,17 +46,19 @@ export class DetalhesVaga implements OnInit {
 
     const candidato = await this.candidatoService.getCandidato(this.authService.getUser() ?? '')
     this.candidato = candidato;
-    console.log(this.candidato);
   }
 
   async ngOnInit() {
     if (this.authService.getJwt() == null)
       this.navigationController.navigateRoot('login')
 
+    this.route.queryParams.subscribe(params => {
+      this.fromCandidaturas = params['fromCandidaturas'] === 'true'; 
+    });
+
     try {
       const response = await this.authService.getContaDetails();
-      this.candidato = this.candidatoService.getCandidato(response.data.idconta)
-      console.log(this.candidato)
+      this.candidato = await this.candidatoService.getCandidato(response.data?.idconta)
 
     } catch (error) {
       console.error('Erro ao obter detalhes da conta:', error);
@@ -66,7 +72,7 @@ export class DetalhesVaga implements OnInit {
     }
 
     this.id = idVaga;
-    this.getVaga(idVaga);
+    await this.getVaga(idVaga);
 
     /*
     */
@@ -87,13 +93,16 @@ export class DetalhesVaga implements OnInit {
     }
   }
 
+  get isCandidatarVisible() {
+    return !this.fromCandidaturas; // Se 'fromCandidaturas' for true, o botão não será exibido
+  }
+
   async getVaga(id: string) {
     const response = await this.vagaService.getVaga(id);
     this.vaga = response.data;
 
     this.formatar();
 
-    console.log(this.vaga);
   }
 
   async formatar() {
@@ -120,58 +129,126 @@ export class DetalhesVaga implements OnInit {
     this.navigationController.navigateForward(ref)
   }
 
-  async enviarEmailComCurriculo(file: File) {
-    let resposta;
-    if (file)
+ // Método para enviar o currículo (com arquivo)
+async enviarEmailComCurriculo(file: File) {
+  let resposta;
+  if (file) {
+    try {
+      // Chama o serviço para enviar o currículo
       resposta = await this.candidatoService.enviarEmailComCurriculo(this.candidato.idconta, this.vaga.idVaga, file);
-    if (resposta){
-      this.presentToast('Curriculo enviado com sucesso!','success');
-      this.navigationController.navigateBack('/');
-    } else {
-      this.presentToast('Erro ao enviar email.','danger');
-    }
-  }
 
-  async enviarEmailComCurriculoDoPerfil() {
-    let resposta;
+      // Verifica se a resposta foi bem-sucedida
+      if (resposta && resposta.data && resposta.data.message === "Email enviado com sucesso!") {
+        this.presentToast('Currículo enviado com sucesso!', 'success');
+        this.navigationController.navigateBack('/'); // Navega para a página anterior (home)
+        return true;  // Retorna true para indicar sucesso
+      } else {
+        this.presentToast('Erro ao enviar email. Tente novamente.', 'danger');
+        return false;  // Retorna false em caso de falha
+      }
+    } catch (error) {
+      console.error('Erro ao enviar currículo:', error);
+      this.presentToast('Erro ao enviar email. Tente novamente.', 'danger');
+      return false;  // Retorna false em caso de erro
+    }
+  } else {
+    this.presentToast('Selecione um arquivo para enviar o email.', 'danger');
+    return false;  // Retorna false se nenhum arquivo foi selecionado
+  }
+}
+
+// Método para enviar o currículo do perfil (sem arquivo)
+async enviarEmailComCurriculoDoPerfil() {
+  let resposta;
+  try {
+    // Chama o serviço para enviar o currículo do perfil
     resposta = await this.candidatoService.enviarEmailComCurriculoDoPerfil(this.candidato.idconta, this.vaga.idVaga);
-    if (resposta){
-      this.presentToast('Curriculo enviado com sucesso!','success');
-      this.navigationController.navigateBack('/');
+
+    // Verifica se a resposta foi bem-sucedida
+    if (resposta && resposta.data && resposta.data.message === "Email enviado com sucesso!") {
+      this.presentToast(resposta.data.message, 'success');
+      this.navigationController.navigateBack('/'); // Navega para a página anterior (home)
+      return true;  // Retorna true para indicar sucesso
     } else {
-      this.presentToast('Erro ao enviar email.','danger');
+      this.presentToast('Erro ao enviar email. Tente novamente.', 'danger');
+      return false;  // Retorna false em caso de falha
     }
+  } catch (error) {
+    console.error('Erro ao enviar currículo do perfil:', error);
+    this.presentToast('Erro ao enviar email. Tente novamente.', 'danger');
+    return false;  // Retorna false em caso de erro
   }
+}
 
-
-  candidatar() {
+  async candidatar() {
     let resposta: any = '';
+  
+    // Se a opção selecionada for 'novo', enviar o currículo selecionado
     if (this.selectedOption === 'novo') {
       if (this.selectedFile) {
         if (this.selectedFile.name.endsWith('.pdf')) {
-          if(this.selectedFile.size <= 8*(1024*1024)){
-            resposta = this.enviarEmailComCurriculo(this.selectedFile);
+          if (this.selectedFile.size <= 8 * (1024 * 1024)) {
+            resposta = await this.enviarEmailComCurriculo(this.selectedFile);
+            if (resposta) {
+              await this.candidatarNoBackend(); // Chamada ao backend
+            } else {
+              this.presentToast('Falha ao enviar o currículo, candidatura não realizada.', 'danger');
+            }
           } else {
-            this.presentToast('Selecione um arquivo que não seja maior que 8MB para enviar o currículo.','danger');
+            this.presentToast('Selecione um arquivo que não seja maior que 8MB para enviar o currículo.', 'danger');
           }
         } else {
-          this.presentToast('Selecione um arquivo PDF para enviar o currículo.','danger');
+          this.presentToast('Selecione um arquivo PDF para enviar o currículo.', 'danger');
         }
       } else {
-        this.presentToast('Selecione um arquivo para enviar o email.','danger');
+        this.presentToast('Selecione um arquivo para enviar o email.', 'danger');
       }
+  
+    // Se a opção selecionada for 'perfil', enviar o currículo do perfil
     } else if (this.selectedOption === 'perfil') {
-      if (this.candidato.curriculo) {
-        resposta = this.enviarEmailComCurriculoDoPerfil();
+      await this.getUser();  // Certifique-se de carregar o usuário
+      if (this.candidato && this.candidato.curriculo) {
+        resposta = await this.enviarEmailComCurriculoDoPerfil();
+        if (resposta) {
+          await this.candidatarNoBackend(); // Chamada ao backend
+        } else {
+          this.presentToast('Falha ao enviar o currículo, candidatura não realizada.', 'danger');
+        }
       } else {
-        this.presentToast('O candidato não tem curriculo cadastrado.','danger');
+        this.presentToast('Você não possui curriculo cadastrado.', 'danger');
       }
+  
+    // Se nenhuma opção foi selecionada
     } else if (this.selectedOption === '') {
-      this.presentToast('Selecione uma opção para enviar o email.','danger');
+      this.presentToast('Selecione uma opção para enviar o email.', 'danger');
+  
+    // Caso ocorra um erro no envio
     } else {
-      this.presentToast('Erro ao enviar email.','danger');
+      this.presentToast('Erro ao enviar email.', 'danger');
     }
+  }
+  
+  private async candidatarNoBackend() {
+    try {
+      const resposta = await this.vagaService.candidatar(this.candidato.idconta, this.vaga.idVaga);
 
+
+      if (resposta.data && resposta.data.message === "Candidatura registrada com sucesso!") {
+        this.showMessage('Candidatura registrada com sucesso!', 'success');
+      } else if (resposta.data && resposta.data.message === "O candidato já se inscreveu nesta vaga.") {
+        this.showMessage('Você já se candidatou para esta vaga!', 'warning'); // Muda a mensagem
+      } else {
+        this.showMessage('Erro ao registrar a candidatura. Tente novamente.', 'danger');
+      }
+    } catch (error: any) {
+      console.error('Erro ao registrar candidatura:', error);
+
+      if (error.response && error.response.status === 409) {
+        this.showMessage('Você já se candidatou para esta vaga!', 'warning');
+      } else {
+        this.showMessage('Erro ao registrar candidatura. Tente novamente.', 'danger');
+      }
+    }
   }
 
   onFileSelected(event: any) {
@@ -202,7 +279,6 @@ export class DetalhesVaga implements OnInit {
 
   handleTheme() {
 
-    console.log(this.isDarkTheme)
 
     if (this.isDarkTheme)
       document.body.setAttribute('color-scheme', 'dark')
@@ -218,5 +294,16 @@ export class DetalhesVaga implements OnInit {
       color: color
     });
     toast.present();
+  }
+
+  async showMessage(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 5000,
+      position: 'bottom',
+      color: color
+    })
+
+    toast.present()
   }
 }

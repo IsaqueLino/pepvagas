@@ -103,7 +103,6 @@ export class ProfissionalDetalhesPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(userId)
-          console.log(this.user)
           break;
         case "C":
           this.user = await this.candidatoService.getCandidato(userId)
@@ -136,7 +135,6 @@ export class ProfissionalDetalhesPage implements OnInit {
 
     this.getTiposServicos();
 
-    console.log(this.prof);
   }
 
   async goBack() {

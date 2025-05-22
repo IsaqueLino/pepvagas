@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class AuthService {
   private readonly urlBase = environment.API
+
   
   private api = axios.create({
     baseURL: this.urlBase
@@ -16,6 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private navController: NavController) { }
 
+  // REALIZA LOGIN DO USUÁRIO
   async login(email: string, senha: string) {
 
     const data: any = {}
@@ -30,11 +32,11 @@ export class AuthService {
       return data
     })
 
-    console.log(response)
-
     return response
   }
 
+
+  // CRIA UMA NOVA CONTA DE USUÁRIO
   async createAccount(email: string, senha: string, tipo: string) {
 
     const data: any = {}
@@ -52,6 +54,7 @@ export class AuthService {
     return response
   }
 
+  // RECUPERAÇÃO DE CONTA PELO E-MAIL
   async recovery(email: string) {
 
     const data: any = {}
@@ -67,32 +70,39 @@ export class AuthService {
     return response
   }
 
+  // SALVA DADOS DA SESSÃO NO LOCALSTORAGE
   setSession(token: string, user: string, type: string) {
     localStorage.setItem('jwt', token)
     localStorage.setItem('user', user)
     localStorage.setItem('type', type)
   }
 
+  // SALVA DADOS DO USUÁRIO EM CRIAÇÃO
   setCreationUser(user: string) {
     localStorage.setItem('c-user', user)
   }
 
+  // OBTÉM O TOKEN JWT DO LOCALSTORAGE
   getJwt() {
     return localStorage.getItem('jwt')
   }
 
+  // OBTÉM O ID DO USUÁRIO DO LOCALSTORAGE
   getUser() {
     return localStorage.getItem('user')
   }
 
+  // DEFINE O TIPO DO USUÁRIO NO LOCALSTORAGE
   setType(tipo: string) {
     localStorage.setItem('type', tipo)
   }
 
+  // OBTÉM O TIPO DO USUÁRIO DO LOCALSTORAGE
   getType() {
     return localStorage.getItem('type')
   }
 
+  // REALIZA LOGOUT REMOVENDO DADOS DO LOCALSTORAGE
   logout() {
     localStorage.removeItem('jwt')
     localStorage.removeItem('user')
@@ -100,9 +110,15 @@ export class AuthService {
     this.navController.navigateRoot("/login")
   }
 
-  async getContaDetails() {
-    const idconta = localStorage.getItem('user');
-    console.log("conta encontrada", idconta)
+  // OBTÉM DETALHES DA CONTA DO USUÁRIO LOGADO OU DE ALGUMA OUTRA CONTA
+  async getContaDetails(buscarOutraConta: boolean = false, id: number = 0) {
+    let idconta: number | string | null;
+
+    if(buscarOutraConta && id > 0)
+      idconta = id;
+    else
+      idconta = localStorage.getItem('user'); 
+
     if (!idconta) {
       throw new Error('ID da conta não encontrado no localStorage');
     }
@@ -110,6 +126,7 @@ export class AuthService {
     return response.data
   }
 
+  // EXCLUI UMA CONTA PELO ID
   async deleteAccount(id: string): Promise<any> {
     try {
       const response = await this.api.delete(this.urlBase + '/conta/' + id);
@@ -119,6 +136,7 @@ export class AuthService {
     }
   }
 
+  // ATUALIZA A SENHA DO USUÁRIO
   async updatePassword(id: string, senhaAtual: string, novaSenha: string, confirmacaoNovaSenha: string): Promise<any> {
     try {
       const response = await this.api.put<any>(this.urlBase + '/conta/senha/' + id, {
@@ -132,11 +150,13 @@ export class AuthService {
     }
   }
 
+  // LISTA TODAS AS CONTAS REGISTRADAS
   async listAcount(){
     const response = await this.api.get(this.urlBase + '/conta');
     return response;
   }
 
+  // OBTÉM UMA CONTA PELO E-MAIL
   async getAccountByEmail(email: string){
     const response = await this.api.get(this.urlBase + '/conta/email/' + email ).catch((err) => err)
     return response

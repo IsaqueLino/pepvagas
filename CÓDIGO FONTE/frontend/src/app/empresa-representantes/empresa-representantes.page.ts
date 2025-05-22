@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, ToastController, AlertController } from '@ionic/angular';
 import { EmpresaService } from '../services/empresa.service';
 import { AuthService } from '../services/auth.service';
+import { RepresentanteService } from '../services/representante.service';
 
 @Component({
   selector: 'app-empresa-representantes',
@@ -19,34 +20,36 @@ export class EmpresaRepresentantesPage implements OnInit {
   public currentPage: number = 1;
   public itemsPerPage: number = 10;
 
-  constructor(private toastController: ToastController, 
+  constructor(
+    private toastController: ToastController,
     private navigationController: NavController,
     private empresaService: EmpresaService,
     private authService: AuthService,
-    private alertController: AlertController) { 
-      if(this.authService.getJwt() == null)
-        this.navigationController.navigateRoot('login')
-    }
+    private alertController: AlertController,
+    private representanteService: RepresentanteService
+  ) {
+    if (this.authService.getJwt() == null)
+      this.navigationController.navigateRoot('login')
+  }
 
   async ngOnInit() {
-    this.getUser()
+    await this.getUser();
   }
 
   async ionViewWillEnter() {
+    await this.carregarRepresentantes();
+  }
+
+  async carregarRepresentantes() {
     try {
-      this.listaRepresentantes = await this.empresaService.getRepresentantesEmpresaId(this.userId)
-      console.log("Representantes buscados com sucesso!")
+      this.listaRepresentantes = await this.empresaService.getRepresentantesEmpresaId(this.userId);
       this.listaRepresentantes = this.listaRepresentantes.filter(representante => representante.conta !== null);
-      console.log("Representantes após filtragem:", this.listaRepresentantes);
-      
     } catch (error) {
-      console.error(error)
     }
   }
 
   onRowClick(idConta: number) {
     this.selectedIdConta = idConta;
-    console.log('ID da área selecionada:', this.selectedIdConta);
   }
 
   get paginatedListaRepresentante() {
@@ -67,50 +70,56 @@ export class EmpresaRepresentantesPage implements OnInit {
   }
 
   async excluir() {
-    let idString: string = String(this.selectedIdConta);
-    
+    if (this.selectedIdConta == null) {
+      this.exibirMensagem("Selecione um representante");
+      return;
+    }
+
+    const idString: string = String(this.selectedIdConta);
+
     try {
-      const resposta = await this.authService.deleteAccount(idString);
-      console.log(resposta);
-      this.ionViewWillEnter();
-    } catch (error) {
-      console.error('Erro ao excluir a conta:', error);
+
+      // Desativa o representante
+      const responseRepresentante = await this.representanteService.desativarRepresentante(idString);
+      const mensagem = responseRepresentante?.message || responseRepresentante?.data?.message;
+
+      if (mensagem === "Representante desativado com sucesso!") {
+        const responseConta = await this.authService.deleteAccount(idString);
+
+        if (responseConta?.data?.message) {
+          this.exibirMensagem("Conta desativada com sucesso!");
+          await this.carregarRepresentantes(); 
+          this.selectedIdConta = null;
+        } else {
+          this.exibirMensagem(responseConta?.data?.message || 'Erro ao desativar a conta.');
+        }
+
+      } else {
+        this.exibirMensagem(mensagem || "Erro ao desativar o representante.");
+      }
+
+    } catch (error: any) {
+      const mensagem = error?.response?.data?.message || "Erro ao desativar representante ou conta.";
+      this.exibirMensagem(mensagem);
     }
   }
 
   async getUser() {
-    this.userId = this.authService.getUser()
-    const userType = this.authService.getType()
+    this.userId = this.authService.getUser();
+    const userType = this.authService.getType();
     if (this.userId == null) {
-      this.isLogged = false
+      this.isLogged = false;
     } else {
-
-      this.userType = userType ?? ''
-      switch (userType) {
-        case "A":
-          break;
-        case "C":
-          break;
-        case "E":
-          this.user = await this.empresaService.getEmpresa(this.userId)
-          break;
-        case "M":
-          break;
-        case "R":
-          break;
-        case "L":
-          break;
+      this.userType = userType ?? '';
+      if (this.userType === "E") {
+        this.user = await this.empresaService.getEmpresa(this.userId);
       }
-
-
-      // const user = await this.candidatoService.getCandidato(userId)
-      // this.user = user
-      this.isLogged = true
+      this.isLogged = true;
     }
   }
 
-  cadastrarRepresentante(){
-    this.navigationController.navigateForward("cadastro-representante")
+  cadastrarRepresentante() {
+    this.navigationController.navigateForward("cadastro-representante");
   }
 
   async exibirMensagem(mensagem: string) {
@@ -124,24 +133,22 @@ export class EmpresaRepresentantesPage implements OnInit {
 
   async confirmarExclusao() {
     if (this.selectedIdConta == null) {
-      this.exibirMensagem("Selecione um representante")
+      this.exibirMensagem("Selecione um representante");
       return;
     }
 
     const alert = await this.alertController.create({
       header: 'Confirmação',
-      message: 'Tem certeza de que deseja excluir representante?',
+      message: 'Tem certeza de que deseja excluir o representante?',
       buttons: [
         {
           text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-          },
+          role: 'cancel'
         },
         {
           text: 'Excluir',
           handler: () => {
-            this.excluir()
+            this.excluir();
           },
         },
       ],
@@ -149,5 +156,4 @@ export class EmpresaRepresentantesPage implements OnInit {
 
     await alert.present();
   }
-
 }

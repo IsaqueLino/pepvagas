@@ -3,12 +3,14 @@ import nodemailer from 'nodemailer';
 import fs from 'fs'
 import path from 'path';
 
+// CARREGANDO AS VARIÁVEIS DE AMBIENTE DO ARQUIVO .ENV
 dotenv.config(
     {
         path: __dirname + "/../.env"
     }
 );
 
+// CONFIGURAÇÃO DO TRANSPORTE DE E-MAIL USANDO NODEMAILER
 const transport = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -23,6 +25,7 @@ const transport = nodemailer.createTransport({
 
 });
 
+// FUNÇÃO PARA GERAR UMA SENHA ALEATÓRIA
 function generatePassword() {
     const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
     const uppercaseLetters = lowercaseLetters.toUpperCase();
@@ -45,8 +48,8 @@ function generatePassword() {
     return password.split('').sort(() => Math.random() - 0.5).join(''); // randomly shuffle
 }
 
+// FUNÇÃO PARA ENVIAR UM E-MAIL DE RECUPERAÇÃO DE SENHA
 async function sendEmail(email: string, password: string) {
-
 
     const mailOptions = {
         from: 'noreply.pepvagas@gmail.com',
@@ -75,6 +78,7 @@ async function sendEmail(email: string, password: string) {
     });
 }
 
+// FUNÇÃO PARA ENVIAR CURRÍCULO VIA E-MAIL
 async function sendEmailCurriculo(curriculo: any, candidato: any, vaga: any) {
     try {
 
@@ -179,9 +183,9 @@ async function sendEmailCurriculo(curriculo: any, candidato: any, vaga: any) {
     } catch (error) {
         console.log(error);
     }
-
 }
 
+// FUNÇÃO PARA ENVIAR CURRÍCULO DIRETO DO PERFIL DO CANDIDATO
 async function sendEmailCurriculoDoPerfil(candidato: any, vaga: any) {
     try {
 
@@ -198,8 +202,6 @@ async function sendEmailCurriculoDoPerfil(candidato: any, vaga: any) {
             }
 
             const curriculo = data;
-
-
 
             const titulo_vaga = vaga.titulo;
             const email = vaga.emailCurriculo;
@@ -302,6 +304,7 @@ async function sendEmailCurriculoDoPerfil(candidato: any, vaga: any) {
 
 }
 
+// FUNÇÃO PARA ENVIAR UMA NOTIFICAÇÃO POR E-MAIL PARA O CANDIDATO
 async function sendEmailNotification(candidato: any, vaga: any, url: any, message: any) {
     let cabecalho = '';
     if (message == 'perfeita') {
@@ -311,8 +314,6 @@ async function sendEmailNotification(candidato: any, vaga: any, url: any, messag
         message = " uma empresa está oferencendo uma vaga que é de seu interesse para você";
         cabecalho = "PEPVagas - Vaga de interesse para você";
     }
-
-
 
     const mailOptions = {
         from: 'noreply.pepvagas@gmail.com',

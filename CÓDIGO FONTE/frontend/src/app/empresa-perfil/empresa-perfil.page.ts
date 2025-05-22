@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { IonModal, NavController, ToastController } from '@ionic/angular';
 import { AdministradorService } from '../services/administrador.service';
-import { RepresentanteService } from '../services/representante.service';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { EmpresaService } from '../services/empresa.service';
 import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
@@ -37,10 +36,7 @@ export class EmpresaPerfilPage implements OnInit {
     this.getUser()
 
     this.conta = await this.authService.getContaDetails()
-    console.log("Conta: ", this.conta)
-
     this.empresa = await this.empresaService.getEmpresa(this.userId)
-    console.log("Empresa: ", this.empresa)
     this.empresaAlterada = Object.assign({}, this.empresa)
     this.empresaAlterada.cnpj = this.formatCnpj(this.empresaAlterada.cnpj)
     this.empresaAlterada.telefone = this.formatTelefone(this.empresaAlterada.telefone)
@@ -151,10 +147,10 @@ export class EmpresaPerfilPage implements OnInit {
   async updatePassword() {
     try {
       if (this.novaSenha.novaSenha.length < 4) {
-        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres")
+        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres.")
       }
       else if(this.novaSenha.novaSenha != this.novaSenha.confirmarSenha){
-        this.exibirMensagem("A nova senha e sua confirmação não coincidem")
+        this.exibirMensagem("A nova senha e sua confirmação não coincidem.")
       }
       else{
         const response = await this.authService.updatePassword(this.conta.idConta, this.novaSenha.senhaAtual, this.novaSenha.novaSenha, this.novaSenha.confirmarSenha);
@@ -173,16 +169,39 @@ export class EmpresaPerfilPage implements OnInit {
       this.exibirMensagem('Senha Atual incorreta');
     }
   }
-
   async deactivateAccount(id: string): Promise<void> {
     try {
-      await this.authService.deleteAccount(id)
-      console.log('Conta excluída com sucesso!')
-      this.logout()
+
+        // Desativar a empresa
+        const responseEmpresa = await this.empresaService.desativarEmpresa(id);
+
+        const mensagem = responseEmpresa?.data?.message || responseEmpresa?.message;
+
+        if (mensagem) {
+
+            if (mensagem === "Empresa desativada com sucesso!") {
+                const responseConta = await this.authService.deleteAccount(id);
+
+                if (responseConta?.data?.message) {
+                    await this.exibirMensagem("Conta desativada com sucesso!");
+                    this.logout();
+                } else {
+                    console.error('Erro ao desativar a conta. Resposta da API de conta:', responseConta);
+                    this.exibirMensagem(responseConta?.data?.message || 'Erro ao desativar a conta. Tente novamente mais tarde.');
+                }
+            } else {
+                console.error('Erro ao desativar a empresa:', mensagem);
+                this.exibirMensagem(mensagem);
+            }
+        } else {
+            console.error('Resposta inválida ou sem mensagem da API de empresa.');
+            this.exibirMensagem('Erro ao desativar a empresa. Tente novamente mais tarde.');
+        }
     } catch (error) {
-      console.error('Erro ao excluir conta:', error)
+        console.error('Erro ao desativar empresa ou conta:', error);
+        this.exibirMensagem('Ocorreu um erro ao tentar desativar a empresa ou a conta. Tente novamente.');
     }
-  }
+}
 
   public actionSheetButtons = [
     {

@@ -34,9 +34,18 @@
                 </ion-item>
               </ion-col>
               <ion-col size="6">
-                <ion-item class="form-item">
-                  <ion-input formControlName="email" label="Email" labelPlacement="floating"
-                    placeholder="Informe o email de contato" type="email"></ion-input>
+                <ion-item class="form-item" [class.invalid]="emailInvalid">
+                  <ion-input 
+                    formControlName="email" 
+                    label="Email" 
+                    labelPlacement="floating"
+                    placeholder="Informe o email de contato" 
+                    type="email"
+                    (ionChange)="validateEmail()">
+                  </ion-input>
+                  <ion-note *ngIf="emailInvalid" color="danger" slot="error">
+                    Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+                  </ion-note>
                 </ion-item>
               </ion-col>
             </ion-row>

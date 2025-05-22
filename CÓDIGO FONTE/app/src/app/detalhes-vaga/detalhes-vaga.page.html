@@ -39,7 +39,7 @@
           <p *ngIf="vaga.modalidade==='P'"><b>Modalidade:</b> Presencial </p>
           <p *ngIf="vaga.modalidade==='H'"><b>Modalidade:</b> Híbrido </p>
           <p *ngIf="vaga.modalidade==='R'"><b>Modalidade:</b> Remoto </p>
-          <p><b>Área:</b> {{vaga.idArea.nome}} </p>
+          <p><b>Área:</b> {{vaga.idArea?.nome}} </p>
           <p *ngIf="vaga.pcd"><b> Vaga para PCDs </b></p>
           <ion-button class="duvida-button" id="vaga">?</ion-button>
           <ion-popover trigger="vaga" triggerAction="click">
@@ -58,13 +58,22 @@
         </ion-col>
         <ion-col size="12">
           <ion-card-content class="job-card-content">
-            <img alt="Logo" class="logo" *ngIf="!isEnvironment" src="http://localhost:4001/images/{{vaga.logo}}" />
-            <img alt="Logo" class="logo" *ngIf="isEnvironment"
-              src="http://vagas.pep2.ifsp.edu.br/api/images/{{vaga.logo}}" />
+            <div *ngIf="vaga.ocultarNome !== 'S' && vaga.logo !== 'vaga-logopadrao.svg'">
+              <img alt="Logo" class="logo" *ngIf="!isEnvironment" src="http://localhost:4001/images/{{vaga.logo}}" />
+              <img alt="Logo" class="logo" *ngIf="isEnvironment" src="http://vagas.pep2.ifsp.edu.br/api/images/{{vaga.logo}}" />
+            </div>
+            
+            <!-- Logo confidencial -->
+            <img *ngIf="vaga.ocultarNome === 'S' || vaga.logo === 'vaga-logopadrao.svg'" alt="Logo Confidencial" class="logo" 
+            src="assets/confidencial.png"/>
+
+
             <div class="text-container">
               <ion-row>
                 <ion-col size="12">
-                  <div class="nome">{{vaga.idEmpresa.nomeEmpresa}}</div>
+                  <div class="nome">
+                    {{vaga.ocultarNome === 'S' ? 'Empresa Confidencial' : vaga.idEmpresa?.nomeEmpresa}}
+                  </div>
                 </ion-col>
                 <ion-col size="6">
                   <div class="nome">{{vaga.cidade}}</div>
@@ -80,7 +89,7 @@
           <ion-label class="breakable">{{vaga.descricao}}</ion-label>
         </ion-col>
         <ion-col size="12">
-          <ion-radio-group [(ngModel)]="selectedOption">
+          <ion-radio-group *ngIf="!fromCandidaturas" [(ngModel)]="selectedOption">
             <ion-radio value="perfil"></ion-radio>
             <ion-label> Usar Currículo do Perfil</ion-label>
             <br>
@@ -89,7 +98,12 @@
           </ion-radio-group>
         </ion-col>
         <ion-col size="12">
-          <ion-button class="curriculo" expand="block" (click)="fileInput.click()">
+          <ion-button 
+            class="curriculo" 
+            expand="block" 
+            (click)="fileInput.click()" 
+            *ngIf="!fromCandidaturas"
+            [disabled]="selectedOption === 'perfil'">
             {{ selectedFile ? 'Currículo selecionado: ' + selectedFile.name : 'Selecionar currículo' }}
           </ion-button>
           <input style="display: none;" type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)">
@@ -97,7 +111,7 @@
       </ion-row>
       <ion-item>
         <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;">
-          <ion-button mat-button shape="round" (click)="candidatar()" class="cor-botao">Quero me candidatar!</ion-button>
+          <ion-button *ngIf="!fromCandidaturas" mat-button shape="round" (click)="candidatar()" class="cor-botao">Quero me candidatar!</ion-button>
         </div>
       </ion-item>
 

@@ -20,10 +20,13 @@ const {
 })
 export class HomePage implements OnInit {
 
-  private vagas: any = []
+  private vagas: any[] = []
   public listaVagas: any = [...this.vagas]
   public isDarkTheme: boolean = false
   public user: any = {}
+  public userName: string = '';
+
+  public searchValue: string = ""
 
   constructor(
     private toastController: ToastController,
@@ -47,9 +50,9 @@ export class HomePage implements OnInit {
       this.getVagas()
     }, 500)
 
-    setInterval(() => {
-      this.getVagas()
-    },5000)
+    //setInterval(() => {
+    //  this.getVagas()
+    //},5000)
 
     // Requisitar permissão para notificações push
     // PushNotifications['requestPermission']().then( (result: { granted: any; }) => {
@@ -94,9 +97,11 @@ export class HomePage implements OnInit {
     //this.registerPush();
   }
 
+  /*
   async ionViewWillEnter() {
     this.ngOnInit()
   }
+  */
 
   /*
   async registerPush() {
@@ -118,21 +123,43 @@ export class HomePage implements OnInit {
   */
 
   async getUser() {
-    const user = await this.candidatoService.getCandidato(this.authService.getUser() ?? '')
-    this.user = user
-    console.log(this.user)
+    const user = await this.candidatoService.getCandidato(this.authService.getUser() ?? '');
+    this.user = user;
+    
+    // Define o nome do usuário para exibição
+    if (user.nome) {
+      // Pega apenas o primeiro nome
+      this.userName = user.nome.split(' ')[0];
+    } else if (user.email) {
+      // Fallback para o email (parte antes do @)
+      this.userName = user.email.split('@')[0];
+    } else {
+      this.userName = 'Usuário';
+    }
   }
 
   async getVagas() {
-    const response = await this.vagaService.getVagas()
-    this.vagas = response.data
-    this.listaVagas = [...this.vagas]
-
-    this.matchVagas()
-
-    this.sortVagas()
-
-    console.log(this.listaVagas)
+    const response = await this.vagaService.getVagas();
+    this.vagas = response.data;
+  
+    const idCandidato = this.user?.idconta;
+    if (idCandidato) {
+      try {
+        const candidaturas = await this.candidatoService.getCandidaturas(idCandidato);
+        const idsCandidatados = candidaturas.map((c: any) => c.idVaga);
+  
+        this.vagas.forEach(vaga => {
+          vaga.jaCandidatado = idsCandidatados.includes(vaga.idVaga);
+        });
+      } catch (error) {
+        console.error("Erro ao buscar candidaturas do candidato:", error);
+      }
+    }
+  
+    this.listaVagas = [...this.vagas];
+  
+    this.matchVagas();
+    this.sortVagas();
   }
 
   // SISTEMA DE PONTUACAO
@@ -190,8 +217,8 @@ export class HomePage implements OnInit {
     });
   }
 
-  verDetalhesVaga(idVaga: string) {
-    localStorage.setItem('idVaga', idVaga);
+  verDetalhesVaga(vaga: any) {
+    localStorage.setItem('idVaga', vaga.idVaga);
     this.redirect('/detalhes-vaga');
   }
 
@@ -215,6 +242,7 @@ export class HomePage implements OnInit {
     }, 2000);
   }
 
+  /*
   handleFilter(event: any) {
     const query = event.target.value.toLowerCase();
 
@@ -230,6 +258,15 @@ export class HomePage implements OnInit {
     })
 
     console.log(this.listaVagas)
+  }
+  */
+
+  search() {
+    const query = this.searchValue.toLowerCase();
+    
+    this.listaVagas = this.vagas.filter(vaga => 
+      vaga.titulo.toLowerCase().includes(query)
+    );
   }
 
   toggleTheme() {

@@ -12,6 +12,7 @@ export class TipoServicoService {
 
   constructor(private http: HttpClient) { }
 
+  // BUSCA TODOS OS TIPOS DE SERVIÇO CADASTRADOS
   async buscarTodosServicos(){
     const api = axios.create({
       baseURL: this.urlBase
@@ -21,6 +22,7 @@ export class TipoServicoService {
     return response.data;
   }
 
+  // BUSCA PROFISSIONAIS RELACIONADOS A UM TIPO DE SERVIÇO ESPECÍFICO
   async buscarProfissionais(id : string){
     const api = axios.create({
       baseURL: this.urlBase
@@ -30,6 +32,7 @@ export class TipoServicoService {
     return response.data;
   }
 
+  // CADASTRA UM NOVO TIPO DE SERVIÇO
   async cadastrarTipo(nome : string){
     const api = axios.create({
       baseURL: this.urlBase
@@ -41,17 +44,17 @@ export class TipoServicoService {
     return response;
   }
 
+  // EXCLUI UM TIPO DE SERVIÇO PELO ID
   async excluir(id : string){
     const api = axios.create({
       baseURL: this.urlBase
     });
 
     const response = await api.delete(this.urlBase + '/tipo-servico/delete/' + id)
-
     return response
-
   }
 
+  // ATUALIZA O NOME DE UM TIPO DE SERVIÇO EXISTENTE
   async atualizarTipo(id : string, nome : string){
     const api = axios.create({
       baseURL: this.urlBase
@@ -62,6 +65,5 @@ export class TipoServicoService {
     })
 
     return response
-
   }
 }

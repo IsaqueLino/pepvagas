@@ -21,6 +21,7 @@ export class CadastroRepresentantePage implements OnInit {
   public novoRepresentante: {nome: string, empresa: string} = {nome: '', empresa: ''}
   public novaConta: {email: string, senha: string, confirmarSenha: string} = {email: '', senha: '', confirmarSenha: ''}
   private userId: any
+  public emailInvalid: boolean = false;
 
   constructor(private toastController: ToastController,
     private authService: AuthService,
@@ -39,18 +40,31 @@ export class CadastroRepresentantePage implements OnInit {
     this.novoRepresentante.empresa = this.userId
   }
 
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.novaConta.email ? !emailRegex.test(this.novaConta.email) : false;
+  }
+
   async onSubmit(){
+
+    this.validateEmail();
+    
+    if (this.emailInvalid) {
+      this.exibirMensagem("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).");
+      return;
+    }
+
     if (this.novoRepresentante.nome.length == 0) {
-      this.exibirMensagem("Informe o nome do membro da equipe")
+      this.exibirMensagem("Informe o nome do representante.")
     }
     else if (this.novaConta.email.length == 0) {
-      this.exibirMensagem("Informe o e-mail da conta")
+      this.exibirMensagem("Informe o e-mail da conta.")
     }
     else if(this.novaConta.senha.length < 4){
-      this.exibirMensagem("A senha deve ter no mímino 4 caracteres")
+      this.exibirMensagem("A senha deve ter no mímino 4 caracteres.")
     }
     else if (this.novaConta.senha != this.novaConta.confirmarSenha) {
-      this.exibirMensagem("As senhas não colidem")
+      this.exibirMensagem("As senhas não coincidem.")
     }else{
       try {
         const response = await this.authService.createAccount(this.novaConta.email, this.novaConta.senha, TipoUsuario.REPRESENTANTE)
@@ -60,12 +74,7 @@ export class CadastroRepresentantePage implements OnInit {
 
           if(response2.status == 201){
             this.exibirMensagem("Representante " + this.novoRepresentante.nome + " cadastrado com sucesso!")
-            this.novoRepresentante.nome = ''
-            this.novoRepresentante.empresa = ''
-            this.novaConta.email = ''
-            this.novaConta.senha = ''
-            this.novaConta.confirmarSenha = ''
-            this.ngOnInit()
+            this.navController.navigateBack('empresa-representantes');
           } else{
             this.exibirMensagem("Erro interno no servidor")
             console.error("Erro ao criar conta")
@@ -108,7 +117,6 @@ export class CadastroRepresentantePage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(this.userId)
-          console.log(this.user)
           break;
         case "C":
           this.user = await this.candidatoService.getCandidato(this.userId)

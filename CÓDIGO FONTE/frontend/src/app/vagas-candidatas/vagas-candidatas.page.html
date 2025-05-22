@@ -1,0 +1,34 @@
+<ion-content [fullscreen]="true">
+  <app-nav></app-nav>
+
+  <ion-toast class="aviso" icon="person" [buttons]="toastButtons" [isOpen]="isToastOpen" 
+              message="Registre suas informações complementares para receber vagas que combinam com você!"></ion-toast>
+
+  <div class="web-padding">
+    <ion-searchbar [debounce]="500" (ionInput)="search()" [(ngModel)]="searchValue" 
+                   placeholder="Título da vaga" show-clear-button="focus" class="custom"></ion-searchbar>
+
+    <h4 class="subtitle">Candidaturas</h4>
+
+    <div *ngIf="listaVagas.length > 0" class="vagas-grid">
+      <div class="vaga-wrapper" *ngFor="let vaga of listaVagas" (click)="verVagaDetalhes(vaga.idVaga)">
+        <app-vaga 
+          [titulo]="vaga.titulo"
+          [cidade]="vaga.cidade"
+          [regime]="vaga.regime"
+          [salario]="vaga.salario"
+          [pcd]="vaga.pcd"
+          [tipo]="vaga.tipo"
+          [data]="vaga.dataLimite"
+          [logo]="vaga.logo"
+          [empresa]="vaga.idEmpresa.nomeEmpresa"
+          [ocultarNome]="vaga.ocultarNome">
+        </app-vaga>
+      </div>
+    </div>
+
+    <div *ngIf="listaVagas.length === 0">
+      <p class="subtitle center">Você ainda não se candidatou a nenhuma vaga.</p>
+    </div>
+  </div>
+</ion-content>

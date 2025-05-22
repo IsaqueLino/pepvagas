@@ -31,6 +31,7 @@ export class CadastroEquipePage implements OnInit {
   public novaConta: {email: string, senha: string, confirmarSenha: string} = {email: '', senha: '', confirmarSenha: ''}
   public user: any = {}
   public userType: string = ''
+  public emailInvalid: boolean = false;
 
   ngOnInit() {
     this.checkTheme()
@@ -41,18 +42,31 @@ export class CadastroEquipePage implements OnInit {
     }
   }
 
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.novaConta.email ? !emailRegex.test(this.novaConta.email) : false;
+  }
+
   async onSubmit(){
+
+    this.validateEmail();
+    
+    if (this.emailInvalid) {
+      this.exibirMensagem("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).");
+      return;
+    }
+
     if (this.novaEquipe.nome.length == 0) {
-      this.exibirMensagem("Informe o nome do membro da equipe")
+      this.exibirMensagem("Informe o nome do membro da equipe.")
     }
     else if (this.novaConta.email.length == 0) {
-      this.exibirMensagem("Informe o e-mail da conta")
+      this.exibirMensagem("Informe o e-mail da conta.")
     }
     else if(this.novaConta.senha.length < 4){
-      this.exibirMensagem("A senha deve ter no mímino 4 caracteres")
+      this.exibirMensagem("A senha deve ter no mímino 4 caracteres.")
     }
     else if (this.novaConta.senha != this.novaConta.confirmarSenha) {
-      this.exibirMensagem("As senhas não colidem")
+      this.exibirMensagem("As senhas não coincidem.")
     }else{
       try {
         const response = await this.authService.createAccount(this.novaConta.email, this.novaConta.senha, TipoUsuario.MEMBRO_EQUIPE)
@@ -71,9 +85,9 @@ export class CadastroEquipePage implements OnInit {
           console.error("Erro ao criar conta")
         }
 
-        }else if(response.status == 409){
-          console.error(response.response.data.message)
-          this.exibirMensagem("Erro ao criar a conta")
+        } else if (response.status == 409) {
+          const msg = response.response?.data?.message || "Erro ao criar a conta";
+          this.exibirMensagem(msg);
         }
 
       } catch (error) {
@@ -132,37 +146,39 @@ export class CadastroEquipePage implements OnInit {
   }
 
   async getUser() {
-    const userId = this.authService.getUser()
-    const userType = this.authService.getType()
+    const userId = this.authService.getUser();
+    const userType = this.authService.getType();
+  
     if (userId == null) {
-      this.isLogged = false
+      this.isLogged = false;
     } else {
-
-      this.userType = userType ?? ''
+      this.userType = userType ?? '';
+  
       switch (userType) {
         case "A":
-          this.user = await this.adminService.getAdministrador(userId)
-          console.log(this.user)
+          const admin = await this.adminService.getAdministrador(userId);
+          if (admin) {
+            this.user = admin;
+          } else {
+            console.error("Erro ao buscar administrador.");
+          }
           break;
         case "C":
-          this.user = await this.candidatoService.getCandidato(userId)
+          this.user = await this.candidatoService.getCandidato(userId);
           break;
         case "E":
           break;
         case "M":
-          this.user = await this.equipeService.getMembroEquipe(userId)
+          this.user = await this.equipeService.getMembroEquipe(userId);
           break;
         case "R":
           break;
         case "L":
           break;
       }
-
-
-      // const user = await this.candidatoService.getCandidato(userId)
-      // this.user = user
-      this.isLogged = true
+  
+      this.isLogged = true;
     }
-  }
+  }  
 
 }

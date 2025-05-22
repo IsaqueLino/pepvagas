@@ -9,6 +9,7 @@ import { Equal } from "typeorm"
 
 export default {
 
+    // FUNÇÃO PARA REALIZAR LOGIN
     async login(request: Request, response: Response) {
 
         const { email, senha, isInApp } = request.body
@@ -38,8 +39,6 @@ export default {
                 }
             })
 
-
-
             if (conta) {
 
                 const senhaExist = await bcrypt.compare(senha, conta.senha)
@@ -59,6 +58,8 @@ export default {
 
                     return response.status(200).json(responseObject)
                 } else {
+
+
 
                     return response.status(404).json({
                         message: "Email ou senha incorretos."
@@ -84,33 +85,9 @@ export default {
                 })
 
                 if (contaDeletedExist) {
-                    const senhaExist = await bcrypt.compare(senha, contaDeletedExist.senha)
-
-                    if (senhaExist) {
-
-                        contaDeletedExist.deletedAt = null
-                        await contaRepository.save(contaDeletedExist)
-
-                        const token = jwt.sign({ id: contaDeletedExist.idConta, tipo: contaDeletedExist.tipo }, '@$%_+POIUYTREWQASDF@@' as string, {
-                            expiresIn: '5h',
-                        });
-
-
-                        const responseObject = {
-                            id: contaDeletedExist.idConta,
-                            token: token,
-                            tipo: contaDeletedExist.tipo
-                        }
-
-                        return response.status(200).json(responseObject)
-                    } else {
-
-                        return response.status(404).json({
-                            message: "Email ou senha incorretos."
-                        })
-
-                    }
-
+                    return response.status(404).json({
+                        message: "Não existe uma conta com este email."
+                    });                
 
                 } else {
                     return response.status(404).json({

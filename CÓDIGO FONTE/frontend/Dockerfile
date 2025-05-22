@@ -9,6 +9,8 @@ RUN npm install
 
 COPY www .
 
+RUN npm run build
+
 FROM nginx:1.25.5-alpine-slim
 
 ENV TZ=America/Sao_Paulo

@@ -46,31 +46,29 @@ export class ListarAreaPage implements OnInit {
     }
   }
 
-  async carregarLista(){
-    this.listaArea = await this.areaService.buscarTodasAreas();
-
-    (await this.areaService.buscarTodasAreas()).subscribe(data => {
-      this.listaArea = data;
-    });
-
-    console.log(this.listaArea)
-  }
+  carregarLista() {
+  this.areaService.buscarTodasAreas().subscribe(data => {
+    this.listaArea = Array.isArray(data) ? data : [];
+  });
+}
 
   onRowClick(idArea: number) {
     this.selectedIdArea = idArea;
-    console.log('ID da área selecionada:', this.selectedIdArea);
   }
 
   async validateAndOpenModal() {
     if (this.selectedIdArea !== null) {
-      this.modal.present();
+      const areaSelecionada = this.listaArea.find((a: any) => a.idArea === this.selectedIdArea);
+      
+      if (areaSelecionada) {
+        // Preenche o formulário com o nome da Área selecionada
+        this.area.patchValue({
+          nome: areaSelecionada.nome
+        });
+        this.modal.present();
+      }
     } else {
-      const toast = await this.toastController.create({
-        message: 'Selecione uma área para poder alterar.',
-        duration: 2000,
-        position: 'bottom'
-      });
-      toast.present();
+      this.exibirMensagem("Selecione uma área para poder alterar.")
     }
   }
 
@@ -96,47 +94,85 @@ export class ListarAreaPage implements OnInit {
   async excluir() {
     if (this.selectedIdArea != null) {
       const idString: string = String(this.selectedIdArea);
-      const resposta = await this.areaService.excluir(idString);
-      console.log(resposta);
-      this.carregarLista();
-      this.modal2.dismiss(null, 'cancel');
-
-      const toast = await this.toastController.create({
-        message: 'Área excluída com sucesso.',
-        duration: 2000,
-        position: 'bottom'
-      });
-      toast.present();
+  
+      try {
+        await this.areaService.excluir(idString);
+        
+        // ATUALIZA A LISTA
+        await this.carregarLista();
+  
+        // TOAST DE SUCESSO
+        const toast = await this.toastController.create({
+          message: 'Área excluída com sucesso!',
+          duration: 2000,
+          position: 'top',
+          cssClass: 'custom-dark-toast'
+        });
+        toast.present();
+        this.selectedIdArea = null;
+  
+      } catch (error) {
+        console.error('Erro ao excluir área:', error);
+  
+        const toast = await this.toastController.create({
+          message: 'Erro ao excluir a área.',
+          duration: 2000,
+          position: 'top',
+          cssClass: 'custom-dark-toast'
+        });
+        toast.present();
+      }
     }
   }
   
-  async enviarAlteracao(){
 
-    if(this.area.value["nome"] == null){
+  // Recarregar a lista toda vez que a página for reexibida
+  ionViewWillEnter() {
+    this.carregarLista();
+  }
+  
+  
+  async enviarAlteracao() {
+    if (this.area.value["nome"] == null) {
       const toast = await this.toastController.create({
-        message: 'O novo noem tem que ser informado para realizar a alteração',
+        message: 'O novo nome tem que ser informado para realizar a alteração',
         duration: 2000,
-        position: 'bottom'
+        position: 'top',
+        cssClass: 'custom-dark-toast'
       });
       toast.present();
-
-      return
+      return;
     }
-
-    if(this.selectedIdArea !== null){
-
-      let idString : string = String(this.selectedIdArea)
-
-      const resposta = this.areaService.atualizarArea(idString, this.area.value["nome"])
-
-      console.log(resposta)
-
-      this.modal.dismiss(null, 'cancel');
-
-      this.carregarLista()
-
+  
+    if (this.selectedIdArea !== null) {
+      let idString: string = String(this.selectedIdArea);
+  
+      try {
+        await this.areaService.atualizarArea(idString, this.area.value["nome"]);
+  
+        this.modal.dismiss(null, 'cancel');
+        this.carregarLista();  // Atualiza a tabela
+  
+        const toast = await this.toastController.create({
+          message: 'Área alterada com sucesso!',
+          duration: 2000,
+          position: 'top',
+          cssClass: 'custom-dark-toast'
+        });
+        toast.present();
+  
+      } catch (error) {
+        const toast = await this.toastController.create({
+          message: 'Erro ao alterar a área.',
+          duration: 2000,
+          position: 'top',
+          cssClass: 'custom-dark-toast'
+        });
+        toast.present();
+      }
     }
   }
+  
 
   onWillDismissPassword(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>
@@ -156,7 +192,7 @@ export class ListarAreaPage implements OnInit {
 
   async confirmarExclusao() {
     if (this.selectedIdArea == null) {
-      this.exibirMensagem("Selecione um representante")
+      this.exibirMensagem("Selecione uma área.")
       return;
     }
 

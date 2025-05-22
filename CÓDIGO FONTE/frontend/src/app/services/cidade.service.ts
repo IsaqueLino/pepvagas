@@ -7,15 +7,17 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class CidadeService {
-  private apiUrl = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios'; // URL da API
+  private apiUrl = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios'; // URL DA API DO IBGE PARA MUNICÍPIOS DE SP (ESTADO 35)
 
   constructor(private http: HttpClient) { }
 
+  // OBTÉM A LISTA COMPLETA DE CIDADES COM TODOS OS DADOS DA API
   getCidades(): Observable<any> {
     return this.http.get<any>(this.apiUrl);
   }
 
-  getCities(): Observable<string[]> { // Defina o tipo de retorno como Observable<string[]>
+  // OBTÉM APENAS OS NOMES DAS CIDADES, TRANSFORMANDO A RESPOSTA EM UM ARRAY DE STRINGS
+  getCities(): Observable<string[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
       map((response: any[]) => response.map((item: any) => item.nome))
     );

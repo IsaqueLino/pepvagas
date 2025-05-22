@@ -10,6 +10,7 @@ import { NavController, ToastController } from '@ionic/angular';
 export class CriarContaPage implements OnInit {
 
   public login: any = {}
+  public emailInvalid: boolean = false; 
 
   constructor(
     private authService: AuthService,
@@ -28,49 +29,62 @@ export class CriarContaPage implements OnInit {
       this.navigationController.navigateRoot('home')
   }
 
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.login.email && !emailRegex.test(this.login.email);
+  }
+
   async onSubmit() {
-
-    if (this.login.email == '') {
-      this.showMessage("Email requerido")
+    // Validação do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.login.email)) {
+      this.showMessage("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).");
+      return;
+    }
+    
+    if (!this.login.email || !this.login.senha) {
+      this.showMessage("O Email e a Senha são requeridos.");
     } else if (this.login.senha != this.login.confirmacaoSenha) {
-      this.showMessage("A senha e a confirmação de senha devem ser iguais")
+      this.showMessage("As senhas não coincidem.");
     } else {
-      const type = this.authService.getType()
 
+      if(this.login.senha.length < 4)
+      {
+        this.showMessage("A senha deve ter no mímino 4 caracteres.")
+        return;
+      }
+
+      const type = this.authService.getType();
+  
       if (type) {
-
-        
-        // const response = await this.authService.createAccount(this.login.email, this.login.senha, type)
-        
-        const conta = await this.authService.getAccountByEmail(this.login.email)
-
+        const conta = await this.authService.getAccountByEmail(this.login.email);
+  
         if(conta.status == 206){
-          this.showMessage("Esta conta já existe")
+          this.showMessage("Já existe uma conta ativa com esse email de login.");
         }else{
-          sessionStorage.setItem("email", this.login.email)
-          sessionStorage.setItem("pass", this.login.senha)
-
+          sessionStorage.setItem("email", this.login.email);
+          sessionStorage.setItem("pass", this.login.senha);
+  
           switch (type) {
             case 'C':
-              this.navigationController.navigateForward("cadastro-candidato")
+              this.navigationController.navigateForward("cadastro-candidato");
               break;
             case 'E':
-              this.navigationController.navigateRoot("/cadastro-empresa")
+              this.navigationController.navigateRoot("/cadastro-empresa");
               break;
             case 'L':
-              this.navigationController.navigateRoot("/profissional-liberal-cadastro")
+              this.navigationController.navigateRoot("/profissional-liberal-cadastro");
               break;
           }
         }
       }
     }
   }
-
   async showMessage(message: string) {
     const toast = await this.toastController.create({
       message: message,
       duration: 1500,
-      position: 'top',
+      position: 'bottom',
     })
 
     toast.present()
@@ -84,6 +98,8 @@ export class CriarContaPage implements OnInit {
       document.body.setAttribute('color-scheme', 'light')
     }
   }
+
+  
 
 
 }

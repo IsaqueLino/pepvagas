@@ -48,7 +48,6 @@ export class CadastroSelecionarTipoPage implements OnInit {
   }
 
   onSubmit(tipo: string) {
-    console.log("Clicou no submit " + tipo)
     switch (tipo) {
       case 'C':
         this.authService.setType('C')

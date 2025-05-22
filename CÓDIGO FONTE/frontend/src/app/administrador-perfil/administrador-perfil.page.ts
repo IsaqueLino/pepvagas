@@ -3,6 +3,8 @@ import { AuthService } from '../services/auth.service';
 import { IonModal, NavController, ToastController } from '@ionic/angular';
 import { AdministradorService } from '../services/administrador.service';
 import { OverlayEventDetail } from '@ionic/core/components';
+import { AxiosResponse, AxiosError } from 'axios';
+
 
 @Component({
   selector: 'app-administrador-perfil',
@@ -18,26 +20,31 @@ export class AdministradorPerfilPage implements OnInit {
   public administrador: any = {}
   public administradorAlterado: any = {}
   public conta: any = {}
-  public novaSenha: {senhaAtual: string, novaSenha: string, confirmarSenha: string} = {senhaAtual: '', novaSenha: '', confirmarSenha: ''}
+  public novaSenha: { senhaAtual: string, novaSenha: string, confirmarSenha: string } = { senhaAtual: '', novaSenha: '', confirmarSenha: '' }
 
   constructor(private toastController: ToastController,
     private authService: AuthService,
     private navController: NavController,
     private adminService: AdministradorService) {
-      if(this.authService.getJwt() == null)
-        this.navController.navigateRoot('login')
-     }
+    if (this.authService.getJwt() == null)
+      this.navController.navigateRoot('login')
+  }
 
   async ngOnInit() {
-      this.getUser()
+    
+    try {
+      this.getUser();
 
-      this.conta = await this.authService.getContaDetails()
-      console.log("Conta: ", this.conta)
+      this.conta = await this.authService.getContaDetails();
 
-      this.administrador = await this.adminService.getAdministrador(this.userId)
-      console.log("Administrador: ", this.administrador)
-      this.administradorAlterado = Object.assign({}, this.administrador)
+      this.administrador = await this.adminService.getAdministrador(this.userId);
+
+      this.administradorAlterado = Object.assign({}, this.administrador);
+    } catch (error) {
+      console.error("Erro ao buscar administrador:", error);
+    }
   }
+
 
   @ViewChild('modal9', { static: true }) modal9!: IonModal;
   @ViewChild('modal10', { static: true }) modal10!: IonModal;
@@ -102,7 +109,6 @@ export class AdministradorPerfilPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(this.userId)
-          console.log(this.user)
           break;
         case "C":
           break;
@@ -125,12 +131,12 @@ export class AdministradorPerfilPage implements OnInit {
   async updatePassword() {
     try {
       if (this.novaSenha.novaSenha.length < 4) {
-        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres")
+        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres.")
       }
-      else if(this.novaSenha.novaSenha != this.novaSenha.confirmarSenha){
-        this.exibirMensagem("A nova senha e sua confirmação não coincidem")
+      else if (this.novaSenha.novaSenha != this.novaSenha.confirmarSenha) {
+        this.exibirMensagem("A nova senha e sua confirmação não coincidem.")
       }
-      else{
+      else {
         const response = await this.authService.updatePassword(this.conta.idConta, this.novaSenha.senhaAtual, this.novaSenha.novaSenha, this.novaSenha.confirmarSenha);
         if (response.status === 200) {
           this.exibirMensagem("Senha atualizada com sucesso!");
@@ -151,7 +157,6 @@ export class AdministradorPerfilPage implements OnInit {
   async deactivateAccount(id: string): Promise<void> {
     try {
       await this.authService.deleteAccount(id)
-      console.log('Conta excluída com sucesso!')
       this.logout()
     } catch (error) {
       console.error('Erro ao excluir conta:', error)
@@ -175,20 +180,20 @@ export class AdministradorPerfilPage implements OnInit {
     },
   ];
 
-  async alterarAdministrador(){
+  async alterarAdministrador() {
     if (this.administradorAlterado.nome.length == 0) {
       this.exibirMensagem("Informe o novo nome para o administrador")
     }
-    else{
+    else {
       try {
         const response = await this.adminService.alterar(this.userId, this.administradorAlterado.nome)
 
         if (response.status == 200) {
-            this.modal9.dismiss(this.administradorAlterado.nome, 'confirm');
-            this.ngOnInit()
-            this.exibirMensagem("Administrador alterado com sucesso!")
+          this.modal9.dismiss(this.administradorAlterado.nome, 'confirm');
+          this.ngOnInit()
+          this.exibirMensagem("Administrador alterado com sucesso!")
         }
-        else{
+        else {
           this.exibirMensagem("Erro interno no servidor")
         }
 

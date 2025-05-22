@@ -77,3 +77,19 @@ ion-img {
     width: 100%;
     max-width: 100%;
 }
+
+ion-item.invalid {
+    --highlight-color-invalid: var(--ion-color-danger);
+    --highlight-color-focused: var(--ion-color-danger);
+    
+    ion-input {
+      --color: var(--ion-color-danger);
+    }
+  }
+  
+  ion-note[slot="error"] {
+    display: block;
+    font-size: small;
+    margin-top: 5px;
+    color: var(--ion-color-danger);
+  }

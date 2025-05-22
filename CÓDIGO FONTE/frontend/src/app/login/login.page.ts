@@ -12,6 +12,7 @@ export class LoginPage implements OnInit {
   public login: any = {}
   public isDarkTheme = false
   public isLoading = false
+  public emailInvalid: boolean = false; 
 
   constructor(
     private authService: AuthService,
@@ -39,6 +40,11 @@ export class LoginPage implements OnInit {
     this.checkTheme()
   }
 
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.login.email && !emailRegex.test(this.login.email);
+  }
+
 
   private checkTheme() {
     const theme = localStorage.getItem('theme')
@@ -55,6 +61,23 @@ export class LoginPage implements OnInit {
 
     this.isLoading = true
 
+    // Validação do email antes de continuar
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!this.login.email || this.login.email.trim() == '') {
+      this.showMessage("Email é requerido.")
+      this.isLoading = false
+      return
+    } else if (!emailRegex.test(this.login.email)) {
+      this.emailInvalid = true;
+      this.showMessage("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).")
+      this.isLoading = false
+      return
+    } else if (this.login.senha == null || this.login.senha.trim() == '' || this.login.senha.length < 4) {
+      this.showMessage("Senha é requerida (no mínimo 4 caracteres).")
+      this.isLoading = false
+      return
+    }
+
     if(this.login.email == null || this.login.email.trim() == ''){
       this.showMessage("Email é requerido.")
       this.isLoading = false
@@ -67,7 +90,6 @@ export class LoginPage implements OnInit {
 
 
     const response = await this.authService.login(this.login.email, this.login.senha)
-    console.log(response)
 
     if (response == null) {
       this.showMessage("Erro interno do servidor")

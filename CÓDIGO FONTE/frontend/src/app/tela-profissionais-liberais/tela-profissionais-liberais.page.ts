@@ -89,7 +89,6 @@ export class TelaProfissionaisLiberaisPage implements OnInit {
 
   async onTipoChange(event: any) {
     this.selectedTipoId = event.detail.value;
-    console.log("Tipo selecionado: ", this.selectedTipoId);
     this.tipoService.buscarProfissionais(this.selectedTipoId).then(profissionais => {
       this.listaProfissionais = profissionais;
       if (this.listaProfissionais.length > 0) {
@@ -100,24 +99,28 @@ export class TelaProfissionaisLiberaisPage implements OnInit {
 
 
   async getTiposServicosDoProfissional() {
-    this.listaProfissionais.forEach(async prof => {
-      const tipo = await this.profissionalLiberalService.buscarTipoPorProfissional(prof.idconta);
-
-      if (prof.telefone)
-        prof.telefone = await this.formatNumber("+55" + prof.telefone);
-      if (prof.nomeSocial)
-        prof.nome = prof.nomeSocial;
-
-      if (!Array.isArray(tipo) || tipo.length === 0) {
-        prof.servicos = "Tipos de Serviços não informados";
-      } else {
-        const nomesAreas = tipo.map(tipoServico => tipoServico.nome);
-        prof.servicos = nomesAreas.join(", ");
+    for (const prof of this.listaProfissionais) {
+      try {
+        const tipo = await this.profissionalLiberalService.buscarTipoPorProfissional(prof.idconta);
+  
+        if (prof.telefone)
+          prof.telefone = await this.formatNumber("+55" + prof.telefone);
+        if (prof.nomeSocial)
+          prof.nome = prof.nomeSocial;
+  
+        if (!Array.isArray(tipo) || tipo.length === 0) {
+          prof.servicos = "Tipos de Serviços não informados";
+        } else {
+          const nomesAreas = tipo.map((tipoServico: any) => tipoServico.nome);
+          prof.servicos = nomesAreas.join(", ");
+        }
+  
+      } catch (err) {
+        prof.servicos = "Tipos de Serviços não encontrados";
       }
-      console.log("Serviços: ", prof.servicos);
-    });
-
+    }
   }
+  
 
   async getUser() {
     const userId = this.authService.getUser()
@@ -130,7 +133,6 @@ export class TelaProfissionaisLiberaisPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(userId)
-          console.log(this.user)
           break;
         case "C":
           this.user = await this.candidatoService.getCandidato(userId)
@@ -158,12 +160,22 @@ export class TelaProfissionaisLiberaisPage implements OnInit {
 
   async carregarLista() {
     try {
+      // Resetar o tipo selecionado
+      this.selectedTipoId = null;
+      
+      // Resetar o valor do select (opcional, mas recomendado)
+      const selectElement = document.getElementById('tipo') as HTMLIonSelectElement;
+      if (selectElement) {
+        selectElement.value = null;
+      }
+  
+      // Carregar a lista completa
       this.listaProfissionais = await this.profissionalLiberalService.buscarTodosAtivos();
-
+  
       if(this.listaProfissionais.length > 0) {
         this.getTiposServicosDoProfissional();
       }
-
+  
     } catch (error) {
       console.error('Erro ao carregar a lista de profissionais liberais:', error);
     }

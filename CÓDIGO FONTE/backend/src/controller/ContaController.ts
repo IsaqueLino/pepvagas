@@ -10,6 +10,7 @@ import { IsNull, Not } from "typeorm"
 
 export default {
 
+    // LISTA TODAS AS CONTAS EXISTENTES
     async index(request: Request, response: Response) {
         const contaRepository = AppDataSource.getRepository(Conta)
 
@@ -25,6 +26,7 @@ export default {
         return response.status(206).json(contas)
     },
 
+    // LISTA TODAS AS CONTAS, INCLUINDO AS EXCLUÍDAS
     async indexDeleted(request: Request, response: Response){
         const contaRepository = AppDataSource.getRepository(Conta)
 
@@ -41,6 +43,7 @@ export default {
         return response.status(206).json(contas)
     },
 
+    // BUSCA UMA CONTA PELO ID
     async getById(request: Request, response: Response) {
         const { id } = request.params
 
@@ -86,6 +89,7 @@ export default {
         }
     },
 
+    // BUSCA UMA CONTA PELO EMAIL
     async getByEmail(request: Request, response: Response){
         const { email } = request.params
 
@@ -132,6 +136,7 @@ export default {
         }
     },
 
+    // CRIA UMA NOVA CONTA NO SISTEMA
     async create(request: Request, response: Response) {
         const { email, senha, tipo } = request.body
 
@@ -158,16 +163,14 @@ export default {
 
             const contaExist = await contaRepository.findOne({
                 where: {
-                    email
-                },
-                withDeleted: true
+                    email,
+                    deletedAt: IsNull()  
+                }
             })
-
-            console.log(contaExist)
 
             if (contaExist) {
                 return response.status(409).json({
-                    message: "Já existe uma conta com o email inserido!"
+                    message: "Já existe uma conta ativa com o email informado!"
                 })
             }
 
@@ -181,7 +184,7 @@ export default {
 
             return response.status(201).json({
                 idConta: conta.idConta,
-                message: "Conta criada com sucesso.",  
+                message: "Conta criada com sucesso!",  
             })
         } catch (error: any) {
             let errors: string[] = [];
@@ -195,6 +198,7 @@ export default {
         }
     },
 
+    // ATUALIZA A SENHA DE UMA CONTA
     async updatePassword(request: Request, response: Response) {
         const { senhaAtual, novaSenha, confirmacaoNovaSenha } = request.body
         const { id } = request.params
@@ -247,7 +251,7 @@ export default {
                     await contaRepository.save(conta)
 
                     return response.status(200).json({
-                        message: "Senha atualizada com sucesso"
+                        message: "Senha atualizada com sucesso!"
                     })
                 } else {
                     return response.status(400).json({
@@ -275,6 +279,7 @@ export default {
         }
     },
 
+    // ATUALIZA O EMAIL DA CONTA
     async updateEmail(request: Request, response: Response){
         const { novoEmail } = request.body
         const { id } = request.params
@@ -310,7 +315,7 @@ export default {
                 await contaRepository.save(conta)
 
                 return response.status(200).json({
-                    message: "Email atualizado com sucesso"
+                    message: "Email atualizado com sucesso!"
                 })
 
             }else{
@@ -331,6 +336,7 @@ export default {
         }
     },
 
+    // DELETA UMA CONTA PELO ID INFORMADO
     async delete(request: Request, response: Response) {
         const { id } = request.params
 
@@ -360,7 +366,7 @@ export default {
                 await contaRepository.save(conta)
 
                 return response.status(200).json({
-                    message: "Conta deletada com sucesso"
+                    message: "Conta deletada com sucesso!"
                 })
 
             }else{
@@ -381,6 +387,7 @@ export default {
         }
     },
 
+    // ENVIA UMA NOVA SENHA PARA O EMAIL INFORMADO CASO A CONTA EXISTA
     async recuperarSenha(request: Request, response: Response) {
         const { email } = request.body
 

@@ -18,8 +18,9 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
 
   public isDarkTheme: boolean = false;
   public isLogged: boolean = false;
-  public email: string = ''
-  public senha: string = ''
+  public email: string = '';
+  public senha: string = '';
+  public emailInvalid: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -35,7 +36,7 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
       nomeSocial: [null],
       descricao: [null, Validators.required],
       telefone: [null, Validators.required],
-      email: [null, Validators.required],
+      email: [null, [Validators.required, Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)]],
       tipo: [null, Validators.required],
       imagem: [null],
     });
@@ -49,28 +50,35 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
       this.isLogged = true;
     }
 
-    this.email = sessionStorage.getItem('email') ?? ''
-    this.senha = sessionStorage.getItem('pass') ?? ''
+    this.email = sessionStorage.getItem('email') ?? '';
+    this.senha = sessionStorage.getItem('pass') ?? '';
+  }
+
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailControl = this.obrigatorio.get('email');
+    if (emailControl) {
+      this.emailInvalid = emailControl.value ? !emailRegex.test(emailControl.value) : false;
+    }
   }
 
   onFileSelected(event: any) {
-    const size = 8 * 1024 * 1024
+    const size = 8 * 1024 * 1024;
 
     const selectedFile = event.target.files[0];
 
-    if(event.target.files[0] != null){
-
-      if(selectedFile != null && selectedFile.size > size){
-        this.presentToast("O tamanho do banner deve ter no maximo 8 MB ")
-      }else{
-        this.selectedFile = selectedFile
+    if (event.target.files[0] != null) {
+      if (selectedFile != null && selectedFile.size > size) {
+        this.presentToast("O tamanho do banner deve ter no máximo 8 MB");
+      } else {
+        this.selectedFile = selectedFile;
       }
     }
   }
 
   logout() {
     this.authService.logout();
-    sessionStorage.clear()
+    sessionStorage.clear();
     this.navController.navigateForward('login');
   }
 
@@ -125,9 +133,8 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
             text: 'Cancelar',
             role: 'cancel',
             handler: () => {
-              // Remover a seleção de "Outro"
               this.obrigatorio.patchValue({
-                tipo: selectedValues.filter((value: string) => value !== 'outro')
+                tipo: selectedValues.filter((value: string) => value !== 'outro'),
               });
             },
           },
@@ -135,11 +142,11 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
             text: 'OK',
             handler: (data) => {
               if (data.outroTipo) {
-                this.tipoService.cadastrarTipo(data.outroTipo)
+                this.tipoService.cadastrarTipo(data.outroTipo);
                 const newOption = { id: data.outroTipo, nome: data.outroTipo };
                 this.opcoes.push(newOption);
                 this.obrigatorio.patchValue({
-                  tipo: [...selectedValues.filter((value: string) => value !== 'outro'), data.outroTipo]
+                  tipo: [...selectedValues.filter((value: string) => value !== 'outro'), data.outroTipo],
                 });
               }
             },
@@ -152,50 +159,64 @@ export class ProfissionalLiberalCadastroPage implements OnInit {
   }
 
   public async onSubmit() {
-    if (this.obrigatorio.invalid) {
-      Object.keys(this.obrigatorio.controls).forEach(key => {
-        const control = this.obrigatorio.get(key);
-        if (control && control.invalid && control.errors && control.errors['required']) {
-          this.presentToast(`O campo ${key} é obrigatório. Por favor, preencha-o.`);
-        }
-      });
+    this.validateEmail();
+
+    if (this.emailInvalid) {
+      this.presentToast("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).");
       return;
     }
 
-    // Criação da Conta
-    const conta = await this.authService.createAccount(this.email, this.senha, 'L')
+    const nome = this.obrigatorio.get('nome')?.value;
+    const descricao = this.obrigatorio.get('descricao')?.value;
+    const telefone = this.obrigatorio.get('telefone')?.value;
+    const email = this.obrigatorio.get('email')?.value;
+    const tipo = this.obrigatorio.get('tipo')?.value;
 
-    let id = conta.data.idConta.toString()
-
-    if (!id) {
-      console.log('Erro ao pegar o id');
+    if (!nome) {
+      this.presentToast("Por favor, preencha o campo Nome.");
+      return;
+    } else if (!descricao) {
+      this.presentToast("Por favor, preencha o campo Descrição.");
+      return;
+    } else if (!telefone) {
+      this.presentToast("Por favor, preencha o campo Telefone.");
+      return;
+    } else if (!email) {
+      this.presentToast("Por favor, preencha o campo Email.");
       return;
     }
 
-    const response = await this.profissionalService.profissionalCadastro(
-      id,
-      this.obrigatorio.value.nome,
-      this.obrigatorio.value.nomeSocial,
-      this.obrigatorio.value.descricao,
-      this.obrigatorio.value.telefone,
-      this.obrigatorio.value.email
-    );
+    try {
+      const conta = await this.authService.createAccount(this.email, this.senha, 'L');
+      const id = conta.data?.idConta?.toString();
 
-    if (response.status === 201 || response.status === 200) {
+      const response = await this.profissionalService.profissionalCadastro(
+        id,
+        this.obrigatorio.value.nome,
+        this.obrigatorio.value.nomeSocial,
+        this.obrigatorio.value.descricao,
+        this.obrigatorio.value.telefone,
+        this.obrigatorio.value.email
+      );
+
+      if (this.obrigatorio.value.tipo) {
+        const responseTipo = await this.profissionalService.cadastrarTipo(id, this.obrigatorio.value.tipo);
+      }
+
+      if (this.obrigatorio.value.imagem && this.selectedFile) {
+        await this.profissionalService.enviarImagem(id, this.selectedFile);
+      }
+
+      this.presentToast("Cadastro realizado com sucesso!");
       localStorage.removeItem('c-user');
+      sessionStorage.clear();
       this.navController.navigateRoot('login');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.menssage || "Erro inesperado ao processar o cadastro. Tente novamente.";
+      this.presentToast(errorMessage);
+      console.error('Erro no onSubmit:', error);
+      sessionStorage.clear();
+      this.navController.navigateRoot('criar-conta');
     }
-
-    if (this.obrigatorio.value.tipo) {
-      const responseTipo = await this.profissionalService.cadastrarTipo(id, this.obrigatorio.value.tipo);
-      console.log(responseTipo);
-    }
-
-    if (this.obrigatorio.value.imagem && this.selectedFile) {
-      const responseImagem = await this.profissionalService.enviarImagem(id, this.selectedFile);
-      console.log(responseImagem);
-    }
-    
-    sessionStorage.clear()
   }
 }

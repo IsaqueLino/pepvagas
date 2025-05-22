@@ -123,3 +123,11 @@ ion-img{
     align-items: center;
     flex-direction: column;
   }
+
+ion-item.invalid {
+  border-color: var(--ion-color-danger);
+}
+
+.invalid {
+  --highlight-color-invalid: var(--ion-color-danger);
+}

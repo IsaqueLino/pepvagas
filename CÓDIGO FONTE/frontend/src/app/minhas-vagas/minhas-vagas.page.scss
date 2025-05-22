@@ -71,3 +71,17 @@
       font-size: 18px;
     }
   }
+
+  .vagas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px;
+    align-items: start;
+  }
+  
+  .vaga-wrapper {
+    height: 100%;
+  }
+  

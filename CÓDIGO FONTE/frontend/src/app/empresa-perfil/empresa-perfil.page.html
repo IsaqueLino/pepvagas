@@ -9,16 +9,10 @@
         <h1 style="text-align: center;">Informações da Conta</h1>
         <br>
         <ion-row>
-          <ion-col size="6">
+          <ion-col size="12">
             <ion-item>
               <ion-input label="Email" labelPlacement="floating" [(ngModel)]="conta.email"
               readonly></ion-input>
-            </ion-item>
-          </ion-col>
-          <ion-col size="6">
-            <ion-item>
-              <ion-input type="password" label="Senha" labelPlacement="floating" value="..................."
-                readonly></ion-input>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -50,9 +44,6 @@
             </ion-item>
           </ion-col>
         </ion-row>
-          <ion-button class="butao" expand="block" (click)="gerenciarRepresentantes()">
-            Gerenciar Representantes
-          </ion-button>
           <br>
           <h1 style="text-align: center;">Informações Complementares</h1>
           <br>
@@ -77,10 +68,10 @@
               </ion-button>
             </ion-col>
             <ion-col size="6">
-              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" fill="outline" expand="block">
-                Desativar Conta
+              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" expand="block">
+                Excluir Conta
               </ion-button>
-              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja desativar sua conta?"
+              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja excluir sua conta?"
               [buttons]="actionSheetButtons"></ion-action-sheet>
             </ion-col>
           </ion-row>

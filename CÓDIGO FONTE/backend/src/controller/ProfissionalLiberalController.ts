@@ -7,11 +7,12 @@ import {TipoServico} from "../database/models/TipoServico";
 import {Not} from "typeorm";
 import { z } from "zod"
 import fs from 'fs'
-import { In } from 'typeorm';
+import { In, IsNull } from 'typeorm';
 import { generatePassword, sendEmail } from "./EmailController";
 
 export default  {
 
+    // ENVIA UMA IMAGEM PARA UM PROFISSIONAL LIBERAL
     async sendImage(request: Request, response: Response){
         const { idconta } = request.params
         const imagem = request.file
@@ -26,7 +27,6 @@ export default  {
         if(!imagem) 
             return response.status(400).json({message: "A imagem do proficional liberal deve ser enviada."})
         
-        console.log("teste" + imagem.filename)
 
         if (proficionalLiberal.arquivoImagem != null){
             fs.unlink( __dirname+"/../../uploads/"+  proficionalLiberal.arquivoImagem, (err) => {
@@ -41,10 +41,11 @@ export default  {
 
         await proficionalLiberalRepository.save(proficionalLiberal)
 
-        return response.status(200).json({message: "Imagem do profissional liberal foi adicionada com sucesso."})
+        return response.status(200).json({message: "Imagem do profissional liberal foi adicionada com sucesso!"})
         
     },
 
+    // BUSCA TIPOS DE SERVIÇOS POR ID DO PROFISSIONAL
     async findTipoByProfissionalId(request: Request, response: Response) {
         const { idconta } = request.params;
     
@@ -70,7 +71,7 @@ export default  {
         }
     },
 
-
+    // CRIA UM NOVO PROFISSIONAL LIBERAL
     async create(request: Request, response: Response) {
         const {idconta, nome, nomeSocial, descricao, telefone, email} = request.body
   
@@ -93,17 +94,10 @@ export default  {
             
             const profissionalLiberalRepository = AppDataSource.getRepository(ProfissionalLiberal)
 
-            const contaExistente = await profissionalLiberalRepository.findOne({where : {idconta : +idconta}})
+            const contaExistente = await profissionalLiberalRepository.findOne({where : {idconta : +idconta, deletedAt: IsNull()}})
 
-            console.log(contaExistente)
-            
-            const telefoneExistente = await profissionalLiberalRepository.findOne({ where: { telefone: telefone } });
-
-            if(telefoneExistente)
-                return response.status(404).json({menssage : "Já existe um Proficional cadastro com esse numero de telefone"})
-
-            if(contaExistente != null)
-                return response.status(404).json({menssage : "Não existe uma conta com o id informado"})
+            if(contaExistente)
+                return response.status(409).json({menssage : "Já existe uma conta com o id informado"})
             
             const novoProficionalLiberal = profissionalLiberalRepository.create({
                 idconta, nome, nomeSocial, descricao,telefone, email
@@ -111,15 +105,14 @@ export default  {
 
             await profissionalLiberalRepository.save(novoProficionalLiberal)
 
-            return response.status(201).json({message: "Profissional cadastrado com sucesso"});
+            return response.status(201).json({message: "Profissional cadastrado com sucesso!"});
         } catch (error) {
             console.log(error)
             return response.status(500).json({message: "Erro ao cadastrar profissional", error: error});
         }
     },
 
-
-
+    // LISTA TODOS OS PROFISSIONAIS
     async index(request: Request, response: Response) {
         try {
             const profissionalRepository = AppDataSource.getRepository(ProfissionalLiberal);
@@ -131,7 +124,6 @@ export default  {
             return response.status(500).json({message: "Erro ao listar profissionais", error: error});
         }
     },
-
 
     async indexAll(request: Request, response: Response) {
         try {
@@ -169,7 +161,7 @@ export default  {
         }
     },
 
-
+    // ATUALIZA OS DADOS DE UM PROFISSIONAL LIBERAL PELO ID
     async update(request: Request, response: Response) {
         const {id} = request.params;
         
@@ -195,7 +187,6 @@ export default  {
 
             const profissionalExists = await profissionalRepository.findOneBy({idconta: +id});
 
-            console.log("proficional " + profissionalExists)
 
             if (!profissionalExists) {
                 return response.status(404).json({message: "Profissional não encontrado"});
@@ -216,6 +207,7 @@ export default  {
         }
     },
 
+    // CADASTRA TIPOS DE SERVIÇOS PARA UM PROFISSIONAL LIBERAL
     async cadastroTipo(request: Request, response: Response){
         const { idconta } = request.params;
         const { tipo } = request.body;
@@ -265,28 +257,31 @@ export default  {
     },
 
     async delete(request: Request, response: Response) {
-        const {id} = request.params;
+        const { id } = request.params;
 
         const dadosObrigatorios = z.object({
-            id : z.string({required_error: "O id é requerido"})
-        })
+            id: z.string({ required_error: "O id é requerido" })
+        });
 
         try {
-            dadosObrigatorios.parse(request.params)
+            dadosObrigatorios.parse(request.params);
 
             const profissionalRepository = AppDataSource.getRepository(ProfissionalLiberal);
 
-            const profissional = await profissionalRepository.findOneBy({idconta: +id});
+            const profissional = await profissionalRepository.findOneBy({ idconta: +id });
 
-            if (!profissional) 
-                return response.status(404).json({message: "Profissional não encontrado"});
+            if (!profissional) {
+                return response.status(404).json({ message: "Profissional não encontrado" });
+            }
 
-            return response.status(200).json({message: "Profissional deletado com sucesso"});
+            profissional.deletedAt = new Date();
+            await profissionalRepository.save(profissional);
+
+            return response.status(200).json({ message: "Profissional desativado com sucesso!" });
 
         } catch (error) {
-            console.error(error)
-            return response.status(500).json({message: "Erro ao deletar profissional", error: error});
+            console.error("Erro ao desativar profissional:", error);
+            return response.status(500).json({ message: "Erro ao deletar profissional", error: error });
         }
-    },
-
+    }
 }

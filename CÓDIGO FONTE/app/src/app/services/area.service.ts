@@ -6,12 +6,15 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
+
+// SERVIÇO QUE FAZ A GERENCIA DE ÁREAS DO CANDIDADO
 export class AreaService {
 
   private readonly urlBase = environment.API
 
   constructor(private http: HttpClient) { }
 
+  // BUSCA TODAS AS ÁREAS DISPONÍVEIS PRO CANDIDATO
   async buscarTodasAreas(){
     const resposta = this.http.get<any[]>(this.urlBase + '/area/list')
     return resposta
@@ -27,6 +30,7 @@ export class AreaService {
     return response
   }
 
+  // BUSCA TODAS AS ÁREAS
   async getAreas(){
     const api = axios.create({
       baseURL: this.urlBase
@@ -37,6 +41,7 @@ export class AreaService {
     return response.data
   }
 
+  // CADASTRA UMA NOVA ÁREA SE NECESSÁRIO
   async cadastrarArea(nome: string) {
     const api = axios.create({
       baseURL: this.urlBase

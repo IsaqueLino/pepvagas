@@ -5,7 +5,7 @@
     <div class="container">
       <ion-card>
         <ion-card-header>
-          <h1 class="title"> Profissionais Liberais/Autônomos </h1>
+          <h1 class="title"> Listar Profissionais Liberais/Autônomos </h1>
         </ion-card-header>
 
         <ion-card-content>
@@ -24,7 +24,7 @@
                       *ngFor="let prof of paginatedListaProfissionaisLiberais"
                       (click)="onRowClick(prof.idconta)"
                       [class.selected]="prof.idconta === selectedIdconta">
-                      <td>{{ prof.idconta }}</td>
+                      <td>{{ prof.nome }}</td>
                       <td>{{ prof.email }}</td>
                     </tr>
                   </tbody>
@@ -46,7 +46,7 @@
           <ion-button *ngIf="isSelected" [routerLink]="['/profissional-detalhes']"  class="teste" (click)="verDetalhes()" color="success" expand="block">Ver Detalhes</ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Cancelar</ion-button>
+          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Voltar</ion-button>
         </ion-col>
       </ion-row>
     </div>

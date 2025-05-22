@@ -3,8 +3,8 @@
 
 
   <div class="web-padding">
-    <ion-searchbar [debounce]="500" (ionInput)="handleFilter($event)" placeholder="Título da vaga"
-      show-clear-button="focus" class="custom"></ion-searchbar>
+
+    <ion-searchbar [debounce]="500" (ionInput)="search()" [(ngModel)]="searchValue" placeholder="Título da vaga" show-clear-button="focus" class="custom"></ion-searchbar>
 
     <h4 class="subtitle">Vagas criadas por você</h4>
     <p class="subtitle">Clique em uma vaga para visualizar as opções</p>
@@ -15,21 +15,29 @@
           
           <ion-button (click)="verDetalhesVaga()" expand="block">Visualizar</ion-button>
           <ion-button (click)="editarVaga()" expand="block">Editar</ion-button>
-          <ion-button (click)="confirmarExclusao()" expand="block">Excluir</ion-button>
+          <ion-button color="danger" (click)="confirmarExclusao()" expand="block">Excluir</ion-button>
 
         </ion-content>
       </ng-template>
     </ion-popover>
 
-    <ion-grid *ngIf="this.listaVagas.length > 0">
-      <ion-row>
-        <ion-col *ngFor="let vaga of listaVagas">
-          <app-vaga (click)="presentPopoverVaga($event, vaga.idVaga)" titulo={{vaga.titulo}} cidade={{vaga.cidade}} regime={{vaga.regime}} salario={{vaga.salario}}
-            pcd={{vaga.pcd}} tipo={{vaga.tipo}} data={{vaga.dataLimite}} logo={{vaga.logo}} empresa={{vaga.idEmpresa.nomeEmpresa}} />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
+    <div *ngIf="this.listaVagas.length > 0" class="vagas-grid">
+      <div class="vaga-wrapper" *ngFor="let vaga of listaVagas" (click)="presentPopoverVaga($event, vaga.idVaga)">
+        <app-vaga 
+          [titulo]="vaga.titulo" 
+          [cidade]="vaga.cidade" 
+          [regime]="vaga.regime" 
+          [salario]="vaga.salario"
+          [pcd]="vaga.pcd" 
+          [tipo]="vaga.tipo" 
+          [data]="vaga.dataLimite" 
+          [logo]="vaga.logo" 
+          [empresa]="vaga.idEmpresa.nomeEmpresa"
+          [ocultarNome]="vaga.ocultarNome"> 
+        </app-vaga>
+      </div>
+    </div>
+    
     <!-- (click)="verDetalhesVaga(vaga.idVaga)" -->
 
 

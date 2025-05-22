@@ -146,3 +146,36 @@ ion-radio {
   color: white;
   --border-radius: 8px;
 }
+
+.logo-confidencial-container {
+  text-align: center;
+  margin: 15px 0;
+  padding: 10px;
+}
+
+.logo-confidencial-texto {
+  font-weight: bold;
+  color: var(--ion-color-danger);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  border: 1px dashed var(--ion-color-danger);
+  border-radius: 5px;
+  padding: 8px;
+  display: inline-block;
+  background-color: rgba(var(--ion-color-danger-rgb), 0.1);
+}
+
+.curriculo {
+  margin-left: 10px;
+  height: 45px;
+  vertical-align: center;
+  --background: var(--ion-color-pep);
+  color: white;
+  --border-radius: 8px;
+}
+
+/* Estilo para botão desabilitado */
+.curriculo[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

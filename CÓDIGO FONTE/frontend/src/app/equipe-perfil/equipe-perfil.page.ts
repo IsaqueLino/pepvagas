@@ -34,10 +34,8 @@ export class EquipePerfilPage implements OnInit {
     this.getUser()
 
     this.conta = await this.authService.getContaDetails()
-    console.log("Conta: ", this.conta)
 
     this.equipe = await this.equipeService.getMembroEquipe(this.userId)
-    console.log("Equipe: ", this.equipe)
     this.equipeAlterado = Object.assign({}, this.equipe)
   }
 
@@ -104,7 +102,6 @@ export class EquipePerfilPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(this.userId)
-          console.log(this.user)
           break;
         case "C":
           break;
@@ -128,10 +125,10 @@ export class EquipePerfilPage implements OnInit {
   async updatePassword() {
     try {
       if (this.novaSenha.novaSenha.length < 4) {
-        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres")
+        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres.")
       }
       else if(this.novaSenha.novaSenha != this.novaSenha.confirmarSenha){
-        this.exibirMensagem("A nova senha e sua confirmação não coincidem")
+        this.exibirMensagem("A nova senha e sua confirmação não coincidem.")
       }
       else{
         const response = await this.authService.updatePassword(this.conta.idConta, this.novaSenha.senhaAtual, this.novaSenha.novaSenha, this.novaSenha.confirmarSenha);
@@ -153,13 +150,35 @@ export class EquipePerfilPage implements OnInit {
 
   async deactivateAccount(id: string): Promise<void> {
     try {
-      await this.authService.deleteAccount(id)
-      console.log('Conta excluída com sucesso!')
-      this.logout()
+
+        const response = await this.equipeService.desativarMembro(id);
+
+        const mensagem = response?.message || response?.data?.message;
+
+        if (mensagem) {
+            if (mensagem === "Membro de equipe desativado com sucesso!") {
+                const responseConta = await this.authService.deleteAccount(id);
+
+                if (responseConta?.data?.message) {
+                    await this.exibirMensagem("Conta desativada com sucesso!");
+                    this.logout();
+                } else {
+                    console.error('Erro ao desativar a conta. Resposta da API de conta:', responseConta);
+                    this.exibirMensagem(responseConta?.data?.message || 'Erro ao desativar a conta. Tente novamente mais tarde.');
+                }
+            } else {
+                console.error('Erro ao desativar :', mensagem);
+                this.exibirMensagem(mensagem);
+            }
+        } else {
+            console.error('Resposta inválida ou sem mensagem da API de representante.');
+            this.exibirMensagem('Erro ao desativar . Tente novamente mais tarde.');
+        }
     } catch (error) {
-      console.error('Erro ao excluir conta:', error)
+        console.error('Erro ao desativar :', error);
+        this.exibirMensagem('Ocorreu um erro ao tentar desativar . Tente novamente.');
     }
-  }
+}
 
   public actionSheetButtons = [
     {

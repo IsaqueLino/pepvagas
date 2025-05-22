@@ -36,10 +36,8 @@ export class RepresentantePerfilPage implements OnInit {
     this.getUser()
 
     this.conta = await this.authService.getContaDetails()
-    console.log("Conta: ", this.conta)
 
     this.representante = await this.representanteService.getRepresentante(this.userId)
-    console.log("Representante: ", this.representante.idEmpresa.nomeEmpresa)
     this.nomeEmpresa = this.representante.idEmpresa.nomeEmpresa
     this.representanteAlterado = Object.assign({}, this.representante)
   }
@@ -104,7 +102,6 @@ export class RepresentantePerfilPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(this.userId)
-          console.log(this.user)
           break;
         case "C":
           break;
@@ -129,10 +126,10 @@ export class RepresentantePerfilPage implements OnInit {
   async updatePassword() {
     try {
       if (this.novaSenha.novaSenha.length < 4) {
-        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres")
+        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres.")
       }
       else if(this.novaSenha.novaSenha != this.novaSenha.confirmarSenha){
-        this.exibirMensagem("A nova senha e sua confirmação não coincidem")
+        this.exibirMensagem("A nova senha e sua confirmação não coincidem.")
       }
       else{
         const response = await this.authService.updatePassword(this.conta.idConta, this.novaSenha.senhaAtual, this.novaSenha.novaSenha, this.novaSenha.confirmarSenha);
@@ -152,16 +149,37 @@ export class RepresentantePerfilPage implements OnInit {
     }
   }
 
-  async deactivateAccount(id: string): Promise<void> {
+ async deactivateAccount(id: string): Promise<void> {
     try {
-      await this.authService.deleteAccount(id)
-      console.log('Conta excluída com sucesso!')
-      this.logout()
-    } catch (error) {
-      console.error('Erro ao excluir conta:', error)
-    }
-  }
 
+        const responseRepresentante = await this.representanteService.desativarRepresentante(id);
+
+        const mensagem = responseRepresentante?.message || responseRepresentante?.data?.message;
+
+        if (mensagem) {
+            if (mensagem === "Representante desativado com sucesso!") {
+                const responseConta = await this.authService.deleteAccount(id);
+
+                if (responseConta?.data?.message) {
+                    await this.exibirMensagem("Conta desativada com sucesso!");
+                    this.logout();
+                } else {
+                    console.error('Erro ao desativar a conta. Resposta da API de conta:', responseConta);
+                    this.exibirMensagem(responseConta?.data?.message || 'Erro ao desativar a conta. Tente novamente mais tarde.');
+                }
+            } else {
+                console.error('Erro ao desativar o representante:', mensagem);
+                this.exibirMensagem(mensagem);
+            }
+        } else {
+            console.error('Resposta inválida ou sem mensagem da API de representante.');
+            this.exibirMensagem('Erro ao desativar o representante. Tente novamente mais tarde.');
+        }
+    } catch (error) {
+        console.error('Erro ao desativar representante ou conta:', error);
+        this.exibirMensagem('Ocorreu um erro ao tentar desativar o representante ou a conta. Tente novamente.');
+    }
+}
   public actionSheetButtons = [
     {
       text: 'Prosseguir',

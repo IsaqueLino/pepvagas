@@ -4,6 +4,7 @@ import { AppDataSource } from "../database/data-source"
 import { Vaga } from "../database/models/Vaga"
 import { Conta } from "../database/models/Conta"
 import { Area } from "../database/models/Area"
+import { Representante } from "../database/models/Representante";
 import fs from 'fs'
 import { MoreThan, MoreThanOrEqual } from "typeorm"
 import { Empresa } from "../database/models/Empresa"
@@ -12,17 +13,17 @@ import FirebaseController from "./FirebaseController"
 import { Candidato } from "../database/models/Candidato"
 const nodemailer = require('nodemailer');
 
+// CALCULA A DIFERENÇA EM DIAS ENTRE A DATA ATUAL E A DATA LIMITE
 function calculateDiff(hoje: Date, limite: Date) {
 
     const diffInMs = hoje.getTime() > limite.getTime() ? (limite.getTime() - hoje.getTime()) : (limite.getTime() - hoje.getTime())
     const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
-
     return diffInDays
 }
 
-
 export default {
 
+    // RECEBE E ATUALIZA LOGO E BANNER DE UMA VAGA
     async sendLogoAndBanner(request: Request, response: Response) {
         const { idvaga } = request.params
         const files = request.files as { [fieldname: string]: Express.Multer.File[] };
@@ -49,8 +50,7 @@ export default {
             return response.status(400).json({ message: "Banner padrão adicionado." })
         }
 
-        console.log(logo)
-        console.log(banner)
+
 
         if (vaga.logo != null && vaga.logo != "vaga-logopadrao.svg") {
             fs.unlink("./../../uploads/" + vaga.logo, (err) => {
@@ -77,12 +77,12 @@ export default {
 
         await vagaRepository.save(vaga)
 
-        console.log(vaga)
 
-        return response.status(200).json({ message: "Logo e banner da vaga adicionada com sucesso." })
+        return response.status(200).json({ message: "Logo e banner da vaga adicionada com sucesso!" })
 
     },
 
+    // CRIA UMA NOVA VAGA NO SISTEMA
     async create(request: Request, response: Response) {
         const {
             idConta,
@@ -94,6 +94,7 @@ export default {
             salario,
             pcd,
             dataLimite,
+            ocultarNome,
             cidade,
             nivelInstrucao,
             site,
@@ -138,7 +139,8 @@ export default {
             }).max(50),
             emailCurriculo: z.string({
                 required_error: "Email para currículo é requerido"
-            }).max(50).email()
+            }).max(50).email(),
+            ocultarNome: z.enum(['S', 'N']).default('N')
         })
 
         const dadosOpcionais = z.object({
@@ -173,7 +175,6 @@ export default {
 
             let diff = calculateDiff(hoje, limite)
 
-            console.log(diff)
 
             const vagaRepository = AppDataSource.getRepository(Vaga)
             const contaRepository = AppDataSource.getRepository(Conta)
@@ -234,6 +235,7 @@ export default {
                 salario,
                 pcd,
                 dataLimite,
+                ocultarNome,
                 cidade,
                 nivelInstrucao,
                 site,
@@ -246,7 +248,7 @@ export default {
 
             return response.status(201).json({
                 idVaga: novaVaga.idVaga,
-                message: "Vaga publicada com sucesso."
+                message: "Vaga publicada com sucesso!"
             })
 
             const candidatoRepository = AppDataSource.getRepository(Candidato);
@@ -285,6 +287,7 @@ export default {
         }
     },
 
+    // RETORNA TODAS AS VAGAS ATIVAS
     async index(request: Request, response: Response) {
         const vagaRepository = AppDataSource.getRepository(Vaga)
 
@@ -305,6 +308,63 @@ export default {
         return response.status(200).json(vagas)
     },
 
+    // REGISTRA UM CANDIDATO EM UMA VAGA
+    async candidatar(request: Request, response: Response) {
+        const { idconta, idVaga } = request.params;
+    
+        try {
+            if (!idconta || !idVaga) {
+                return response.status(400).json({ message: "ID do candidato ou ID da vaga está ausente." });
+            }
+    
+            const candidatoRepository = AppDataSource.getRepository(Candidato);
+            const vagaRepository = AppDataSource.getRepository(Vaga);
+    
+            const candidato = await candidatoRepository.findOne({
+                where: { idconta: +idconta },
+                relations: ["vagas"], 
+            });
+    
+    
+            const vaga = await vagaRepository.findOneBy({
+                idVaga: +idVaga,
+            });
+    
+            if (!candidato) {
+                return response.status(404).json({ message: "Candidato não encontrado." });
+            }
+    
+            if (!vaga) {
+                return response.status(404).json({ message: "Vaga não encontrada." });
+            }
+    
+            if (new Date(vaga.dataLimite) < new Date()) {
+                return response.status(400).json({ message: "A vaga já expirou." });
+            }
+    
+            const candidaturaExistente = candidato.vagas.some(v => v.idVaga === vaga.idVaga);
+    
+            if (candidaturaExistente) {
+                return response.status(409).json({ message: "O candidato já se inscreveu nesta vaga." }); // ALTERADO PARA 409 (CONFLICT)
+            }
+    
+            await AppDataSource
+                .createQueryBuilder()
+                .relation(Candidato, "vagas")
+                .of(candidato)
+                .add(vaga);
+        
+            return response.status(201).json({
+                message: "Candidatura registrada com sucesso!",
+                candidatura: vaga,
+            });
+    
+        } catch (error) {
+            return response.status(500).json({ message: "Erro ao registrar candidatura." });
+        }
+    },    
+
+    // BUSCA UMA VAGA PELO ID FORNECIDO 
     async findById(request: Request, response: Response) {
         const {
             idVaga
@@ -354,7 +414,7 @@ export default {
         }
     },
 
-
+    // BUSCA TODAS AS VAGAS ASSOCIADAS A UM DETERMINADO ID DE CONTA
     async findByIdConta(request: Request, response: Response) {
         const {
             id
@@ -398,7 +458,7 @@ export default {
         }
     },
 
-
+    // ATUALIZA UMA VAGA EXISTENTE COM NOVOS DADOS
     async update(request: Request, response: Response) {
         const {
             idVaga
@@ -413,6 +473,7 @@ export default {
             salario,
             pcd,
             dataLimite,
+            ocultarNome,
             cidade,
             nivelInstrucao,
             logo,
@@ -422,6 +483,7 @@ export default {
             idEmpresa,
             emailCurriculo
         } = request.body
+
 
         const idSchema = z.object({
             idVaga: z.coerce.number()
@@ -438,6 +500,7 @@ export default {
             salario: z.number(),
             pcd: z.boolean(),
             dataLimite: z.coerce.date(),
+            ocultarNome: z.enum(['S', 'N']),
             cidade: z.string().max(50),
             emailCurriculo: z.string().max(50).email()
         })
@@ -463,7 +526,8 @@ export default {
                 pcd,
                 dataLimite,
                 cidade,
-                emailCurriculo
+                emailCurriculo,
+                ocultarNome
             })
 
             dadosOpcionais.parse({
@@ -502,15 +566,14 @@ export default {
                     message: "Essa empresa não existe"
                 })
             } else if (dataLimite < formatedDate) {
-                console.log(dataLimite)
-                console.log(formatedDate)
+
                 return response.status(400).json({
                     message: "Data limite tem que ser maior ou igual ao dia de hoje"
                 })
             }
 
             vaga.cidade = cidade,
-                vaga.dataLimite = dataLimite
+            vaga.dataLimite = dataLimite
             vaga.idArea = area
             vaga.idEmpresa = empresa
             vaga.descricao = descricao
@@ -525,11 +588,12 @@ export default {
             vaga.regime = regime
             vaga.salario = salario
             vaga.site = site
+            vaga.ocultarNome = ocultarNome;
 
             await vagaRepository.save(vaga)
 
             return response.status(200).json({
-                message: "Vaga atualizada com sucesso"
+                message: "Vaga atualizada com sucesso!"
             })
 
         } catch (error: any) {
@@ -546,6 +610,7 @@ export default {
         }
     },
 
+    // MARCA UMA VAGA COMO EXCLUÍDA (EXCLUSÃO LÓGICA)
     async delete(request: Request, response: Response) {
         const { idVaga } = request.params
 
@@ -578,7 +643,7 @@ export default {
             await vagaRepository.save(vaga)
 
             return response.status(200).json({
-                message: "Vaga desativada com sucesso."
+                message: "Vaga excluída com sucesso!"
             })
 
         } catch (error: any) {
@@ -594,6 +659,60 @@ export default {
             })
         }
     },
+// GET /vaga/representante/:idRepresentante
+async vagasDoRepresentante(request: Request, response: Response) {
+    const { idRepresentante } = request.params;
+
+    // 💡 Verificação inicial com return
+    if (!idRepresentante || isNaN(Number(idRepresentante))) {
+        return response.status(400).json({
+            message: "ID do representante inválido."
+        });
+    }
+
+    const schema = z.object({
+        idRepresentante: z.coerce.number()
+    });
+
+    try {
+        const { idRepresentante: idParsed } = schema.parse(request.params);
+
+        const representanteRepo = AppDataSource.getRepository(Representante);
+        const vagaRepo = AppDataSource.getRepository(Vaga);
+
+        const representante = await representanteRepo.findOne({
+            where: { idconta: idParsed },
+            relations: ["idEmpresa"]
+        });
+
+        if (!representante || !representante.idEmpresa) {
+            return response.status(404).json({ message: "Representante ou empresa não encontrada." });
+        }
+
+        const vagas = await vagaRepo.find({
+            where: [
+                { conta: { idConta: idParsed } },
+                { idEmpresa: { idconta: representante.idEmpresa.idconta } }
+            ],
+            relations: {
+                conta: true,
+                idArea: true,
+                idEmpresa: true
+            }
+        });
+
+        return response.status(200).json(vagas);
+    } catch (error: any) {
+        console.error(error);
+
+        if (error.issues) {
+            const messages = error.issues.map((issue: any) => issue.message);
+            return response.status(400).json({ messages });
+        }
+
+        return response.status(500).json({ message: "Erro ao buscar vagas do representante." });
+    }
+}
 
     // async vagasMatch(request: Request, response: Response){
     //     const { idCandidato } = request.params

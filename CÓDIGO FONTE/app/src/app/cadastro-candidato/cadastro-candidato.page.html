@@ -16,10 +16,6 @@
             </ion-item>
 
             <ion-item>
-              <ion-input formControlName="nomeSocial" label="Nome Social (opcional)" labelPlacement="floating"placeholder="Informe o nome social"></ion-input>
-            </ion-item>
-
-            <ion-item>
               <ion-select formControlName="genero" label="Sexo" label-placement="Informe o sexo">
                 <ion-select-option value="f">Feminino</ion-select-option>
                 <ion-select-option value="m">Masculino</ion-select-option>
@@ -28,8 +24,11 @@
             </ion-item>
 
             <ion-item>
-              <ion-input [maskito]="cpfMask" [maskitoElement]="maskPredicate" formControlName="cpf" label="CPF" labelPlacement="floating" placeholder="Informe o CPF" maxlength="14"></ion-input>
+              <ion-input [maskito]="cpfMask" [maskitoElement]="maskPredicate" formControlName="cpf" label="CPF" labelPlacement="floating" placeholder="Informe o CPF" maxlength="14" (ionChange)="validateCpf()"></ion-input>
             </ion-item>
+            <ion-note *ngIf="cpfValid == false" color="danger" class="ion-padding">
+              Por favor, insira um CPF válido
+            </ion-note>
 
             <ion-item>
               <ion-input formControlName="dataNascimento" label="Data de Nascimento" labelPlacement="floating" placeholder="Informe a data de nascimento"
@@ -52,6 +51,10 @@
         </ion-card-header>
         <ion-card-content>
           <form [formGroup]="opcional">
+
+            <ion-item>
+              <ion-input formControlName="nomeSocial" label="Nome Social" labelPlacement="floating"placeholder="Informe o nome social"></ion-input>
+            </ion-item>
 
             <ion-item>
               <ion-select formControlName="disponibilidade" label="Turno" label-placement="Informe o turno">

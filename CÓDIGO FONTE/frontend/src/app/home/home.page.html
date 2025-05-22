@@ -1,34 +1,12 @@
-<!-- <ion-menu contentId="main-content" type="overlay">
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Menu</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content class="menu-content">
-    <ion-list>
-      <ion-item lines="full" *ngIf="
-          this.userType == 'A' ||
-          this.userType == 'M' ||
-          this.userType == 'R' ||
-          this.userType == 'E'
-        ">
-        <ion-icon slot="start" name="briefcase-outline"></ion-icon>
-        <ion-label>Cadastrar Vaga</ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-content>
-</ion-menu> -->
-
-
-
 <ion-content [fullscreen]="true">
   <app-nav></app-nav>
 
   <ion-toast class="aviso" icon="person" [buttons]="toastButtons" [isOpen]="isToastOpen" message="Registre suas informações complementares para receber vagas que combinam com você!"></ion-toast>
 
   <div class="web-padding">
-    <ion-searchbar [debounce]="500" (ionInput)="handleFilter($event)" placeholder="Título da vaga"
-      show-clear-button="focus" class="custom"></ion-searchbar>
+    
+
+    <ion-searchbar [debounce]="500" (ionInput)="search()" [(ngModel)]="searchValue" placeholder="Título da vaga" show-clear-button="focus" class="custom"></ion-searchbar>
 
     <ion-button [routerLink]="['/tela-profissionais-liberais']"> Pesquisar Profissionais Liberais/Autônomos</ion-button>
 
@@ -43,20 +21,27 @@
       </ng-template>
     </ion-popover>
 
-    <ion-grid *ngIf="this.listaVagas.length > 0">
-      <ion-row>
-        <ion-col *ngFor="let vaga of listaVagas" [routerLink]="['/vaga-detalhes']" (click)="verVagaDetalhes(vaga.idVaga)">
-          <app-vaga titulo={{vaga.titulo}} cidade={{vaga.cidade}} regime={{vaga.regime}} salario={{vaga.salario}}
-            pcd={{vaga.pcd}} tipo={{vaga.tipo}} data={{vaga.dataLimite}} logo={{vaga.logo}}
-            empresa={{vaga.idEmpresa.nomeEmpresa}} />
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <div *ngIf="this.listaVagas.length === 0">
-      <p class="subtitle center">Não há nenhuma vaga publicada.</p>
+    <div *ngIf="this.listaVagas.length > 0" class="vagas-grid">
+      <div class="vaga-wrapper" *ngFor="let vaga of listaVagas" [routerLink]="['/vaga-detalhes']" (click)="verVagaDetalhes(vaga)" [ngClass]="{ 'vaga-desabilitada': vaga.jaCandidatado }">
+        <app-vaga 
+          [titulo]="vaga.titulo" 
+          [cidade]="vaga.cidade" 
+          [regime]="vaga.regime" 
+          [salario]="vaga.salario"
+          [pcd]="vaga.pcd" 
+          [tipo]="vaga.tipo" 
+          [data]="vaga.dataLimite" 
+          [logo]="vaga.logo"
+          [empresa]="vaga.idEmpresa.nomeEmpresa"
+          [ocultarNome]="vaga.ocultarNome">  
+        </app-vaga>
+        <div *ngIf="vaga.jaCandidatado" class="badge-candidatado">
+          Já candidatado
+        </div>
+      </div>
     </div>
-
+    <div *ngIf="this.listaVagas.length === 0">
+      <p class="subtitle center">Não há nenhuma vaga publicada no momento.</p>
+    </div>
   </div>
-
 </ion-content>

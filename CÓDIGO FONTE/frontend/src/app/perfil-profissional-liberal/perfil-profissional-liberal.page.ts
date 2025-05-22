@@ -60,28 +60,27 @@ export class PerfilProfissionalLiberalPage implements OnInit {
     this.obterOpcoes()
     this.checkTheme()
 
+    const mostrarToast = localStorage.getItem('mostrarToastAtualizacao');
+    if (mostrarToast === 'true') {
+      localStorage.removeItem('mostrarToastAtualizacao');
+      this.presentToast("Profissional Liberal atualizado com sucess!o");
+    }
+
     if (this.authService.getJwt()){
       this.isLogged = true
     }
 
     try {
       this.conta = await this.authService.getContaDetails()
-      console.log("Conta obtida com sucesso!")
-      console.log(this.conta)
 
     } catch (error) {
       console.error('Erro ao obter detalhes da conta:', error)
     }
 
-    try{
-      console.log("id da conta " + this.conta.idConta)
-    }catch(error){
-      console.log("erro ao pegar o id da conta" + error)
-    }
+    
 
     try{
       this.profissional =  await this.profissionalService.buscarProfissional(this.conta.idConta)
-      console.log("candidato obtido com sucesso!")
     }catch{
       console.log("não foi obtido")
     }
@@ -154,7 +153,7 @@ export class PerfilProfissionalLiberalPage implements OnInit {
     const toast = await this.toastController.create({
       message: message,
       duration: 2000,
-      position: 'bottom'
+      position: 'top'
     });
     toast.present();
   }
@@ -193,23 +192,21 @@ export class PerfilProfissionalLiberalPage implements OnInit {
   }
 
   confirmPassword(){
-    console.log("entrei aqui")
     this.updatePassword()
     // this.modal2.dismiss(this.candidato.nome, 'confirm')
   }
 
   cancelPassword() {
-    console.log("entrei no cancelar")
     this.modal2.dismiss(null, 'cancel');
   }
 
   async updatePassword() {
     try {
       if (this.senha.value["senhaNova"].length < 4) {
-        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres")
+        this.exibirMensagem("Nova senha deve ter no mínimo 4 caracteres.")
       }
       else if(this.senha.value["senhaNova"] != this.senha.value["senhaConfirmada"]){
-        this.exibirMensagem("A nova senha e sua confirmação não coincidem")
+        this.exibirMensagem("A nova senha e sua confirmação não coincidem.")
       }
       else{
         const response = await this.authService.updatePassword(this.conta.idConta, this.senha.value["senhaAtaul"], this.senha.value["senhaNova"], this.senha.value["senhaConfirmada"]);
@@ -264,13 +261,35 @@ export class PerfilProfissionalLiberalPage implements OnInit {
 
   async deactivateAccount(id: string): Promise<void> {
     try {
-      await this.authService.deleteAccount(id)
-      console.log('Conta excluída com sucesso!')
-      this.logout()
+
+        const response = await this.profissionalService.desativarProfissional(id);
+
+        const mensagem = response?.message || response?.data?.message;
+
+        if (mensagem) {
+            if (mensagem === "Profissional desativado com sucesso!") {
+                const responseConta = await this.authService.deleteAccount(id);
+
+                if (responseConta?.data?.message) {
+                    await this.exibirMensagem("Conta desativada com sucesso!");
+                    this.logout();
+                } else {
+                    console.error('Erro ao desativar a conta. Resposta da API de conta:', responseConta);
+                    this.exibirMensagem(responseConta?.data?.message || 'Erro ao desativar a conta. Tente novamente mais tarde.');
+                }
+            } else {
+                console.error('Erro ao desativar :', mensagem);
+                this.exibirMensagem(mensagem);
+            }
+        } else {
+            console.error('Resposta inválida ou sem mensagem da API de representante.');
+            this.exibirMensagem('Erro ao desativar . Tente novamente mais tarde.');
+        }
     } catch (error) {
-      console.error('Erro ao excluir conta:', error)
+        console.error('Erro ao desativar :', error);
+        this.exibirMensagem('Ocorreu um erro ao tentar desativar . Tente novamente.');
     }
-  }
+}
 
   public actionSheetButtons = [
     {
@@ -336,67 +355,67 @@ export class PerfilProfissionalLiberalPage implements OnInit {
     }
   }
 
-  public async onSubmit(){
-    if (this.obrigatorio.invalid) {
-      Object.keys(this.obrigatorio.controls).forEach(key => {
-        const control = this.obrigatorio.get(key);
-        if (control !== null && control !== undefined && control.invalid) {
-          if (control.errors && control.errors['required']) {
-            this.presentToast(`O campo ${key} é obrigatório. Por favor, preencha-o.`);
-          }
-        }
-      });
-      return;
-    }
-
-    let id = localStorage.getItem("user")
-
-    //let id = "2"
-
-    if(id == null){
-      console.log("erro ao pegar o id")
-      return
-    }
-
-    if(this.obrigatorio.value["nome"] == null){
-      this.obrigatorio.value["nome"] = this.conta.nome
-    }
-
-    if(this.obrigatorio.value["nomeSocial"] == null){
-      this.obrigatorio.value["nomeSocial"] = this.conta.nomeSocial
-    }
-
-    if(this.obrigatorio.value["descricao"]== null){
-      this.obrigatorio.value["descricao"] = this.conta.descricao
-    }
-
-    if(this.obrigatorio.value["telefone"] == null){
-      this.obrigatorio.value["telefone"] = this.conta.telefone
-    }
-
-    console.log("telefone" + this.obrigatorio.value["telefone"])
-
-    if(this.obrigatorio.value["email"] == null){
-      this.obrigatorio.value["email"] = this.conta.email
-    }
-
-    const response = await this.profissionalService.atualizarProficional(this.conta.idConta, this.obrigatorio.value["nome"], this.obrigatorio.value["nomeSocial"], this.obrigatorio.value["descricao"], this.obrigatorio.value["telefone"], this.obrigatorio.value["email"])
-    console.log(response)
-
-    if(this.obrigatorio.value["tipo"] != null){
-      const responseTipo = await this.profissionalService.cadastrarTipo(this.conta.idConta, this.obrigatorio.value["tipo"])
-      console.log(responseTipo)
-    }
-
-    if(this.obrigatorio.value["imagem"] != null){
-      if(this.selectedFile !== null){
-        const responseImagem = await this.profissionalService.enviarImagem(this.conta.idConta, this.selectedFile)
-        console.log(responseImagem)
+  public async onSubmit() {
+    try {
+      // 1. Preparar os dados
+      const dados = {
+        nome: this.obrigatorio.value["nome"] || this.profissional.nome,
+        nomeSocial: this.obrigatorio.value["nomeSocial"] || this.profissional.nomeSocial,
+        descricao: this.obrigatorio.value["descricao"] || this.profissional.descricao,
+        telefone: this.obrigatorio.value["telefone"] ? 
+                 this.obrigatorio.value["telefone"].replace(/[^\d]/g, '') : 
+                 this.profissional.telefone,
+        email: this.obrigatorio.value["email"] || this.profissional.email,
+        tipo: this.obrigatorio.value["tipo"] || this.tipoDeServico.map((t: any) => t.id)
+      };
+  
+      // 2. Enviar atualizações básicas
+      const respostaBasica = await this.profissionalService.atualizarProficional(
+        this.conta.idConta,
+        dados.nome,
+        dados.nomeSocial,
+        dados.descricao,
+        dados.telefone,
+        dados.email
+      );
+  
+  
+      // 3. Atualizar tipos de serviço
+      const respostaTipos = await this.profissionalService.cadastrarTipo(
+        this.conta.idConta,
+        dados.tipo
+      );
+  
+      // 4. Atualizar imagem se fornecida
+      if (this.selectedFile) {
+        const respostaImagem = await this.profissionalService.enviarImagem(
+          this.conta.idConta,
+          this.selectedFile
+        );
       }
-
+  
+      // 5. Atualizar dados locais
+      await this.carregarDadosAtualizados();
+      
+      this.presentToast("Dados atualizados com sucesso!");
+      this.modal.dismiss(null, 'confirm');
+  
+    } catch (error) {
+      console.error('Erro detalhado:', error);
+      localStorage.setItem('mostrarToastAtualizacao', 'true');
+      window.location.reload();
     }
-
-      this.fechar()
+  }
+  
+  private async carregarDadosAtualizados() {
+    this.profissional = await this.profissionalService.buscarProfissional(this.conta.idConta);
+    this.tipoDeServico = await this.profissionalService.buscarTipoPorProfissional(this.conta.idConta);
+    
+    this.conta.nome = this.profissional.nome;
+    this.conta.nomeSocial = this.profissional.nomeSocial;
+    this.conta.descricao = this.profissional.descricao;
+    this.conta.telefone = this.formatTelefone(this.profissional.telefone);
+    this.conta.email = this.profissional.email;
   }
 
 }

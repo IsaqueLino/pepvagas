@@ -75,3 +75,46 @@ ion-header {
     font-size: 18px;
   }
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  border-radius: 20px;
+  background: rgba(var(--ion-color-pep-rgb), 0.1);
+  
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ion-color-pep);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Efeito hover para melhor interação */
+.user-info:hover {
+  background: rgba(var(--ion-color-pep-rgb), 0.15);
+}
+
+/* Ajuste para tema escuro */
+@media (prefers-color-scheme: dark) {
+  .user-info {
+    background: rgba(var(--ion-color-pep-rgb), 0.2);
+    
+    .user-name {
+      color: var(--ion-color-pep-shade);
+    }
+  }
+  
+  .user-info:hover {
+    background: rgba(var(--ion-color-pep-rgb), 0.25);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .user-info .user-name {
+    color: var(--ion-color-pep-shade); /* Ou uma cor personalizada com mais contraste */
+  }
+}

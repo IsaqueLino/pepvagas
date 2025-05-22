@@ -1,19 +1,22 @@
 .vaga {
     border: 1px solid var(--ion-border-color);
     border-radius: 10px;
-    padding: 20px 20px;
+    padding: 20px;
     box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.1);
-    background-color: var(--ion-card-background);
-    margin: 0px 8px;
-    margin-bottom: 10px;
     display: flex;
     flex-direction: column;
     gap: 15px;
     min-width: 300px;
-
+    height: 200px; /* altura fixa e uniforme */
+    box-sizing: border-box;
+    background-color: var(--ion-card-background); /* melhor para tema claro/escuro */
     cursor: pointer;
-}
+  }
+  
 
+body[color-scheme="light"] .vaga {
+    background-color: #3b9a6f !important;
+}
 
 .badges {
     display: flex;

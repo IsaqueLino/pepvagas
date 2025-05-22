@@ -39,8 +39,11 @@
                 <ion-col size="6">
                   <ion-item class="form-item">
                     <ion-input [maskito]="cpfMask" [maskitoElement]="maskPredicate" formControlName="cpf" label="CPF"
-                      labelPlacement="floating" placeholder="Informe o CPF" maxlength="14"></ion-input>
+                      labelPlacement="floating" placeholder="Informe o CPF" maxlength="14" (ionChange)="validateCpf()"></ion-input>
                   </ion-item>
+                  <ion-note *ngIf="cpfValid == false" color="danger" class="ion-padding">
+                    Por favor, insira um CPF válido
+                  </ion-note>
                 </ion-col>
               </ion-row>
             </ion-grid>

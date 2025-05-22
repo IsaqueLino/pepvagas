@@ -19,12 +19,26 @@
           <ion-row>
             <ion-col size="6">
               <ion-item >
-                <ion-input [(ngModel)]="novaEmpresa.cnpj" [maskito]="cnpjMask" [maskitoElement]="maskPredicate" label="CNPJ" labelPlacement="floating" placeholder="Informe o CNPJ da Empresa" expand="block"></ion-input>
+                <ion-input [(ngModel)]="novaEmpresa.cnpj" [maskito]="cnpjMask" [maskitoElement]="maskPredicate" label="CNPJ" labelPlacement="floating" placeholder="Informe o CNPJ da Empresa" expand="block" (ionChange)="validateCnpj()"></ion-input>
               </ion-item>
+              <ion-note *ngIf="cnpjValid == false" color="danger" class="ion-padding">
+                Por favor, insira um CNPJ válido
+              </ion-note>
             </ion-col>
             <ion-col size="6">
-              <ion-item>
-                <ion-input [(ngModel)]="novaEmpresa.email" label="E-mail para contato" labelPlacement="floating" placeholder="Informe o E-mail de contato da empresa" maxlength="50" expand="block"></ion-input>
+              <ion-item [class.invalid-input]="emailInvalid">
+                <ion-input 
+                  [(ngModel)]="novaEmpresa.email" 
+                  label="E-mail para contato" 
+                  labelPlacement="floating" 
+                  placeholder="Informe o E-mail de contato da empresa" 
+                  maxlength="50" 
+                  expand="block"
+                  (ionChange)="validateEmail()">
+                </ion-input>
+                <ion-note *ngIf="emailInvalid" color="danger" slot="error">
+                  Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+                </ion-note>
               </ion-item>
             </ion-col>
           </ion-row>
@@ -44,20 +58,22 @@
             </ion-col>
           </ion-row>
           <br>
-          <ion-row>
-            <ion-col size="6">
-              <ion-button class="botao-cadastrar" expand="block" (click)="onSubmit()">
-                Cadastrar Empresa
-              </ion-button>
-            </ion-col>
-            <ion-col size="6">
-              <ion-button class="botao-cancelar" color="danger" fill="outline" expand="block" (click)="deactivateAccount()">
-                Cancelar
-              </ion-button>
-            </ion-col>
-          </ion-row>
         </ion-card-content>
       </ion-card>
+
+      <ion-row>
+        <ion-col size="6">
+          <ion-button class="teste" expand="block" (click)="onSubmit()">
+            Cadastrar
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button class="teste" color="light" expand="block" (click)="deactivateAccount()">
+            Cancelar
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
     </div>
   </div>
 </ion-content>

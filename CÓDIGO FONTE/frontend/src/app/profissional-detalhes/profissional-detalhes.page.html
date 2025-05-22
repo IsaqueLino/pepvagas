@@ -2,7 +2,7 @@
   <app-nav></app-nav>
 
   <div class="web-padding">
-    <div class="container">
+    <div class="container" *ngIf="prof">
       <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000;">
         <ion-button mat-button shape="round" (click)="goBack()" color="dark">Voltar</ion-button>
       </div>

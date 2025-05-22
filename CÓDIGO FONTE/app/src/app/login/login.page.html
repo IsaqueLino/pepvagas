@@ -12,9 +12,19 @@
     </div>
     <div class="form">
 
-      <ion-item lines="none">
-        <ion-input [(ngModel)]="login.email" type="email" placeholder="Endereço de Email" id="email" />
+      <ion-item lines="none" [class.invalid]="emailInvalid">
+        <ion-input 
+          [(ngModel)]="login.email" 
+          type="email" 
+          placeholder="Endereço de Email" 
+          id="email"
+          (ionChange)="validateEmail()">
+        </ion-input>
       </ion-item>
+
+      <ion-note *ngIf="emailInvalid" color="danger" class="ion-padding">
+        Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+      </ion-note>
 
       <ion-item lines="none">
         <app-show-hide-password>

@@ -13,6 +13,12 @@
             </ion-item>
             <ion-item>
               <ion-input formControlName="email" label="Email" labelPlacement="floating" placeholder="Informe o email" type="email"></ion-input>
+              <ion-note *ngIf="email?.errors?.['pattern'] && email?.touched" color="danger" slot="error">
+                Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+              </ion-note>
+              <ion-note *ngIf="email?.errors?.['required'] && email?.touched" color="danger" slot="error">
+                O campo e-mail é obrigatório
+              </ion-note>
             </ion-item>
             <ion-item>
               <ion-input formControlName="senha" label="Senha" labelPlacement="floating" placeholder="Informe a senha" type="password" ></ion-input>

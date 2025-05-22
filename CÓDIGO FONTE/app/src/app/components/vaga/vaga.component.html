@@ -8,10 +8,13 @@
   </div>
   <div class="infos">
     <div class="empresa">
-      <ion-img src={{logo}} />
+      <ion-img *ngIf="ocultarNome !== 'S'" [src]="logo"/>
+      <ion-img *ngIf="ocultarNome === 'S'" src="assets/confidencial.png" class="logo-confidencial"/>
       <div class="infos-empresa">
-        <p class="empresa-nome">{{empresa}}</p>
-        <p class="empresa-cidade">{{cidade}}</p>
+        <div class="infos-empresa">
+          <p class="empresa-nome">{{ocultarNome === 'S' ? 'Empresa Confidencial' : empresa}}</p>
+          <p class="empresa-cidade">{{cidade}}</p>
+        </div>
       </div>
     </div>
     <div class="metadata">

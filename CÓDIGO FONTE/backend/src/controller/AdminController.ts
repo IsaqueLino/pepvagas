@@ -1,116 +1,165 @@
-import { Request, Response } from "express";
+import { Request, Response } from "express"; 
 import { AppDataSource } from "../database/data-source";
 import { Administrador } from "../database/models/Administrador";
 import { Vaga } from "../database/models/Vaga";
+import { Conta } from "../database/models/Conta";
+import {IsNull } from "typeorm";
 
 export default {
-
+    /**
+     * Cria um novo administrador.
+     * Verifica se já existe um administrador com o mesmo idconta antes de criar.
+     * Caso já exista, retorna erro de conflito.
+     */
     async create(request: Request, response: Response) {
         try {
-            const {
-                idconta,
-                nome,
-            } = request.body;
+            // corpo da requisição
+            const { idconta, nome } = request.body;
 
+            // Obtém o repositório de administradores
             const adminRepository = AppDataSource.getRepository(Administrador);
+
+            // Verifica se o administrador já existe com o idconta fornecido
             const adminExists = await adminRepository.findOne({
-                where: { idconta: idconta },
+                where: { idconta: idconta, deletedAt: IsNull() },
             });
-            console.log(adminExists);
-            if (adminExists && !adminExists.deletedAt) {
+
+            // Se o administrador já existir e não tiver sido removido, retorna erro
+            if (adminExists) {
                 return response.status(409).json({ message: "Administrador já cadastrado" });
             }
 
+            // Cria o novo administrador
             const admin = adminRepository.create({
                 idconta,
                 nome
             });
 
-            console.log("New Administrator informations:", admin);
+            // Salva o novo administrador no banco de dados
             await adminRepository.save(admin);
-            console.log("Administrator succesfully created!");
+
             return response.status(201).json(admin);
         } catch (error) {
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
     },
 
+    /**
+     * Retorna a lista de todos os administradores cadastrados.
+     */
     async index(request: Request, response: Response) {
         const adminRepository = AppDataSource.getRepository(Administrador);
 
         try {
+            // Busca todos os administradores no banco de dados
             const administradores = await adminRepository.find();
 
+            // Retorna a lista de administradores
             return response.status(200).json(administradores);
         } catch (error) {
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
     },
 
+    /**
+     * Remove um administrador e sua conta associada.
+     * Antes, verifica se há vagas associadas ao administrador.
+     */
     async delete(request: Request, response: Response) {
         const { id } = request.params;
         const adminRepository = AppDataSource.getRepository(Administrador);
-        const admin = await adminRepository.findOneBy({ idconta: +id });
-        if (!admin) {
-            return response.status(404).json({ message: "Usuário não encontrado" });
-        }
-
-        //se existir alguma vaga com esse administrador, não pode deletar
         const vagaRepository = AppDataSource.getRepository(Vaga);
-        const vaga = await vagaRepository.findOneBy({ idVaga: +id });
-
-        if (vaga) {
-            return response.status(422).json({ message: "Não é possível deletar o usuário. Ainda há vagas associadas a ele" });
-        }
-
-        admin.deletedAt = new Date();
-        await adminRepository.save(admin);
-        return response.status(200).json({ message: "Usuário deletado" });
-    },
-
-    async find(request: Request, response: Response) {
-        const { id } = request.params;
+        const contaRepository = AppDataSource.getRepository(Conta);
 
         try {
-            const adminRepository = AppDataSource.getRepository(Administrador);
-
+            // Busca o administrador pelo idconta
             const admin = await adminRepository.findOneBy({ idconta: +id });
-            if (!admin) {
-                return response.status(404).json({ message: "Administrador não encontrado" });
-            }
-            return response.status(200).json(admin);
 
+            // Se o administrador não for encontrado, retorna erro
+            if (!admin) {
+                return response.status(404).json({ message: "Usuário não encontrado" });
+            }
+
+            // Verifica se o administrador tem vagas associadas
+            const vaga = await vagaRepository.findOneBy({ idVaga: +id });
+
+            if (vaga) {
+                return response.status(422).json({ message: "Não é possível remover o usuário. Ainda há vagas associadas a ele" });
+            }
+
+            // Marca o administrador como removido 
+            admin.deletedAt = new Date();
+            await adminRepository.save(admin);
+
+            // Marca a conta associada como removida
+            const conta = await contaRepository.findOne({
+                where: { idConta: admin.idconta }
+            });
+
+            if (conta) {
+                conta.deletedAt = new Date();
+                await contaRepository.save(conta);
+            }
+
+            return response.status(200).json({ message: "Administrador e conta removidos com sucesso!" });
         } catch (error) {
-            console.log(error);
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
     },
 
-    async update(request: Request, response: Response) {
-        const {
-            idconta,
-            nome,
-        } = request.body;
-
+    /**
+     * Busca um administrador pelo id.
+     */
+    async find(request: Request, response: Response) {
         const { id } = request.params;
-        const adminRepository = AppDataSource.getRepository(Administrador);
+
         try {
+            // Obtém o repositório de administradores
+            const adminRepository = AppDataSource.getRepository(Administrador);
+
+            // Busca o administrador pelo idconta
+            const admin = await adminRepository.findOneBy({ idconta: +id });
+
+            if (!admin) {
+                return response.status(404).json({ message: "Administrador não encontrado" });
+            }
+
+            // Retorna os dados do administrador
+            return response.status(200).json(admin);
+
+        } catch (error) {
+            return response.status(500).json({ message: "Erro interno do servidor" });
+        }
+    },
+
+    /**
+     * Atualiza os dados de um administrador.
+     * Caso o administrador não exista, retorna erro.
+     */
+    async update(request: Request, response: Response) {
+        const { idconta, nome } = request.body;
+        const { id } = request.params;
+
+        const adminRepository = AppDataSource.getRepository(Administrador);
+
+        try {
+            // Verifica se o administrador existe
             const adminExists = await adminRepository.findOneBy({ idconta: +id });
+
+            // Se o administrador não existir, retorna erro
             if (!adminExists) {
                 return response.status(404).json({ message: "Administrador não cadastrado" });
             }
 
-            //adminExists.idconta = idconta;
-            console.log("ID:", idconta);
-            console.log("ID:", adminExists.idconta);
             adminExists.nome = nome;
-            console.log("New Informations:", adminExists);
 
+            // Salva as alterações no banco de dados
             await adminRepository.save(adminExists);
-            console.log("Successfully Saved!");
+
+            // Retorna os dados atualizados do administrador
             return response.status(200).json(adminExists);
         } catch (error) {
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
     }
-}
+};

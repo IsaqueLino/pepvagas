@@ -65,6 +65,9 @@ export class Vaga {
   @Column("varchar", { name: "site", nullable: true, length: 45 })
   site: string | null;
 
+  @Column("char", { name: "ocultar_nome", length: 1, default: 'N' })
+  ocultarNome: string;
+
   @DeleteDateColumn({ name: "deletedAt", nullable: true })
   deletedAt: Date | null;
 

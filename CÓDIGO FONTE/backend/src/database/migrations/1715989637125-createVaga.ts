@@ -25,6 +25,7 @@ export class CreateVaga1715989637125 implements MigrationInterface {
                 { name: "idArea", type: "int", isNullable: false },
                 { name: "idConta", type: "int", isNullable: false },
                 { name: "idEmpresa", type: "int", isNullable: false },
+                { name: "ocultar_nome", type: "char", length: "1", isNullable: false, default: "'N'" }
             ]
         }), true);
 
@@ -48,14 +49,17 @@ export class CreateVaga1715989637125 implements MigrationInterface {
         CREATE TRIGGER tr_set_default_images BEFORE INSERT ON vaga
         FOR EACH ROW
         BEGIN
+            -- Apenas define a logo padrão se a logo for NULL ou vazia
             IF NEW.logo IS NULL OR NEW.logo = '' THEN
                 SET NEW.logo = 'vaga-logopadrao.svg';
             END IF;
-    
+
+            -- Apenas define o banner padrão se o banner for NULL ou vazio
             IF NEW.banner IS NULL OR NEW.banner = '' THEN
                 SET NEW.banner = 'vaga-bannerpadrao.svg';
             END IF;
         END;
+
         `);
         
 

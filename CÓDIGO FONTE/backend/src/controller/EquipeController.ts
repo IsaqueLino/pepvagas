@@ -2,8 +2,11 @@ import { AppDataSource } from "../database/data-source";
 import { Request, Response } from "express";
 import { Equipe } from "../database/models/Equipe";
 import { Vaga } from "../database/models/Vaga";
+import { IsNull, Not } from "typeorm"
 
 export default {
+
+    // FUNÇÃO PARA CRIAR UM NOVO MEMBRO DA EQUIPE
     async create(request: Request, response: Response) {
         try {
             const {
@@ -13,9 +16,9 @@ export default {
 
             const equipeRepository = AppDataSource.getRepository(Equipe);
             const equipeExists = await equipeRepository.findOne({
-                where: { idconta },
+                where: { idconta, deletedAt: IsNull()  },
             });
-            if (equipeExists && equipeExists.deletedAt == null) {
+            if (equipeExists) {
                 return response.status(409).json({ message: "Membro da Equipe já cadastrado" });
             }
 
@@ -24,9 +27,7 @@ export default {
                 idconta
             });
 
-            console.log("New Equipe Member informations:", equipe);
             await equipeRepository.save(equipe);
-            console.log("Equipe member succesfully created!");
 
             return response.status(201).json(equipe);
         } catch (error) {
@@ -34,6 +35,7 @@ export default {
         }
     },
 
+    // FUNÇÃO PARA LISTAR TODOS OS MEMBROS DA EQUIPE
     async index(request: Request, response: Response) {
 
         try {
@@ -48,18 +50,43 @@ export default {
         }
     },
 
+    // FUNÇÃO PARA DELETAR UM MEMBRO DA EQUIPE
     async delete(request: Request, response: Response) {
+        try {
         const { id } = request.params;
-        const equipeRepository = AppDataSource.getRepository(Equipe);
-        const equipe = await equipeRepository.findOneBy({ idconta: + id });
-        if (!equipe) {
-            return response.status(404).json({ message: "Membro da Equipe não encontrado" });
+    
+        const membroRepository = AppDataSource.getRepository(Equipe); 
+        const vagaRepository = AppDataSource.getRepository(Vaga);
+    
+        const membro = await membroRepository.findOneBy({ idconta: +id });
+    
+        if (!membro) {
+            return response.status(404).json({ message: "Membro de equipe não encontrado" });
         }
-        equipe.deletedAt = new Date();
-        await equipeRepository.save(equipe);
-        return response.status(200).json({ message: "Membro da Equipe deletado" });
+    
+        // Verifica se há vagas ativas vinculadas ao membro
+        const vagasAtivas = await vagaRepository
+            .createQueryBuilder("vaga")
+            .where("vaga.idConta = :id", { id: membro.idconta })
+            .andWhere("vaga.deletedAt IS NULL")
+            .andWhere("vaga.data_limite >= CURRENT_DATE")
+            .getCount();
+    
+        if (vagasAtivas > 0) {
+            return response.status(400).json({ message: "Não é possível desativar o Membro da Equipe porque há vagas ativas." });
+        }
+    
+        membro.deletedAt = new Date();
+        await membroRepository.save(membro);
+    
+        return response.status(200).json({ message: "Membro de equipe desativado com sucesso!" });
+        } catch (error) {
+        console.error("Erro ao desativar membro de equipe:", error);
+        return response.status(500).json({ message: "Erro interno do servidor" });
+        }
     },
 
+    // FUNÇÃO PARA ENCONTRAR UM MEMBRO DA EQUIPE PELO ID
     async find(request: Request, response: Response) {
         const { id } = request.params;
         const equipeRepository = AppDataSource.getRepository(Equipe);
@@ -74,6 +101,7 @@ export default {
         }
     },
 
+    // FUNÇÃO PARA ATUALIZAR OS DADOS DE UM MEMBRO DA EQUIPE
     async update(request: Request, response: Response) {
         const {
             nome
@@ -82,7 +110,6 @@ export default {
         const { id } = request.params;
         const equipeRepository = AppDataSource.getRepository(Equipe);
         try {
-            console.log("ID do membro da equipe:", id);
             const equipeExists = await equipeRepository.findOneBy({ idconta: + id });
             if (!equipeExists) {
                 return response.status(404).json({ message: "Membro de Equipe não encontrado" });
@@ -93,16 +120,15 @@ export default {
 
             equipeExists.nome = nome;
 
-            console.log("New Informations:", equipeExists);
 
             await equipeRepository.save(equipeExists);
-            console.log("Successfully Saved!");
             return response.status(200).json(equipeExists);
         } catch (error) {
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
     },
 
+    // FUNÇÃO PARA PUBLICAR UMA VAGA ASSOCIADA A UM MEMBRO DA EQUIPE
     async publishVaga(request: Request, response: Response) {
         const { id } = request.params;
         const { idVaga } = request.body;

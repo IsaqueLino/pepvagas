@@ -7,8 +7,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 
-
-
 export class AdministradorService {
 
   private readonly urlBase = environment.API
@@ -23,25 +21,26 @@ export class AdministradorService {
   ) { }
 
   async getAdministrador(id: string) {
-
-    const jwt = this.authService.getJwt()
-
-    const response = await this.api.get(this.urlBase + "/admin/" + id, {
-      headers: {
-        Authorization: `Bearer ${jwt}`
+    const jwt = this.authService.getJwt();
+  
+    try {
+      const response = await this.api.get(`/admin/${id}`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`
+        }
+      });
+  
+      return response.data;
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        this.authService.logout();
       }
-    }).catch((err: AxiosError)=> {
-      if(err.response?.status == 401){
-        this.authService.logout()
-      }
-
-      return err
-    })
-
-
-    return response
+      console.error("Erro ao buscar administrador:", err);
+      return null;
+    }
   }
-
+  
+  // LISTA TODOS OS ADMINISTRADORES
   async getAdministradores() {
 
     const jwt = this.authService.getJwt()
@@ -54,6 +53,8 @@ export class AdministradorService {
 
     return response.data ?? null
   }
+  
+  // LISTA TODOS OS ADMINISTRADORES
   async criar(id: string, nome: string) {
 
     const jwt = this.authService.getJwt()
@@ -64,6 +65,8 @@ export class AdministradorService {
 
     return response.data ?? null
   }
+
+  // ATUALIZA O NOME DE UM ADMINISTRADOR EXISTENTE
   async alterar(id: string, nome: string) {
 
     const response = await this.api.put(this.urlBase + "/admin/" + id, {
@@ -72,6 +75,8 @@ export class AdministradorService {
 
     return response ?? null
   }
+
+  // REMOVE UM ADMINISTRADOR PELO ID
   async excluir(id: string) {
 
     const jwt = this.authService.getJwt()

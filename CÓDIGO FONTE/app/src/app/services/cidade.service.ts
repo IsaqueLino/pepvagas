@@ -6,11 +6,14 @@ import { map } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
+
+// SERVIÇO QUE FAZ A GERENCIA DE CIDADES (FAZ ACESSO A UMA API PARA ISSO)
 export class CidadeService {
   private apiUrl = 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/35/municipios'; // URL da API
 
   constructor(private http: HttpClient) { }
 
+  // BUSCA TODAS AS CIDADES
   getCidades(): Observable<any> {
     return this.http.get<any>(this.apiUrl);
   }

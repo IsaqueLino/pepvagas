@@ -6,6 +6,8 @@ import { AdministradorService } from '../services/administrador.service';
 import { AlertController, NavController, PopoverController, ToastController } from '@ionic/angular';
 import { EmpresaService } from '../services/empresa.service';
 import { AxiosResponse } from 'axios';
+import { RepresentanteService } from '../services/representante.service';
+import { MembroService } from '../services/membro.service';
 
 @Component({
   selector: 'app-minhas-vagas',
@@ -16,12 +18,14 @@ export class MinhasVagasPage implements OnInit {
 
   @ViewChild('popoverVaga') popoverVaga: any;
 
-  private vagas: any = []
+  private vagas: any[] = []
   public listaVagas: any = [...this.vagas]
   public vagasRelacionadas: any = []
   public user: any = {}
   public userType: any = {}
   public isPopoverVagaOpen: boolean = false
+
+  public searchValue: string = ""
 
   constructor(
     private candidatoService: CandidatoService,
@@ -32,15 +36,16 @@ export class MinhasVagasPage implements OnInit {
     private empresaService: EmpresaService,
     private toastController: ToastController,
     private alertController: AlertController,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+
+    private representanteService: RepresentanteService,
+    private membroService: MembroService
   ) {
     if(this.authService.getJwt() == null)
       this.navController.navigateRoot('login')
    }
 
-  ngOnInit(
-    
-  ) {
+  ngOnInit() {
     this.getUser()
     
     setTimeout(() => {
@@ -49,7 +54,8 @@ export class MinhasVagasPage implements OnInit {
   }
 
   async getVagas() {
-    const response = await this.vagaService.getVagasPorConta( this.user.idconta ?? this.user.data.idconta)
+    const response = await this.vagaService.getVagasPorConta(this.user.idconta)
+
     this.vagas = response.data
     this.listaVagas = [...this.vagas]
 
@@ -120,6 +126,7 @@ export class MinhasVagasPage implements OnInit {
     })
   }
 
+  /*
   handleFilter(event: any) {
     const query = event.target.value.toLowerCase();
 
@@ -134,7 +141,15 @@ export class MinhasVagasPage implements OnInit {
       }
     })
 
-    console.log(this.listaVagas)
+  }
+  */
+
+  search() {
+    const query = this.searchValue.toLowerCase();
+    
+    this.listaVagas = this.vagas.filter(vaga => 
+      vaga.titulo.toLowerCase().includes(query)
+    );
   }
 
   async getUser() {
@@ -146,23 +161,19 @@ export class MinhasVagasPage implements OnInit {
 
       this.userType = userType ?? ''
 
-      console.log("Tipo usuário " + this.userType)
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(userId)
-          console.log("DADOS DO ADMIN " + this.user)
-          break;
-        case "C":
-          this.user = await this.candidatoService.getCandidato(userId)
           break;
         case "E":
           this.user = await this.empresaService.getEmpresa(userId)
           break;
         case "M":
+          this.user = await this.membroService.getMembroEquipe(userId)
+          //this.user = this.user.data
           break;
         case "R":
-          break;
-        case "L":
+          this.user = await this.representanteService.getRepresentante(userId)
           break;
       }
     }

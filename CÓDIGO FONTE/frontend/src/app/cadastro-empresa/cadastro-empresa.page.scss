@@ -47,6 +47,11 @@ ion-img {
     height: 100%;
 }
 
+.teste {
+    --padding-top: 18px;
+    --background: var(--ion-color-pep);
+    --padding-bottom: 18px;
+}
 
 .title{
     text-align: center;
@@ -65,4 +70,22 @@ h1{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+
+  .invalid-input {
+    --highlight-color: var(--ion-color-danger);
+    --highlight-color-invalid: var(--ion-color-danger);
+    --highlight-color-focused: var(--ion-color-danger);
+    
+    ion-input {
+      --color: var(--ion-color-danger);
+      --border-color: var(--ion-color-danger);
+    }
+  }
+  
+  ion-note[slot="error"] {
+    display: block;
+    font-size: small;
+    margin-top: 5px;
+    color: var(--ion-color-danger);
   }

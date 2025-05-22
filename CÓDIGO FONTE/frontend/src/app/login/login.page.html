@@ -14,8 +14,22 @@
       </div>
 
       <ion-item lines="none">
-        <ion-input label="Email" maxLength="50" [(ngModel)]="login.email" labelPlacement="floating" type="email" placeholder="Endereço de Email" id="email" />
-      </ion-item> 
+        <ion-input 
+          label="Email" 
+          maxLength="50" 
+          [(ngModel)]="login.email" 
+          labelPlacement="floating" 
+          type="email" 
+          placeholder="Endereço de Email" 
+          id="email"
+          (ionChange)="validateEmail()"
+          [class.invalid]="emailInvalid">
+        </ion-input>
+      </ion-item>
+
+      <ion-note *ngIf="emailInvalid" color="danger" class="ion-padding">
+        Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+      </ion-note> 
 
       <ion-item lines="none">
         <ion-input label="Senha" [(ngModel)]="login.senha" labelPlacement="floating" type="password" placeholder="Senha">

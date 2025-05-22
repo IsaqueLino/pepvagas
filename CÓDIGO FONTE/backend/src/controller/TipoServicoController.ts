@@ -5,7 +5,7 @@ import { z } from "zod"
 
 export default {
 
-
+    // CRIA UM NOVO TIPO DE SERVIÇO
     async create(request: Request, response: Response) {
         const { nome } = request.body;
 
@@ -45,6 +45,7 @@ export default {
 
     },
 
+    // RETORNA TODOS OS TIPOS DE SERVIÇO
     async index(request: Request, response: Response) {
         try {
             const tipoServicoRepository = AppDataSource.getRepository(TipoServico);
@@ -64,6 +65,7 @@ export default {
 
     },
 
+    // DELETA LOGICAMENTE UM TIPO DE SERVIÇO
     async delete(request: Request, response: Response) {
         const { id } = request.params;
 
@@ -90,7 +92,7 @@ export default {
 
             tipoServico.deletedAt = new Date();
             await tipoServicoRepository.save(tipoServico);
-            return response.status(200).json({ message: "TIpo de serviço deletado com sucesso" });
+            return response.status(200).json({ message: "TIpo de serviço deletado com sucesso!" });
 
         } catch (error: any) {
             console.log(error)
@@ -104,10 +106,9 @@ export default {
             })
         }
 
-
-
     },
 
+     // BUSCA UM TIPO DE SERVIÇO PELO ID
     async findById(request: Request, response: Response) {
         const { id } = request.params;
 
@@ -137,6 +138,7 @@ export default {
         }
     },
 
+    // BUSCA PROFISSIONAIS ASSOCIADOS A UM TIPO DE SERVIÇO
     async findProfissionais(request: Request, response: Response) {
         const { id } = request.params;
 
@@ -175,6 +177,7 @@ export default {
         }
     },
 
+    // ATUALIZA UM TIPO DE SERVIÇO EXISTENTE
     async update(request: Request, response: Response) {
         const { nome } = request.body;
         const { id } = request.params;

@@ -6,6 +6,7 @@ import { NavController, ToastController } from '@ionic/angular';
 import { AuthService } from '../services/auth.service';
 import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
 import { EmpresaService } from '../services/empresa.service';
+import { cnpj } from 'cpf-cnpj-validator';
 
 @Component({
   selector: 'app-cadastro-empresa',
@@ -18,19 +19,22 @@ export class CadastroEmpresaPage implements OnInit {
   public userType: string = ''
   public isLogged: boolean = false
   public isDarkTheme: boolean = false
-  public novaEmpresa: {nome: string, cnpj: string, email: string, site: string, telefone: string} = {nome: '', cnpj: '', email: '', site: '', telefone: ''}
+  public novaEmpresa: { nome: string, cnpj: string, email: string, site: string, telefone: string } = { nome: '', cnpj: '', email: '', site: '', telefone: '' }
   private id: any
   public email: string = ''
   public senha: string = ''
+  public emailInvalid: boolean = false;
+
+  public cnpjValid: boolean = true;
 
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement()
 
   readonly phoneMask: MaskitoOptions = {
-    mask: ['(', /\d/, /\d/,')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/,  '-', /\d/, /\d/, /\d/, /\d/],
+    mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
   };
 
   readonly fixPhoneMask: MaskitoOptions = {
-    mask: ['(', /\d/, /\d/,')', ' ', /\d/, /\d/, /\d/, /\d/,  '-', /\d/, /\d/, /\d/, /\d/],
+    mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
   };
 
   readonly cnpjMask: MaskitoOptions = {
@@ -59,48 +63,69 @@ export class CadastroEmpresaPage implements OnInit {
     this.senha = sessionStorage.getItem('pass') ?? ''
   }
 
-  async onSubmit(){
+  validateEmail() {
+    if (!this.novaEmpresa.email) {
+      this.emailInvalid = false;
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = !emailRegex.test(this.novaEmpresa.email);
+  }
+
+  async onSubmit() {
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (this.novaEmpresa.email && !emailRegex.test(this.novaEmpresa.email)) {
+      this.exibirMensagem("Por favor, insira um e-mail válido (exemplo: usuario@dominio.com).");
+      return;
+    }
+
     if (this.novaEmpresa.nome.length == 0) {
-      this.exibirMensagem("Informe o nome da Empresa")
+      this.exibirMensagem("Informe o nome da Empresa.")
     }
     else if (this.novaEmpresa.cnpj.length < 18) {
-      this.exibirMensagem("Informe o CNPJ completo da Empresa")
+      this.exibirMensagem("Informe o CNPJ completo da Empresa.")
     }
     else if (this.novaEmpresa.email.length == 0) {
-      this.exibirMensagem("Informe o e-mail da Empresa")
+      this.exibirMensagem("Informe o e-mail da Empresa.")
     }
     else if (this.novaEmpresa.telefone.length != 0 && this.novaEmpresa.telefone.length < 14) {
-      this.exibirMensagem("Por favor, complete o número de telefone digitado")
+      this.exibirMensagem("Por favor, complete o número de telefone digitado.")
     }
-    else{
+    else if (!cnpj.isValid(this.novaEmpresa.cnpj)) {
+      this.exibirMensagem('CNPJ inválido. Por favor, insira um CNPJ válido.');
+    }
+    else if ((await this.empresaService.verificarCNPJRepetido(this.novaEmpresa.cnpj)).encontrado) {
+      this.exibirMensagem('Já existe uma empresa cadastrada com o CNPJ informado.');
+    }
+    else {
       try {
 
-       
+
         // Criação da Conta
         const conta = await this.authService.createAccount(this.email, this.senha, 'E')
 
         this.id = conta.data.idConta.toString()
 
-        if(!this.id){
+        if (!this.id) {
           console.log("erro ao pegar o id")
           return
         }
 
-        if (await this.isValidCNPJ(this.novaEmpresa.cnpj) == false){
-          this.exibirMensagem("CNPJ Inválido")
+        if (await this.isValidCNPJ(this.novaEmpresa.cnpj) == false) {
+          this.exibirMensagem('CNPJ inválido. Por favor, insira um CNPJ válido.');
           return
         }
-        else{
-          const response = await this.empresaService.cadastrarEmpresa(this.id, this.novaEmpresa.nome, 
+        else {
+          const response = await this.empresaService.cadastrarEmpresa(this.id, this.novaEmpresa.nome,
             this.novaEmpresa.cnpj, this.novaEmpresa.email, this.novaEmpresa.telefone, this.novaEmpresa.site)
-            console.log("RESPONSE: ", response.status)
-          
-            if(response.status == 201){
-              this.exibirMensagem("Empresa " + this.novaEmpresa.nome + " cadastrada com sucesso!")
-              localStorage.removeItem('c-user')
-              sessionStorage.clear()
-              this.navController.navigateRoot('login')
-            }
+
+          if (response.status == 201) {
+            this.exibirMensagem("Empresa " + this.novaEmpresa.nome + " cadastrada com sucesso!")
+            localStorage.removeItem('c-user')
+            sessionStorage.clear()
+            this.navController.navigateRoot('login')
+          }
         }
 
       } catch (error) {
@@ -114,7 +139,7 @@ export class CadastroEmpresaPage implements OnInit {
     const toast = await this.toastController.create({
       message: mensagem,
       duration: 3000,
-      position: 'top'
+      position: 'bottom'
     });
     toast.present();
   }
@@ -165,7 +190,6 @@ export class CadastroEmpresaPage implements OnInit {
       switch (userType) {
         case "A":
           this.user = await this.adminService.getAdministrador(userId)
-          console.log(this.user)
           break;
         case "C":
           this.user = await this.candidatoService.getCandidato(userId)
@@ -204,8 +228,8 @@ export class CadastroEmpresaPage implements OnInit {
     let pos = tamanho - 7;
 
     for (let i = tamanho; i >= 1; i--) {
-        soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
-        if (pos < 2) pos = 9;
+      soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+      if (pos < 2) pos = 9;
     }
 
     let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
@@ -217,19 +241,23 @@ export class CadastroEmpresaPage implements OnInit {
     pos = tamanho - 7;
 
     for (let i = tamanho; i >= 1; i--) {
-        soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
-        if (pos < 2) pos = 9;
+      soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+      if (pos < 2) pos = 9;
     }
 
     resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
     if (resultado !== parseInt(digitos.charAt(1))) return false;
 
     return true;
-}
+  }
 
-async deactivateAccount(){
-  sessionStorage.clear()
-  this.navController.navigateRoot('login')
-}
+  async deactivateAccount() {
+    sessionStorage.clear()
+    this.navController.navigateRoot('login')
+  }
+
+  validateCnpj() {
+    this.cnpjValid = cnpj.isValid(this.novaEmpresa.cnpj)
+  }
 
 }

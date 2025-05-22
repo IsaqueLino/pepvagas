@@ -16,15 +16,15 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
                       <th>Nome</th>
+                      <th>Email</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let administrador of admins" (click)="onRowClick(administrador.idconta)"
                       [class.selected]="administrador.idconta === selectedIdconta">
-                      <td>{{ administrador.idconta }}</td>
                       <td>{{ administrador.nome }}</td>
+                      <td>{{ administrador.email }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -49,7 +49,7 @@
           <ion-button class="teste" expand="block" (click)="validateAndOpenModal()">Alterar</ion-button>
         </ion-col>
         <ion-col size="3">
-          <ion-button class="teste" (click)="excluir()" color="danger" expand="block" type="button">Excluir</ion-button>
+          <ion-button class="teste" (click)="confirmarExclusao()" color="danger" expand="block" type="button">Excluir</ion-button>
         </ion-col>
         <ion-col size="3">
           <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Voltar</ion-button>

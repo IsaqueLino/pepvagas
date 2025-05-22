@@ -8,7 +8,9 @@ import { DatePipe } from '@angular/common';
 import { MaskitoOptions, MaskitoElementPredicate, maskitoTransform } from '@maskito/core';
 import { LoginPage } from '../login/login.page';
 import { CidadeService } from '../services/cidade.service';
-import {maskitoNumberOptionsGenerator} from '@maskito/kit';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
+import { cpf } from 'cpf-cnpj-validator';
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -20,8 +22,8 @@ export class CadastroCandidatoPage implements OnInit {
 
   obrigatorio: FormGroup;
   opcional: FormGroup;
-  opcoes : any = []
-  cidades : any = []
+  opcoes: any = []
+  cidades: any = []
 
   cidadesFiltro: any = []
   cidadesSelecionadas: string[] = []
@@ -31,17 +33,19 @@ export class CadastroCandidatoPage implements OnInit {
 
   selectedFile: File | null = null;
 
+  public cpfValid: boolean = true;
 
-  constructor(private formBuilder: FormBuilder, private cidadeService : CidadeService,private candidatoService: CandidatoService, private navController: NavController, private toastController: ToastController, private areaService : AreaService, private alertController: AlertController) {
+
+  constructor(private formBuilder: FormBuilder, private cidadeService: CidadeService, private candidatoService: CandidatoService, private navController: NavController, private toastController: ToastController, private areaService: AreaService, private alertController: AlertController, private authService: AuthService) {
 
     this.obterOpcoes()
 
     this.obrigatorio = this.formBuilder.group({
       nome: [null, Validators.required],
       genero: [null, Validators.required],
-      cpf : [null, Validators.required],
-      dataNascimento : [null, [Validators.required, this.validateDateOfBirth]],
-      pcd : [null, Validators.required],
+      cpf: [null, Validators.required],
+      dataNascimento: [null, [Validators.required, this.validateDateOfBirth]],
+      pcd: [null, Validators.required],
     });
 
     this.opcional = this.formBuilder.group({
@@ -54,8 +58,9 @@ export class CadastroCandidatoPage implements OnInit {
       pretensaoSalarial: [null, [Validators.required, this.validatePretensaoSalarial]],
       telefone: [null],
       curriculo: [null],
-      areas : [null]
-  })}
+      areas: [null]
+    })
+  }
 
   async obterOpcoes() {
 
@@ -71,7 +76,7 @@ export class CadastroCandidatoPage implements OnInit {
     thousandSeparator: '.',
     min: 0,
     prefix: 'R$',
-});
+  });
 
   validateDateOfBirth(control: FormControl): { [key: string]: boolean } | null {
     if (control.value) {
@@ -86,7 +91,7 @@ export class CadastroCandidatoPage implements OnInit {
         return { invalidDateOfBirth: true };
       }
     }
-        return null;
+    return null;
   }
 
   validatePretensaoSalarial(control: FormControl): { [key: string]: any } | null {
@@ -99,7 +104,6 @@ export class CadastroCandidatoPage implements OnInit {
 
   async carregarCidades() {
     this.cidadeService.getCidades().subscribe((data: any[]) => {
-      console.log(data)
       this.cidades = data.map((cidade: any) => cidade.nome);
       this.cidadesFiltro = [...this.cidades]
     });
@@ -125,21 +129,20 @@ export class CadastroCandidatoPage implements OnInit {
   readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
   readonly phoneMask: MaskitoOptions = {
-    mask: ['(', /\d/, /\d/,')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/,  '-', /\d/, /\d/, /\d/, /\d/],
+    mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
   };
 
   readonly cpfMask: MaskitoOptions = {
-    mask: [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/,/\d/, '-', /\d/, /\d/]
+    mask: [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]
   }
 
-  dismissCidadesPopover(){
+  dismissCidadesPopover() {
     this.cidadesSelecionadasText = this.cidadesSelecionadas.toString()
     this.cidadesSelecionadas = []
     this.isCidadesPopoverOpen = false
-    console.log(this.cidadesSelecionadasText)
   }
 
-  public handleCidadesFiltro(e: any){
+  public handleCidadesFiltro(e: any) {
     const query = e.target.value.toLowerCase();
 
     if (query == '') {
@@ -154,41 +157,39 @@ export class CadastroCandidatoPage implements OnInit {
     })
   }
 
-  public checkboxChange(e: any){
+  public checkboxChange(e: any) {
     const details = e.detail ?? null
 
-    if(details){
-      
-      if(details.checked){
+    if (details) {
+
+      if (details.checked) {
         this.addOnCidades(details.value)
-      }else{
+      } else {
         this.removeCidade(details.value)
       }
 
     }
   }
 
-  public mostrarCidades(e: Event){
+  public mostrarCidades(e: Event) {
     this.cidadesPopover.event = e
     this.isCidadesPopoverOpen = true
   }
 
-  public addOnCidades(cidade: string){
+  public addOnCidades(cidade: string) {
 
     const index = this.cidadesSelecionadas.indexOf(cidade)
-    if(index <= -1){
+    if (index <= -1) {
       this.cidadesSelecionadas.push(cidade)
     }
-    console.log("Adicionando cidades: " + this.cidadesSelecionadas)
   }
 
-  public removeCidade(cidade: string){
+  public removeCidade(cidade: string) {
     const index = this.cidadesSelecionadas.indexOf(cidade)
-    if (index > -1){
+    if (index > -1) {
       this.cidadesSelecionadas.splice(index, 1)
     }
 
-    console.log("Cidades após remover: " + this.cidadesSelecionadas)
   }
 
   onFileSelected(event: any) {
@@ -196,11 +197,11 @@ export class CadastroCandidatoPage implements OnInit {
 
     const selectedFile = event.target.files[0];
 
-    if(event.target.files[0] != null){
+    if (event.target.files[0] != null) {
 
-      if(selectedFile != null && selectedFile.size > size){
+      if (selectedFile != null && selectedFile.size > size) {
         this.presentToast("O tamanho o curriculo deve ter no maximo 8 MB ")
-      }else{
+      } else {
         this.selectedFile = selectedFile
       }
     }
@@ -210,62 +211,107 @@ export class CadastroCandidatoPage implements OnInit {
     return new Date().toISOString().split('T')[0];
   }
 
-  public async onSubmit(){
-    if (this.obrigatorio.invalid) {
-      Object.keys(this.obrigatorio.controls).forEach(key => {
-        const control = this.obrigatorio.get(key);
-        if (control !== null && control !== undefined && control.invalid) {
-          if (control.errors && control.errors['required']) {
-            this.presentToast(`O campo ${key} é obrigatório. Por favor, preencha-o.`);
-          }
-          if (control.errors && control.errors['invalidDateOfBirth']) {
-            this.presentToast('Você deve ter mais de 18 anos para se cadastrar.');
-          }
-        }
-      });
+  public async onSubmit() {
+    // Validação dos campos obrigatórios
+    if (!this.obrigatorio.value["nome"]) {
+      this.presentToast("Por favor, preencha o campo Nome.");
       return;
     }
-
+    if (!this.obrigatorio.value["genero"]) {
+      this.presentToast("Por favor, preencha o campo Sexo.");
+      return;
+    }
+    if (!this.obrigatorio.value["cpf"]) {
+      this.presentToast("Por favor, preencha o campo CPF.");
+      return;
+    }
+    if (!this.obrigatorio.value["dataNascimento"]) {
+      this.presentToast("Por favor, preencha o campo Data de Nascimento.");
+      return;
+    }
+    if (this.obrigatorio.value["pcd"] === null || this.obrigatorio.value["pcd"] === undefined) {
+      this.presentToast("Por favor, preencha o campo PCD.");
+      return;
+    }
+  
+    // Validação de idade (mais de 16 anos)
+    const birthDate = new Date(this.obrigatorio.value["dataNascimento"]);
+    const currentDate = new Date();
+    const age = currentDate.getFullYear() - birthDate.getFullYear();
+    if (age <= 16) {
+      this.presentToast("Você deve ter mais de 16 anos para se cadastrar.");
+      return;
+    }
+  
+    // Validação de CPF
+    const cpfValue = this.obrigatorio.value["cpf"];
+    if (!cpf.isValid(cpfValue)) {
+      this.presentToast("CPF inválido. Por favor, insira um CPF válido.");
+      return;
+    }
+  
+    // Verificação de CPF repetido
+    if ((await this.candidatoService.verificarCPFRepetido(cpfValue)).encontrado) {
+      this.presentToast("Já existe um candidato cadastrado com o CPF informado.");
+      return;
+    }
+  
+    // Validação dos campos opcionais
     let hasOptionalErrors = false;
-
     Object.keys(this.opcional.controls).forEach(key => {
       const control = this.opcional.get(key);
       if (control !== null && control !== undefined && control.invalid) {
-        if (control.errors && control.errors['required']) {
-        }
         if (control.errors && control.errors['invalidPretensaoSalarial']) {
-          this.presentToast('A pretensão salarial deve ser maior que zero.');
+          this.presentToast("A pretensão salarial deve ser maior que zero.");
           hasOptionalErrors = true;
         }
-        return
       }
     });
-
+  
     if (hasOptionalErrors) {
       return;
     }
-
-    let id = localStorage.getItem("c-user")
-
-    if(!id){
-      console.log("erro ao pegar o id")
-      return
+  
+    // Converter pretensaoSalarial para número
+    let pretensaoSalarial = this.opcional.value["pretensaoSalarial"];
+    if (pretensaoSalarial) {
+      // Remove formatação (R$, separadores de milhar e converte vírgula para ponto)
+      pretensaoSalarial = parseFloat(
+        pretensaoSalarial
+          .replace('R$', '') // Remove o prefixo R$
+          .replace(/\./g, '') // Remove separadores de milhar
+          .replace(',', '.') // Converte vírgula para ponto
+          .trim()
+      );
+    } else {
+      pretensaoSalarial = null; // Caso o campo seja opcional e esteja vazio
     }
-
-    const response = await this.candidatoService.cadastroCandidato(id, this.obrigatorio.value["nome"], this.opcional.value["nomeSocial"], this.obrigatorio.value["genero"], this.obrigatorio.value["cpf"], this.obrigatorio.value["dataNascimento"], this.obrigatorio.value["pcd"], this.opcional.value["disponibilidade"], this.cidadesSelecionadasText, this.opcional.value["vagaInteresse"], this.opcional.value["niviInstrucao"], this.opcional.value["cnh"], this.opcional.value["pretensaoSalarial"], this.opcional.value["telefone"])
-    console.log(response)
-
-
-    if(this.opcional.value["areas"] != null){
-      const responseArea = await this.candidatoService.cadastrarAreas(id, this.opcional.value["areas"])
-      console.log(responseArea)
+  
+    const responseCreateAccount = await this.authService.createAccount(localStorage.getItem("candidato_email"), localStorage.getItem("candidato_senha"), "C");
+  
+    if (responseCreateAccount.status == 201) {
+      this.authService.setCreationUser(responseCreateAccount.data.idConta);
+    } else if (responseCreateAccount.status == 409) {
+      this.presentToast(responseCreateAccount.response.data.message);
+      return;
     }
-    
+  
+    let id = localStorage.getItem("c-user");
+    if (!id) {
+      console.log("erro ao pegar o id");
+      return;
+    }
+  
+    const response = await this.candidatoService.cadastroCandidato(id, this.obrigatorio.value["nome"], this.opcional.value["nomeSocial"], this.obrigatorio.value["genero"], this.obrigatorio.value["cpf"], this.obrigatorio.value["dataNascimento"], this.obrigatorio.value["pcd"], this.opcional.value["disponibilidade"], this.cidadesSelecionadasText, this.opcional.value["vagaInteresse"], this.opcional.value["niviInstrucao"], this.opcional.value["cnh"], pretensaoSalarial, this.opcional.value["telefone"]);
+  
+    if (this.opcional.value["areas"] != null) {
+      const responseArea = await this.candidatoService.cadastrarAreas(id, this.opcional.value["areas"]);
+    }
+  
     if (this.opcional.value["curriculo"] != null) {
       if (this.selectedFile !== null) {
         try {
           const respostaCurriculo = await this.candidatoService.uploadFile(id, this.selectedFile);
-          console.log(respostaCurriculo);
         } catch (error) {
           console.error('Erro ao enviar arquivo:', error);
         }
@@ -273,18 +319,18 @@ export class CadastroCandidatoPage implements OnInit {
         console.error('Nenhum arquivo selecionado.');
       }
     }
-
-
-    if(response.status == 201)
-      localStorage.removeItem('c-user')
-      this.navController.navigateRoot('login')
-
+  
+    if (response.status == 201) {
+      localStorage.removeItem('c-user');
+      this.presentToast("Conta cadastrada com sucesso!");
+      this.navController.navigateRoot('login');
+    }
   }
 
-  public async cancelar(){
+  public async cancelar() {
     this.navController.navigateForward('login')
   }
-  
+
   private checkTheme() {
     const theme = localStorage.getItem('theme')
     if (theme == 'dark') {
@@ -321,21 +367,25 @@ export class CadastroCandidatoPage implements OnInit {
             handler: async (data) => {
               if (data.outraArea) {
 
-                  this.areaService.cadastrarArea(data.outraArea)
-                  const newOption = { id: data.outraArea, nome: data.outraArea};
-                  this.opcoes.push(newOption);
-                  this.opcional.patchValue({
-                    areas: [...selectedValues.filter((value: string) => value !== 'outro'), data.outraArea]
-                  });
-                  this.presentToast('Nova área de interesse adicionada com sucesso.');
+                this.areaService.cadastrarArea(data.outraArea)
+                const newOption = { id: data.outraArea, nome: data.outraArea };
+                this.opcoes.push(newOption);
+                this.opcional.patchValue({
+                  areas: [...selectedValues.filter((value: string) => value !== 'outro'), data.outraArea]
+                });
+                this.presentToast('Nova área de interesse adicionada com sucesso!');
               }
             },
           },
         ],
       });
-  
+
       await alert.present();
     }
+  }
+
+  validateCpf() {
+    this.cpfValid = cpf.isValid(this.obrigatorio.value["cpf"])
   }
 
 }

@@ -103,3 +103,18 @@ ion-input{
     justify-content: center;
     flex-direction: column;
 }
+
+ion-item.invalid {
+  border-color: var(--ion-color-danger);
+}
+
+.invalid {
+  --highlight-color-invalid: var(--ion-color-danger);
+}
+
+ion-note {
+  display: block;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}

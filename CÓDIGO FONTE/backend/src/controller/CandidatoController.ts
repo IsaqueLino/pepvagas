@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import { hash } from "bcrypt";
 import * as bcrypt from "bcrypt";
-import { In } from "typeorm";
+import { In, IsNull } from "typeorm";
 import { TipoUsuario } from "../../../shared/enums/TipoUsuario";
 import { Candidato } from "../database/models/Candidato";
 import { Conta } from "../database/models/Conta";
@@ -13,7 +13,9 @@ import FirebaseController from "./FirebaseController";
 import { sendEmailCurriculo, sendEmailCurriculoDoPerfil } from "./EmailController";
 import { string, z } from 'zod'
 import fs from 'fs'
+import path from 'path';
 
+// FUNÇÃO PARA VALIDAR UM CPF REALIZA O CÁLCULO DE VALIDAÇÃO UTILIZANDO OS DÍGITOS VERIFICADORES
 function isValidCPF(cpf: string) {
     if (typeof cpf !== "string") return false;
     cpf = cpf.replace(/[\s.-]*/gim, "");
@@ -51,6 +53,7 @@ function isValidCPF(cpf: string) {
 
 export default {
 
+    // FUNÇÃO PARA ENVIAR O CURRÍCULO DE UM CANDIDATO. 
     async sendCV(request: Request, response: Response) {
 
         const { idconta } = request.params
@@ -68,9 +71,9 @@ export default {
         if (!pdf)
             return response.status(400).json({ message: "Currículo deve ser enviado." })
 
-        if(candidato.curriculo != null){
-            fs.unlink("./../../uploads/" + candidato.curriculo, (err)=> {
-                if(err){
+        if (candidato.curriculo != null) {
+            fs.unlink("./../../uploads/" + candidato.curriculo, (err) => {
+                if (err) {
                     console.log(err)
                     return
                 }
@@ -82,10 +85,111 @@ export default {
         await candidatoRepository.save(candidato)
 
         return response.status(200).json({
-            message: "Currículo enviado com sucesso."
+            message: "Currículo enviado com sucesso!"
         })
     },
 
+    async removeCV(request: Request, response: Response) {
+        const { idconta } = request.params;
+
+        const candidatoRepository = AppDataSource.getRepository(Candidato);
+
+        const candidato = await candidatoRepository.findOneBy({ idconta: +idconta });
+
+        if (!candidato)
+            return response.status(404).json({ message: "Candidato não encontrado" });
+
+        if (!candidato.curriculo)
+            return response.status(400).json({ message: "Você não possui currículo cadastrado." });
+
+        const nomeArquivo = candidato.curriculo;
+
+        // Verificar se outro candidato usa o mesmo currículoj
+        const outrosCandidatos = await candidatoRepository.find({
+            where: {
+                curriculo: nomeArquivo,
+                idconta: Not(+idconta)
+            }
+        });
+
+        // Se nenhum outro candidato usa o mesmo arquivo, deletar o arquivo físico
+        if (outrosCandidatos.length === 0) {
+            fs.unlink(`./../../uploads/${nomeArquivo}`, (err) => {
+                if (err) {
+                    console.error("Erro ao deletar arquivo:", err);
+                    // Continua mesmo se erro ao deletar
+                }
+            });
+        }
+
+        // Remover referência do currículo no candidato
+        candidato.curriculo = null;
+
+        await candidatoRepository.save(candidato);
+
+        return response.status(200).json({
+            message: "Currículo removido com sucesso!"
+        });
+    },
+
+    async getCV(request: Request, response: Response) {
+        const { idconta } = request.params;
+
+        const candidatoRepository = AppDataSource.getRepository(Candidato);
+
+        const candidato = await candidatoRepository.findOneBy({ idconta: +idconta });
+
+        if (!candidato)
+            return response.status(404).json({ message: "Candidato não encontrado" });
+
+        if (!candidato.curriculo)
+            return response.status(400).json({ message: "Você não possui currículo cadastrado." });
+
+        const filePath = path.resolve(__dirname, '..', '..', '..', '..', 'uploads', candidato.curriculo);
+
+
+        return response.sendFile(filePath, (err) => {
+            if (err) {
+                console.error("Erro ao enviar currículo:", err);
+                if (!response.headersSent) {
+                    response.status(500).json({ message: "Erro ao buscar o currículo." });
+                }
+            }
+        });
+    },
+
+    //FUNÇÃO QUE VERIFICA A EXISTÊNCIA DE UM CPF JÁ CADASTRADO NO BANCO
+    async verificarCPFRepetido(request: Request, response: Response) {
+        let { cpf } = request.params;
+    
+        cpf = cpf.replace(/\D/g, '');
+    
+        const candidatoRepository = AppDataSource.getRepository(Candidato);
+    
+        try {
+            const candidato = await candidatoRepository.findOne({
+                where: {
+                    cpf,
+                    conta: {
+                        deletedAt: IsNull()
+                    }
+                },
+                relations: ['conta']
+            });
+    
+            if (candidato) {
+                return response.status(200).json({ message: "Já existe um candidato com este CPF" });
+            } else {
+                return response.status(404).json({ message: "Nenhum candidato encontrado com este CPF" });
+            }
+        } catch (error) {
+            console.error("Erro ao verificar CPF repetido:", error);
+            return response.status(500).json({ message: "Erro interno no servidor" });
+        }
+    },
+
+    // FUNÇÃO PARA CRIAR UM NOVO CANDIDATO. VALIDA OS DADOS RECEBIDOS, 
+    // VERIFICA SE O CPF É VÁLIDO E SALVA NO BANCO DE DADOS
     async create(request: Request, response: Response) {
 
         const {
@@ -156,14 +260,19 @@ export default {
 
             const conta = await contaRepository.findOne({
                 where: {
-                    idConta: +idconta
+                    idConta: +idconta,
+                    deletedAt: IsNull()
                 }
             })
 
             const candidato = await candidatoRepository.findOne({
                 where: {
-                    cpf
-                }
+                    cpf,
+                    conta: {
+                        deletedAt: IsNull()
+                    }
+                },
+                relations: ['conta']
             })
 
             const candidatoComConta = await candidatoRepository.findOne({
@@ -175,8 +284,9 @@ export default {
             if (!conta)
                 return response.status(404).json({ message: "Não há uma conta com este identificador" })
 
-            if (candidato)
+            if (candidato) {
                 return response.status(404).json({ message: "Já existe um candidato com este cpf" })
+            }
 
             if (candidatoComConta)
                 return response.status(400).json({ message: "Já existe um candidato utilizando esta conta" })
@@ -199,11 +309,11 @@ export default {
             })
 
             // novoCandidato.tokenFirebase = generateToken();
-            
+
             await candidatoRepository.save(novoCandidato)
-            
+
             return response.status(201).json({
-                message: "Candidato criado com sucesso"
+                message: "Candidato criado com sucesso!"
             })
 
         } catch (error: any) {
@@ -296,6 +406,7 @@ export default {
         }
     },
 
+    // LISTA TODOS OS CANDIDATOS
     async indexAll(request: Request, response: Response) {
         const candidatoRepository = AppDataSource.getRepository(Candidato);
         try {
@@ -307,6 +418,7 @@ export default {
         }
     },
 
+    // BUSCA UM CANDIDATO PELO ID
     async findById(request: Request, response: Response) {
         try {
 
@@ -341,6 +453,7 @@ export default {
         }
     },
 
+    // BUSCA UM CANDIDATO PELO NOME SOCIAL
     async findByNomeSocial(request: Request, response: Response) {
 
         const schema = z.object({
@@ -348,12 +461,10 @@ export default {
         })
 
         try {
-
             schema.parse(request.params)
 
             const { nome } = request.params
 
-            console.log(nome)
             if (nome == null) {
                 return response.status(400).json({ message: "Nome social não enviado" });
             }
@@ -378,6 +489,7 @@ export default {
         }
     },
 
+    // ATUALIZA DADOS DE UM CANDIDATO
     async update(request: Request, response: Response) {
         const { idconta } = request.params;
         const {
@@ -461,6 +573,7 @@ export default {
         }
     },
 
+    //ATUALIZA OS INTERESSES DO CANDIDATO COM OS DADOS FORNECIDOS NA REQUISIÇÃO
     async atualizarInteresses(request: Request, response: Response) {
         const { idconta } = request.params;
         const files = request.files;
@@ -515,7 +628,6 @@ export default {
             const candidato = candidatoRepository.create(candidatoExistente);
             await candidatoRepository.save(candidato);
 
-            console.log(candidato)
             return response.status(200).json(candidatoExistente);
         } catch (error) {
             console.log(error)
@@ -523,22 +635,31 @@ export default {
         }
     },
 
+    //MARCA UM CANDIDATO COMO DELETADO
     async delete(request: Request, response: Response) {
-        const { idconta } = request.params;
-        const contaRepository = AppDataSource.getRepository(Conta);
-        const conta = await contaRepository.findOneBy({
-            idConta: +idconta
-        });
+        try {
+            const { id } = request.params;
 
-        if (!conta) {
-            return response.status(404).json({ message: "Candidato não encontrado" });
+            const candidatoRepository = AppDataSource.getRepository(Candidato);
+
+            const candidato = await candidatoRepository.findOneBy({ idconta: +id });
+
+            if (!candidato) {
+                return response.status(404).json({ message: "Candidato não encontrado" });
+            }
+
+            const now = new Date();
+            candidato.deletedAt = now;
+            await candidatoRepository.save(candidato);
+
+            return response.status(200).json({ message: "Candidato desativado com sucesso!" });
+        } catch (error) {
+            console.error("Erro ao desativar candidato:", error);
+            return response.status(500).json({ message: "Erro interno do servidor" });
         }
-        conta.deletedAt = new Date();
-        await contaRepository.save(conta);
-        return response.status(200).json({ message: "Candidato deletado" });
     },
 
-
+    // CADASTRA AS ÁREAS DE INTERESSE PARA UM CANDIDATO
     async cadastrarAreas(request: Request, response: Response) {
         const { idconta } = request.params;
         const { areas } = request.body;
@@ -588,6 +709,7 @@ export default {
         }
     },
 
+    // ENVIA EMAIL COM O CURRÍCULO EM PDF PARA UMA VAGA
     async enviarEmailCurriculo(request: Request, response: Response) {
         const { idconta, idvaga } = request.params;
         const pdf = request.file;
@@ -622,7 +744,6 @@ export default {
         }
     },
 
-
     async enviarEmailCurriculoDoPerfil(request: Request, response: Response) {
         const { idconta, idvaga } = request.params;
 
@@ -656,7 +777,8 @@ export default {
         }
     },
 
-    async findAreasByCandidatoId(request: Request, response: Response) {
+    // BUSCA AS VAGAS PARA AS QUAIS O CANDIDATO SE CANDIDATOU
+    async candidaturas(request: Request, response: Response) {
         const { idconta } = request.params;
 
         if (!idconta) {
@@ -667,27 +789,27 @@ export default {
             const candidatoRepository = AppDataSource.getRepository(Candidato);
             const candidato = await candidatoRepository.findOne({
                 where: { idconta: +idconta },
-                relations: ["areas"]
+                relations: ["vagas", "vagas.idEmpresa"],  // Inclua "vagas.idEmpresa" para garantir que a empresa seja carregada
             });
+
 
             if (!candidato) {
                 return response.status(404).json({ message: "Candidato não encontrado" });
             }
 
-            return response.status(200).json(candidato.areas);
+            // Retorna as vagas associadas ao candidato
+            return response.status(200).json(candidato.vagas);
         } catch (error) {
             console.error(error);
             return response.status(500).json({ message: "Erro interno no servidor" });
         }
     },
 
+    // ATUALIZA AS ÁREAS DE INTERESSE DO CANDIDATO NO BANCO DE DADOS
     async atualizarAreasDeInteresse(request: Request, response: Response) {
         const { idconta } = request.params;
         const { areas } = request.body;
 
-        console.log("Chegou");
-        console.log("idconta:", idconta);
-        console.log("areas:", areas);
 
         try {
             const candidatoRepository = AppDataSource.getRepository(Candidato);
@@ -722,7 +844,7 @@ export default {
 
             await candidatoRepository.save(candidato);
 
-            return response.status(200).json({ message: "Áreas de interesse atualizadas com sucesso" });
+            return response.status(200).json({ message: "Áreas de interesse atualizadas com sucesso!" });
         } catch (error) {
             console.log(error);
             return response.status(500).json({ message: "Erro interno no servidor" });
@@ -756,7 +878,7 @@ export default {
             await candidatoRepository.save(candidato);
 
 
-            return response.status(200).json({ message: "Token salvo com sucesso" });
+            return response.status(200).json({ message: "Token salvo com sucesso!" });
 
         } catch (error) {
             console.log(error)

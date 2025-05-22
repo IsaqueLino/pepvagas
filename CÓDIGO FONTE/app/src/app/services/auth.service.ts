@@ -9,7 +9,7 @@ import { Network } from '@capacitor/network';
   providedIn: 'root'
 })
 
-
+// SERVIÇO QUE FAZ A GERENCIA DE AUTORIZAÇÕES DO USUÁRIO (CANDIDATO)
 export class AuthService {
 
   private readonly urlBase = environment.API
@@ -20,6 +20,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  // FAZ O LOGIN DO USUÁRIO COM BASE NO SEU E-MAIL E SENHA JÁ CADASTRADOS
   async login(email: string, senha: string){
 
       const data: any = {}
@@ -37,7 +38,8 @@ export class AuthService {
       return response
   }
 
-  async createAccount(email: string, senha: string, tipo: string){
+  // CRIA UMA NOVA CONTA PARA O USUÁRIO (NOVO CANDIDATO)
+  async createAccount(email: string | null, senha: string | null, tipo: string){
 
     const data: any = {}
 
@@ -54,6 +56,7 @@ export class AuthService {
     return response
   }
 
+  // ENVIA UM EMAIL DE RECUPERAÇÃO DE CONTA PRO USUÁRIO
   async recovery(email:string){
 
     const data: any = {}
@@ -75,6 +78,7 @@ export class AuthService {
     localStorage.setItem('type', type)
   }
 
+  // MÉTODOS QUE ENVOLVEM A SESSÃO DO USUÁRIO:
   setCreationUser(user: string){
     localStorage.setItem('c-user', user)
   }
@@ -95,7 +99,6 @@ export class AuthService {
 
   async getContaDetails() {
     const idconta = localStorage.getItem('user');
-    console.log("conta encontrada", idconta)
     if (!idconta) {
       throw new Error('ID da conta não encontrado no localStorage');
     }
@@ -103,6 +106,7 @@ export class AuthService {
     return response.data
   }
 
+  // DELETA A CONTA DO USUÁRIO
   async deleteAccount(id: string): Promise<any> {
     try {
       const response = await this.api.delete(this.urlBase + '/conta/' + id);
@@ -112,6 +116,7 @@ export class AuthService {
     }
   }
 
+  // ATUALIZA A SENHA DO USUÁRIO
   async updatePassword(id: string, senhaAtual: string, novaSenha: string, confirmacaoNovaSenha: string): Promise<any> {
     try {
       const response = await this.api.put<any>(this.urlBase + '/conta/senha/' + id, {

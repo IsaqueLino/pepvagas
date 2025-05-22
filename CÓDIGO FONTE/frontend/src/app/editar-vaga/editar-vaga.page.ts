@@ -24,6 +24,7 @@ export class EditarVagaPage implements OnInit {
   vaga: any = {}
   userType: any = ''
   idVaga: any = ''
+  public emailInvalid: boolean = false;
 
   cidadesSelecionadas: string[] = []
   cidadeSelecionadasText: string = ''
@@ -64,12 +65,16 @@ export class EditarVagaPage implements OnInit {
     this.obterAreas()
     this.obterEmpresas()
     
-
     this.userId = this.authService.getUser()
     this.userType = this.authService.getType()
     this.idVaga = localStorage.getItem('idVaga') ?? null
     
     this.obterVaga()
+  }
+
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.vaga.emailCurriculo ? !emailRegex.test(this.vaga.emailCurriculo) : false;
   }
 
   public mostrarCidades(e: Event){
@@ -78,7 +83,6 @@ export class EditarVagaPage implements OnInit {
   }
 
   public addOnCidades(cidade: string){
-
     const index = this.cidadesSelecionadas.indexOf(cidade)
     if(index <= -1){
       this.cidadesSelecionadas.push(cidade)
@@ -98,12 +102,10 @@ export class EditarVagaPage implements OnInit {
 
   public handleCidadesFiltro(e: any){
     const query = e.target.value.toLowerCase();
-
     if (query == '') {
       this.cidadesFiltro = [...this.cidades]
       return this.cidadesFiltro
     }
-
     this.cidadesFiltro = this.cidadesFiltro.filter((cidade: any) => {
       if (cidade.toLowerCase().indexOf(query) > -1) {
         return cidade
@@ -126,14 +128,12 @@ export class EditarVagaPage implements OnInit {
 
   async carregarCidades() {
     this.cidadeService.getCidades().subscribe((data: any[]) => {
-      console.log(data)
       this.cidades = data.map((cidade: any) => cidade.nome);
       this.cidadesFiltro = [...this.cidades]
     });
   }
 
   async obterAreas() {
-
     (await this.areaService.buscarTodasAreas()).subscribe(data => {
       this.areas = data;
       this.areas.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
@@ -142,31 +142,21 @@ export class EditarVagaPage implements OnInit {
 
   async obterEmpresas() {
     this.empresas = await this.empresaService.getEmpresas()
-    console.log(this.empresas)
   }
 
   async obterVaga(){
     if(this.idVaga){
       const vaga = await this.vagaService.getVaga(this.idVaga)
       this.vaga = vaga.data
-
-      console.log("AREA " + JSON.stringify(vaga.data.idArea))
-
       this.vaga.idArea = vaga.data.idArea.idArea
       this.vaga.pcd = (vaga.data.pcd == true) ? "1" : "0"
-
+      this.vaga.ocultarNome = vaga.data.ocultarNome === 'S'
       this.vaga.idEmpresa = vaga.data.idEmpresa.idconta
-
       const reg = /^\d+-/
-
       this.vaga.logoNome = vaga.data.logo.replace(reg, '')
       this.vaga.bannerNome = vaga.data.banner.replace(reg, '')
-
       this.vaga.salario = parseFloat(this.vaga.salario)
-      console.log(typeof this.vaga.salario)
-      console.log(this.vaga.salario)
       this.vaga.salario = this.converterParaMoeda(this.vaga.salario)
-
       this.cidadeSelecionadasText = this.vaga.cidade
     }
   }
@@ -177,35 +167,26 @@ export class EditarVagaPage implements OnInit {
       duration: 1500,
       position: 'top',
     })
-
     toast.present()
   }
 
   async onSubmit() {
-
-    if(this.vaga.salario == 'R$' || this.vaga.salario == ''){
-      this.showMessage("Atribua um salário para a vaga")
-      return
+    this.validateEmail();
+    if (this.emailInvalid) {
+      this.showMessage("Por favor, insira um e-mail válido para recebimento de currículos");
+      return;
     }
-
-    let vagaSalario = this.converterParaNumero(this.vaga.salario)
-
+    
     if(await this.verifyData())
       return
-
+    let vagaSalario = this.converterParaNumero(this.vaga.salario)
     if (this.vaga.pcd == 1)
       this.vaga.pcd = true
     else
       this.vaga.pcd = false
-
     if (this.userId && this.userType) {
-
       if (this.userType == 'E')
         this.vaga.idEmpresa = this.userId
-
-      console.log(this.vaga.idArea)
-
-
       await this.vagaService.update({
         "idVaga": +this.idVaga,
         "titulo": this.vaga.titulo,
@@ -221,13 +202,12 @@ export class EditarVagaPage implements OnInit {
         "site": this.vaga.site ?? null,
         "idArea": this.vaga.idArea.id ?? this.vaga.idArea.idArea ?? this.vaga.idArea,
         "emailCurriculo": this.vaga.emailCurriculo,
-        "idEmpresa": +this.vaga.idEmpresa
+        "idEmpresa": +this.vaga.idEmpresa,
+        "ocultarNome": this.vaga.ocultarNome === true ? 'S' : 'N'
       }, this.idVaga).then(response => {
         if (response.status == 200) {
-
           const imgResponse = this.vagaService.sendLogoAndBanner(this.idVaga, this.vaga.logo, this.vaga.banner)
-
-          this.showMessage("Vaga atualizada com sucesso.")
+          this.showMessage("Vaga atualizada com sucesso!")
           this.navController.navigateRoot('minhas-vagas')
         }
       })
@@ -235,44 +215,78 @@ export class EditarVagaPage implements OnInit {
   }
 
   async verifyData(){
-    if(this.vaga.titulo == null || this.vaga.titulo.trim() == ""){
-      this.showMessage("Preencha o título da vaga.")
-    }else if(this.vaga.salario == null){
-      this.showMessage("Preencha o salário da vaga.")
-    }else if(this.vaga.descricao == null || this.vaga.descricao.trim() == ""){
-      this.showMessage("Preencha os detalhes da vaga.")
-    }else if (this.vaga.tipo == null){
-      this.showMessage("Preencha o turno da vaga.")
-    }else if (this.vaga.regime == null){
-      this.showMessage("Preencha o regime da vaga.")
-    }else if (this.vaga.modalidade == null){
-      this.showMessage("Preencha a modalidade da vaga.")
-    }else if (this.vaga.idArea == null){
-      this.showMessage("Preencha a area da vaga.")
-    }else if (this.vaga.cidade == null){
-      this.showMessage("Preencha a cidade da vaga.")
-    }else if (this.vaga.idEmpresa == null && this.userType != "E"){
-      this.showMessage("Preencha a empresa da vaga.")
-    }else if (this.vaga.nivelInstrucao == null){
-      this.showMessage("Preencha o nível de instrução da vaga.")
-    }else if (this.vaga.dataLimite == null){
-      this.showMessage("Preencha a data limite da vaga.")
-    }else if (this.vaga.emailCurriculo == null){
-      this.showMessage("Preencha o email de currículos da vaga.")
-    }else{
-      return false
+    this.validateEmail();
+    if (this.emailInvalid) {
+      this.showMessage("Por favor, insira um e-mail válido para recebimento de currículos");
+      return true;
     }
-    return true
+    const hoje = new Date();
+    const amanha = new Date(hoje);
+    amanha.setDate(hoje.getDate() + 1);
+    amanha.setHours(0, 0, 0, 0);
+    if (this.vaga.dataLimite == null) {
+      this.showMessage("Por favor, preencha o campo Data de encerramento.");
+      return true;
+    } else {
+      const dataLimite = new Date(this.vaga.dataLimite);
+      if (isNaN(dataLimite.getTime()) || dataLimite < amanha) {
+        this.showMessage("Por favor, insira uma data de encerramento que esteja no futuro.");
+        return true;
+      }
+    }
+    if (this.vaga.titulo == null || this.vaga.titulo.trim() == "") {
+      this.showMessage("Por favor, preencha o campo Título.");
+      return true;
+    }
+    if (this.vaga.salario == null) {
+      this.showMessage("Por favor, preencha o campo Salário.");
+      return true;
+    }
+    if (this.vaga.descricao == null || this.vaga.descricao.trim() == "") {
+      this.showMessage("Por favor, preencha o campo Detalhes.");
+      return true;
+    }
+    if (this.vaga.tipo == null) {
+      this.showMessage("Por favor, preencha o campo Turno.");
+      return true;
+    }
+    if (this.vaga.regime == null) {
+      this.showMessage("Por favor, preencha o campo Regime.");
+      return true;
+    }
+    if (this.vaga.modalidade == null) {
+      this.showMessage("Por favor, preencha o campo Modalidade.");
+      return true;
+    }
+    if (this.vaga.idArea == null) {
+      this.showMessage("Por favor, preencha o campo Área.");
+      return true;
+    }
+    if (this.vaga.cidade == null) {
+      this.showMessage("Por favor, preencha o campo Cidade.");
+      return true;
+    }
+    if (this.vaga.idEmpresa == null && this.userType != "E") {
+      this.showMessage("Por favor, preencha o campo Empresa.");
+      return true;
+    }
+    if (this.vaga.nivelInstrucao == null) {
+      this.showMessage("Por favor, preencha o campo Nível de instrução.");
+      return true;
+    }
+    if (this.vaga.emailCurriculo == null || this.vaga.emailCurriculo.trim() == "") {
+      this.showMessage("Por favor, preencha o campo Email de currículos.");
+      return true;
+    }
+    return false;
   }
 
   onLogoSelected(e: any) {
     this.vaga.logo = e.target.files[0]
-    console.log(this.vaga.logo)
   }
 
   onBannerSelected(e: any) {
     this.vaga.banner = e.target.files[0]
-    console.log(this.vaga.logo)
   }
 
   async onAreaChange(event: any) {
@@ -306,52 +320,39 @@ export class EditarVagaPage implements OnInit {
                 this.areas.push(newOption);
                 // Atualiza as áreas selecionadas
                 this.vaga.idArea = newOption.idArea
-
-                console.log(this.vaga.idArea)
                 // Exibe a mensagem de sucesso
-                this.showMessage('Nova área de interesse adicionada com sucesso.');
+                this.showMessage('Nova área de interesse adicionada com sucesso!');
               }
             },
           },
         ],
       });
-  
       await alert.present();
     }
-
-    console.log(event.detail.value)
   }
 
   converterParaNumero(valorString: any){
     if (valorString == 'R$') {
       return null
     }
-
     let valorNumericoString = valorString.replace(/[^\d,.]/g, '');
     valorNumericoString = valorNumericoString.replace('.', '')
-
     const valorNumerico = parseFloat(valorNumericoString.replace(',', '.'));
-
     if (isNaN(valorNumerico)) {
         throw new Error(`Valor "${valorString}" não pôde ser convertido para número.`);
     }
-
     return valorNumerico;
   }
 
-converterParaMoeda(valorNumerico: any){
-  if (isNaN(valorNumerico)) {
-      throw new Error(`Valor numerico não pôde ser convertido para um número`);
+  converterParaMoeda(valorNumerico: any){
+    if (isNaN(valorNumerico)) {
+        throw new Error(`Valor numerico não pôde ser convertido para um número`);
+    }
+    const valorFormatado = valorNumerico.toFixed(2);
+    const partes = valorFormatado.split('.');
+    let parteInteira = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    let resultado = `R$ ${parteInteira},${partes[1]}`;
+    return resultado;
   }
-
-  const valorFormatado = valorNumerico.toFixed(2);
-  const partes = valorFormatado.split('.');
-
-  let parteInteira = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  let resultado = `R$ ${parteInteira},${partes[1]}`;
-
-  return resultado;
-}
 
 }

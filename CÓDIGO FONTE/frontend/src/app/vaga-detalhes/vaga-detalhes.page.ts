@@ -11,6 +11,7 @@ import { RepresentanteService } from '../services/representante.service';
 import { MembroService } from '../services/membro.service';
 import { ProfissionalLiberalService } from '../services/profissional-liberal.service';
 import { environment } from 'src/environments/environment';
+import { ActivatedRoute } from '@angular/router'; 
 
 @Component({
   selector: 'app-vaga-detalhes',
@@ -23,7 +24,7 @@ export class VagaDetalhesPage implements OnInit {
   public user: any = {}
   public userType: string = ''
   public isLogged: boolean = false
-  public vaga: any;
+  public vaga: any = {};
   public candidato: any;
   private id: string = '';
   public isCandidato: boolean = false;
@@ -35,6 +36,7 @@ export class VagaDetalhesPage implements OnInit {
   public selectedFile: File | null = null;
   public selectedOption: any = '';
   public isEnvironment: boolean = false;
+  public fromCandidaturas: boolean = false; 
 
   constructor(
     private authService: AuthService,
@@ -46,16 +48,21 @@ export class VagaDetalhesPage implements OnInit {
     private empresaService: EmpresaService,
     private representanteService: RepresentanteService,
     private equipeService: MembroService,
-    private profissionalLiberalService: ProfissionalLiberalService
+    private profissionalLiberalService: ProfissionalLiberalService,
+    private route: ActivatedRoute,
+
   ) {
   }
 
   async ngOnInit() {
     this.checkTheme()
 
+    this.route.queryParams.subscribe(params => {
+      this.fromCandidaturas = params['fromCandidaturas'] === 'true'; // Converte para booleano
+    });
+
     await this.getUser();
 
-    console.log(this.user)
 
     if (!this.authService.getJwt())
       this.isLogged = false;
@@ -63,11 +70,10 @@ export class VagaDetalhesPage implements OnInit {
       this.isLogged = true;
     }
 
-    if(this.userType == "C"){
+    if (this.userType == "C") {
       try {
         const response = await this.authService.getContaDetails();
         this.candidato = await this.candidatoService.getCandidato(response.idConta)
-        console.log("Candidato: " + this.candidato)
 
       } catch (error) {
         console.error('Erro ao obter detalhes da conta:', error);
@@ -76,23 +82,29 @@ export class VagaDetalhesPage implements OnInit {
 
     const idVaga = localStorage.getItem('idVaga');
     if (!idVaga) {
-      this.showMessage("Erro ao encontrar a vaga",'danger');
+      this.showMessage("Erro ao encontrar a vaga", 'danger');
       this.navigationController.navigateBack('home');
       return;
     }
 
     this.id = idVaga;
-    this.getVaga(idVaga);
+    await this.getVaga(idVaga);
 
 
-    if(environment.production)
-        this.isEnvironment = true
+    if (environment.production)
+      this.isEnvironment = true
 
   }
 
-  goToHome(){
-    this.navigationController.navigateRoot('home')
+  get isCandidatarVisible() {
+    return !this.fromCandidaturas; // Se 'fromCandidaturas' for true, o botão não será exibido
   }
+
+  goToHome() {
+    const targetPage = this.fromCandidaturas ? '/vagas-candidatas' : '/home';
+    this.navigationController.navigateForward(targetPage);
+  }
+  
 
   async getUser() {
     const userId = this.authService.getUser()
@@ -134,79 +146,134 @@ export class VagaDetalhesPage implements OnInit {
 
   async enviarEmailComCurriculo(file: File) {
     let resposta;
-    if (file)
-      resposta = await this.candidatoService.enviarEmailComCurriculo(this.candidato.idconta, this.vaga.idVaga, file);
-    if (resposta){
-      this.showMessage('Curriculo enviado com sucesso!','success');
-      this.navigationController.navigateBack('home');
-    }
-    else {
-      this.showMessage('Erro ao enviar email.','danger');
+    if (file) {
+      try {
+
+        resposta = await this.candidatoService.enviarEmailComCurriculo(this.candidato.idconta, this.vaga.idVaga, file);
+
+        if (resposta && resposta.data && resposta.data.message === "Email enviado com sucesso!") {
+          this.showMessage('Currículo enviado com sucesso!', 'success');
+          this.navigationController.navigateBack('home');
+          return true;  
+        } else {
+          this.showMessage('Erro ao enviar email. Tente novamente.', 'danger');
+          return false;  
+        }
+      } catch (error) {
+        console.error('Erro ao enviar currículo:', error);
+        this.showMessage('Erro ao enviar email. Tente novamente.', 'danger');
+        return false; 
+      }
+    } else {
+      this.showMessage('Selecione um arquivo para enviar o email.', 'danger');
+      return false;  
     }
   }
 
   async enviarEmailComCurriculoDoPerfil() {
     let resposta;
-    resposta = await this.candidatoService.enviarEmailComCurriculoDoPerfil(this.candidato.idconta, this.vaga.idVaga);
-    if (resposta){
-      this.showMessage('Curriculo enviado com sucesso!','success');
-      this.navigationController.navigateBack('home');
-    } else {
-      this.showMessage('Erro ao enviar email.','danger');
+    try {
+      resposta = await this.candidatoService.enviarEmailComCurriculoDoPerfil(this.candidato.idconta, this.vaga.idVaga);
+
+      if (resposta && resposta.data && resposta.data.message === "Email enviado com sucesso!") {
+        this.showMessage(resposta.data.message, 'success');
+        this.navigationController.navigateBack('home');
+        return true; 
+      } else {
+        this.showMessage('Erro ao enviar email. Tente novamente.', 'danger');
+        return false;  
+      }
+    } catch (error) {
+      console.error('Erro ao enviar currículo do perfil:', error);
+      this.showMessage('Erro ao enviar email. Tente novamente.', 'danger');
+      return false;  
     }
   }
 
-  public candidatar() {
+  public async candidatar() {
     if (this.isCandidato && this.isLogged) {
-
       let resposta: any = '';
+
       if (this.selectedOption === 'novo') {
         if (this.selectedFile) {
           if (this.selectedFile.name.endsWith('.pdf')) {
-            if(this.selectedFile.size <= 8*(1024*1024)){
-              resposta = this.enviarEmailComCurriculo(this.selectedFile);
+            if (this.selectedFile.size <= 8 * (1024 * 1024)) {
+              resposta = await this.enviarEmailComCurriculo(this.selectedFile);
+              if (resposta) {
+                console.log('Candidatar no backend...');
+                await this.candidatarNoBackend();
+              } else {
+                console.log('Falha ao enviar o currículo, candidatura não realizada.');
+              }
             } else {
-              this.showMessage('Selecione um arquivo que não seja maior que 8MB para enviar o currículo.','danger');
+              this.showMessage('Selecione um arquivo que não seja maior que 8MB para enviar o currículo.', 'danger');
             }
           } else {
-            this.showMessage('Selecione um arquivo PDF para enviar o currículo.','danger');
+            this.showMessage('Selecione um arquivo PDF para enviar o currículo.', 'danger');
           }
         } else {
-          this.showMessage('Selecione um arquivo para enviar o email.','danger');
+          this.showMessage('Selecione um arquivo para enviar o email.', 'danger');
         }
       } else if (this.selectedOption === 'perfil') {
-        this.getUser()
-        console.log(this.candidato)
-        if (this.candidato.curriculo) {
-          resposta = this.enviarEmailComCurriculoDoPerfil();
-          console.log(resposta);
-          this.showMessage('Sucesso ao enviar email com a candidatura.','success');
+        console.log('Enviando currículo do perfil...');
+        this.getUser();
+        if (this.candidato && this.candidato.curriculo) {
+          resposta = await this.enviarEmailComCurriculoDoPerfil();
+          console.log('Resposta de enviarEmailComCurriculoDoPerfil:', resposta);
+          if (resposta) {
+            console.log('Candidatar no backend...');
+            await this.candidatarNoBackend();
+          } else {
+            console.log('Falha ao enviar o currículo, candidatura não realizada.');
+          }
         } else {
-          this.showMessage('O candidato não tem curriculo cadastrado.','danger');
+          this.showMessage('Você não possui curriculo cadastrado.', 'danger');
         }
       } else if (this.selectedOption === '') {
-        this.showMessage('Selecione uma opção para enviar o email.','danger');
+        this.showMessage('Selecione uma opção para enviar o email.', 'danger');
       } else {
-        this.showMessage('Erro ao enviar email.','danger');
+        this.showMessage('Erro ao enviar email.', 'danger');
       }
     } else {
       if (!this.isLogged) {
-        this.showMessage("Faça login para se candidatar!", 'danger')
+        this.showMessage("Faça login para se candidatar!", 'danger');
         return;
       }
 
       if (!this.isCandidato) {
-        this.showMessage("Seja candidato para se candidatar!", 'danger')
-        return
+        this.showMessage("Seja candidato para se candidatar!", 'danger');
+        return;
       }
     }
+  }
 
+  private async candidatarNoBackend() {
+    try {
+      console.log('Iniciando chamada para o backend...');
+      const resposta = await this.vagaService.candidatar(this.candidato.idconta, this.vaga.idVaga);
+
+
+      if (resposta.data && resposta.data.message === "Candidatura registrada com sucesso!") {
+        this.showMessage('Candidatura registrada com sucesso!', 'success');
+      } else if (resposta.data && resposta.data.message === "O candidato já se inscreveu nesta vaga.") {
+        this.showMessage('Você já se candidatou para esta vaga!', 'warning'); // Muda a mensagem
+      } else {
+        this.showMessage('Erro ao registrar a candidatura. Tente novamente.', 'danger');
+      }
+    } catch (error: any) {
+      console.error('Erro ao registrar candidatura:', error);
+
+      if (error.response && error.response.status === 409) {
+        this.showMessage('Você já se candidatou para esta vaga!', 'warning');
+      } else {
+        this.showMessage('Erro ao registrar candidatura. Tente novamente.', 'danger');
+      }
+    }
   }
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
   }
-
 
   async getVaga(id: string) {
     const response = await this.vagaService.getVaga(id);
@@ -216,7 +283,6 @@ export class VagaDetalhesPage implements OnInit {
 
     this.formatar();
 
-    console.log(this.vaga);
   }
 
   async setarLink() {

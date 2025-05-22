@@ -15,7 +15,6 @@
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
                       <th>Nome</th>
                     </tr>
                   </thead>
@@ -24,7 +23,6 @@
                       *ngFor="let area of paginatedListaTipo"
                       (click)="onRowClick(area.idArea)"
                       [class.selected]="area.idArea === selectedIdArea">
-                      <td>{{ area.idArea }}</td>
                       <td>{{ area.nome }}</td>
                     </tr>
                   </tbody>
@@ -52,7 +50,7 @@
           <ion-button class="teste" (click)="confirmarExclusao()" color="danger" expand="block">Excluir</ion-button>
         </ion-col>
         <ion-col size="3">
-          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Cancelar</ion-button>
+          <ion-button class="teste" [routerLink]="['/home']" color="light" expand="block">Voltar</ion-button>
         </ion-col>
       </ion-row>
     </div>

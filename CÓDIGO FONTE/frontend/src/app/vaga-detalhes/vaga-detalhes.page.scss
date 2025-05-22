@@ -28,6 +28,11 @@ p {
   width: 100%;
 }
 
+.curriculo[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 ion-item {
   --background: var(--ion-item-background);
   border-radius: 5px;
@@ -276,4 +281,20 @@ ion-button {
 
 .breakable {
   white-space: pre-line;
+}
+
+.logo-confidencial {
+  max-width: 150px;
+  max-height: 80px;
+  object-fit: contain;
+  filter: grayscale(100%) opacity(0.7);
+  border: 1px dashed var(--ion-color-medium);
+  padding: 10px;
+  border-radius: 5px;
+  
+  /* Estilo alternativo com destaque vermelho */
+  &.destaque-vermelho {
+    filter: sepia(100%) saturate(500%) hue-rotate(300deg);
+    border-color: var(--ion-color-danger);
+  }
 }

@@ -16,13 +16,15 @@ import { ProfissionalLiberalService } from '../services/profissional-liberal.ser
 })
 export class HomePage {
 
-  private vagas: any = []
-  public listaVagas: any = [...this.vagas]
+  private vagas: any[] = []
+  public listaVagas: any[] = [...this.vagas]
   public vagasRelacionadas: any = []
   public isDarkTheme: boolean = false
   public user: any = {}
   public userType: string = ''
   public isLogged: boolean = false
+
+  public searchValue: string = ""
 
   public isToastOpen = false
 
@@ -60,25 +62,41 @@ export class HomePage {
     sessionStorage.clear()
   }
 
-  ngOnInit() {
-    setTimeout(() => {
-      this.getVagas()
-    }, 500)
+  async ngOnInit() {
+    this.checkTheme();
 
-    this.checkTheme()
-    this.getUser()
-
-    if (this.authService.getJwt()) {
-      this.isLogged = true
+    if (!this.authService.getJwt()) {
+      this.isLogged = false;
+      return;
     }
 
-    if (this.userType == 'C') {
-      this.checkInteressesCandidato()
-    } else if (this.userType == 'E'){
-      this.navController.navigateRoot("/minhas-vagas")
+    this.isLogged = true;
+
+    await this.getUser();
+
+
+    if (!this.userType) {
+      console.error("Tipo de usuário não identificado.");
+      return;
     }
 
-    sessionStorage.clear()
+    if (this.userType === 'E') {
+      this.navController.navigateRoot("/minhas-vagas");
+      return;
+    }
+
+    if (this.userType === 'C') {
+      this.checkInteressesCandidato();
+    }
+
+    if (this.userType === 'L') {
+      this.navController.navigateRoot("/tela-profissionais-liberais");
+      return;
+    }
+
+    await this.getVagas();
+
+    sessionStorage.clear();
   }
 
   async ionViewWillEnter() {
@@ -97,55 +115,97 @@ export class HomePage {
 
     if (!disponibilidade || !cidade || !vaga || areas.length == 0 || !instrucao || !cnh || !pretensaoSalarial) {
       this.isToastOpen = true
-    }else{
+    } else {
       this.isToastOpen = false
     }
 
   }
 
   async getUser() {
-    const userId = this.authService.getUser()
-    const userType = this.authService.getType()
+    const userId = this.authService.getUser();
+    const userType = this.authService.getType();
+
+
     if (userId == null) {
-      this.isLogged = false
-    } else {
-
-      this.userType = userType ?? ''
-      switch (userType) {
-        case "A":
-          this.user = await this.adminService.getAdministrador(userId)
-          break;
-        case "C":
-          this.user = await this.candidatoService.getCandidato(userId)
-          break;
-        case "E":
-          this.user = await this.empresaService.getEmpresa(userId)
-          break;
-        case "M":
-          this.user = await this.equipeService.getMembroEquipe(userId)
-          break;
-        case "R":
-          this.user = await this.representanteService.getRepresentante(userId)
-          break;
-        case "L":
-          this.user = await this.profissionalLiberalService.buscarProfissional(userId)
-          break;
-      }
-
-      // const user = await this.candidatoService.getCandidato(userId)
-      // this.user = user
-      this.isLogged = true
+      this.isLogged = false;
+      return;
     }
+
+    this.userType = userType ?? '';
+
+    switch (userType) {
+      case "A":
+        this.user = await this.adminService.getAdministrador(userId);
+        break;
+      case "C":
+        this.user = await this.candidatoService.getCandidato(userId);
+        break;
+      case "E":
+        this.user = await this.empresaService.getEmpresa(userId);
+        break;
+      case "M":
+        this.user = await this.equipeService.getMembroEquipe(userId);
+        break;
+      case "R":
+        this.user = (await this.representanteService.getRepresentante(userId));
+        break;
+      case "L":
+        this.user = await this.profissionalLiberalService.buscarProfissional(userId);
+        break;
+      default:
+        console.error(" Tipo de usuário não reconhecido:", userType);
+        return;
+    }
+
+
+    this.isLogged = true;
   }
 
   async getVagas() {
-    const response = await this.vagaService.getVagas()
-    this.vagas = response.data
-    this.listaVagas = [...this.vagas]
 
-    this.matchVagas()
+    const idCandidato = this.user?.idconta;
+    if (this.userType === 'R') {
+      const idRepresentante = this.user?.idconta;
 
-    this.sortVagas()
+
+      if (!idRepresentante || isNaN(Number(idRepresentante))) {
+        console.error(" ID do representante inválido (NaN):", idRepresentante);
+        return;
+      }
+
+      try {
+        const response = await this.vagaService.getVagasDoRepresentante(idRepresentante);
+        this.vagas = response.data;
+      } catch (error) {
+        console.error(" Erro ao buscar vagas do representante:", error);
+      }
+
+    } else {
+      try {
+        const response = await this.vagaService.getVagas();
+        this.vagas = response.data;
+
+        if (this.userType === 'C' && idCandidato) {
+          try {
+            const candidaturas = await this.candidatoService.getCandidaturas(idCandidato);
+            const idsCandidatados = candidaturas.map((c: any) => c.idVaga);
+
+            this.vagas.forEach(vaga => {
+              vaga.jaCandidatado = idsCandidatados.includes(vaga.idVaga);
+            });
+          } catch (error) {
+            console.error("Erro ao buscar candidaturas do candidato:", error);
+          }
+        }
+
+      } catch (error) {
+        console.error("Erro ao buscar vagas gerais:", error);
+      }
+    }
+
+    this.listaVagas = [...this.vagas];
+    this.matchVagas();
+    this.sortVagas();
   }
 
   // SISTEMA DE PONTUACAO
@@ -186,6 +246,8 @@ export class HomePage {
     })
   }
 
+  /*
+
   handleFilter(event: any) {
     const query = event.target.value.toLowerCase();
 
@@ -199,6 +261,16 @@ export class HomePage {
         return vaga
       }
     })
+  }
+
+  */
+
+  search() {
+    const query = this.searchValue.toLowerCase();
+
+    this.listaVagas = this.vagas.filter(vaga =>
+      vaga.titulo.toLowerCase().includes(query)
+    );
   }
 
   toggleTheme() {
@@ -236,8 +308,8 @@ export class HomePage {
     this.navController.navigateRoot('login')
   }
 
-  verVagaDetalhes(idVaga: string) {
-    localStorage.setItem('idVaga', idVaga);
+  verVagaDetalhes(vaga: any) {
+    localStorage.setItem('idVaga', vaga.idVaga);
   }
 
 

@@ -9,7 +9,8 @@ import { MaskitoOptions, MaskitoElementPredicate, maskitoTransform } from '@mask
 import { LoginPage } from '../login/login.page';
 import { CidadeService } from '../services/cidade.service';
 import { AuthService } from '../services/auth.service';
-import {maskitoNumberOptionsGenerator} from '@maskito/kit';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
+import { cpf } from 'cpf-cnpj-validator';
 
 @Component({
   selector: 'app-cadastro-candidato',
@@ -36,9 +37,9 @@ export class CadastroCandidatoPage implements OnInit {
   public isDarkTheme: boolean = false
   public isLogged: boolean = false
 
+  public cpfValid: boolean = true;
 
   constructor(private formBuilder: FormBuilder, private alertController: AlertController, private authService: AuthService, private cidadeService: CidadeService, private candidatoService: CandidatoService, private navController: NavController, private toastController: ToastController, private areaService: AreaService) {
-
     this.email = ''
     this.senha = ''
 
@@ -70,21 +71,15 @@ export class CadastroCandidatoPage implements OnInit {
   }
 
   async obterOpcoes() {
-
     this.opcoes = await this.areaService.getAreas();
     this.opcoes.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
-
   }
 
   validateDateOfBirth(control: FormControl): { [key: string]: boolean } | null {
     if (control.value) {
-
       const birthDate = new Date(control.value);
-
       const currentDate = new Date();
-
       const age = currentDate.getFullYear() - birthDate.getFullYear();
-
       if (age <= 16) {
         return { invalidDateOfBirth: true };
       }
@@ -92,36 +87,29 @@ export class CadastroCandidatoPage implements OnInit {
     return null;
   }
 
-  public checkboxChange(e: any){
+  public checkboxChange(e: any) {
     const details = e.detail ?? null
-
-    if(details){
-      
-      if(details.checked){
+    if (details) {
+      if (details.checked) {
         this.addOnCidades(details.value)
-      }else{
+      } else {
         this.removeCidade(details.value)
       }
-
     }
   }
 
-  public addOnCidades(cidade: string){
-
+  public addOnCidades(cidade: string) {
     const index = this.cidadesSelecionadas.indexOf(cidade)
-    if(index <= -1){
+    if (index <= -1) {
       this.cidadesSelecionadas.push(cidade)
     }
-    console.log("Adicionando cidades: " + this.cidadesSelecionadas)
   }
 
-  public removeCidade(cidade: string){
+  public removeCidade(cidade: string) {
     const index = this.cidadesSelecionadas.indexOf(cidade)
-    if (index > -1){
+    if (index > -1) {
       this.cidadesSelecionadas.splice(index, 1)
     }
-
-    console.log("Cidades após remover: " + this.cidadesSelecionadas)
   }
 
   validatePretensaoSalarial(control: FormControl): { [key: string]: any } | null {
@@ -129,7 +117,6 @@ export class CadastroCandidatoPage implements OnInit {
       return { invalidPretensaoSalarial: true };
     }
     return null;
-
   }
 
   toggleTheme() {
@@ -137,7 +124,6 @@ export class CadastroCandidatoPage implements OnInit {
       this.isDarkTheme = false
     else
       this.isDarkTheme = true
-
     this.handleTheme()
   }
 
@@ -153,12 +139,11 @@ export class CadastroCandidatoPage implements OnInit {
 
   async carregarCidades() {
     this.cidadeService.getCidades().subscribe((data: any[]) => {
-      console.log(data)
       this.cidades = data.map((cidade: any) => cidade.nome);
       this.cidadesFiltro = [...this.cidades]
     });
   }
-  
+
   async presentToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
@@ -169,17 +154,13 @@ export class CadastroCandidatoPage implements OnInit {
   }
 
   ngOnInit() {
-
     this.email = ''
     this.senha = ''
-
     this.checkTheme()
     this.carregarCidades()
-
     if (this.authService.getJwt()) {
       this.isLogged = true
     }
-
     this.email = sessionStorage.getItem('email') ?? ''
     this.senha = sessionStorage.getItem('pass') ?? ''
   }
@@ -189,7 +170,7 @@ export class CadastroCandidatoPage implements OnInit {
     this.navController.navigateForward('login')
   }
 
-  public mostrarCidades(e: Event){
+  public mostrarCidades(e: Event) {
     this.cidadesPopover.event = e
     this.isCidadesPopoverOpen = true
   }
@@ -207,21 +188,18 @@ export class CadastroCandidatoPage implements OnInit {
     mask: [/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]
   }
 
-  dismissCidadesPopover(){
+  dismissCidadesPopover() {
     this.cidadesSelecionadasText = this.cidadesSelecionadas.toString()
     this.cidadesSelecionadas = []
     this.isCidadesPopoverOpen = false
-    console.log(this.cidadesSelecionadasText)
   }
 
-  public handleCidadesFiltro(e: any){
+  public handleCidadesFiltro(e: any) {
     const query = e.target.value.toLowerCase();
-
     if (query == '') {
       this.cidadesFiltro = [...this.cidades]
       return this.cidadesFiltro
     }
-
     this.cidadesFiltro = this.cidadesFiltro.filter((cidade: any) => {
       if (cidade.toLowerCase().indexOf(query) > -1) {
         return cidade
@@ -236,22 +214,18 @@ export class CadastroCandidatoPage implements OnInit {
     thousandSeparator: '.',
     min: 0,
     prefix: 'R$',
-});
+  });
 
   onFileSelected(event: any) {
     const size = 8 * 1024 * 1024
-
     const selectedFile = event.target.files[0];
-
-    if(event.target.files[0] != null){
-
-      if(selectedFile != null && selectedFile.size > size){
+    if (event.target.files[0] != null) {
+      if (selectedFile != null && selectedFile.size > size) {
         this.presentToast("O tamanho o curriculo deve ter no maximo 8 MB ")
-      }else{
+      } else {
         this.selectedFile = selectedFile
       }
     }
-
   }
 
   getMaxDate(): string {
@@ -259,33 +233,62 @@ export class CadastroCandidatoPage implements OnInit {
   }
 
   public async onSubmit() {
-    if (this.obrigatorio.invalid) {
-      Object.keys(this.obrigatorio.controls).forEach(key => {
-        const control = this.obrigatorio.get(key);
-        if (control !== null && control !== undefined && control.invalid) {
-          if (control.errors && control.errors['required']) {
-            this.presentToast(`O campo ${key} é obrigatório. Por favor, preencha-o.`);
-          }
-          if (control.errors && control.errors['invalidDateOfBirth']) {
-            this.presentToast('Você deve ter mais de 18 anos para se cadastrar.');
-          }
-        }
-      });
+    // Validação dos campos obrigatórios
+    if (!this.obrigatorio.value["nome"]) {
+      this.presentToast("Por favor, preencha o campo Nome.");
+      return;
+    }
+    if (!this.obrigatorio.value["genero"]) {
+      this.presentToast("Por favor, preencha o campo Sexo.");
+      return;
+    }
+    if (!this.obrigatorio.value["cpf"]) {
+      this.presentToast("Por favor, preencha o campo CPF.");
+      return;
+    }
+    if (!this.obrigatorio.value["dataNascimento"]) {
+      this.presentToast("Por favor, preencha o campo Data de nascimento.");
+      return;
+    }
+    if (this.obrigatorio.value["pcd"] === null || this.obrigatorio.value["pcd"] === undefined) {
+      this.presentToast("Por favor, preencha o campo PCD.");
       return;
     }
 
-    let hasOptionalErrors = false;
+    // Validação de idade (mais de 16 anos)
+    const birthDate = new Date(this.obrigatorio.value["dataNascimento"]);
+    const currentDate = new Date();
+    const age = currentDate.getFullYear() - birthDate.getFullYear();
+    if (age <= 16) {
+      this.presentToast("Você deve ter mais de 16 anos para se cadastrar.");
+      return;
+    }
 
+    // Validação de CPF
+    const cpfValue = this.obrigatorio.value["cpf"];
+    if (!cpf.isValid(cpfValue)) {
+      this.presentToast("CPF inválido. Por favor, insira um CPF válido.");
+      return;
+    }
+
+    // Verificação de CPF repetido
+    if ((await this.candidatoService.verificarCPFRepetido(cpfValue)).encontrado) {
+      this.presentToast("Já existe um candidato cadastrado com o CPF informado.");
+      return;
+    }
+
+    // Validação dos campos opcionais
+    let hasOptionalErrors = false;
     Object.keys(this.opcional.controls).forEach(key => {
       const control = this.opcional.get(key);
       if (control !== null && control !== undefined && control.invalid) {
         if (control.errors && control.errors['required']) {
         }
         if (control.errors && control.errors['invalidPretensaoSalarial']) {
-          this.presentToast('A pretensão salarial deve ser maior que zero.');
+          this.presentToast("A pretensão salarial deve ser maior que zero.");
           hasOptionalErrors = true;
         }
-        return
+        return;
       }
     });
 
@@ -299,8 +302,6 @@ export class CadastroCandidatoPage implements OnInit {
     // Criação da Conta
     const conta = await this.authService.createAccount(this.email, this.senha, 'C')
 
-    console.log("CONTA: " + conta.status)
-
     let id = conta.data.idConta.toString()
 
     if (!id) {
@@ -309,24 +310,22 @@ export class CadastroCandidatoPage implements OnInit {
     }
 
     let pretensaoSalarial: any
-    if(this.opcional.value["pretensaoSalarial"] != null){
+    if (this.opcional.value["pretensaoSalarial"] != null) {
       pretensaoSalarial = this.converterParaNumero(this.opcional.value["pretensaoSalarial"]);
     }
-    
-    const response = await this.candidatoService.cadastroCandidato(id, this.obrigatorio.value["nome"], this.obrigatorio.value["nomeSocial"], this.obrigatorio.value["genero"], this.obrigatorio.value["cpf"], this.obrigatorio.value["dataNascimento"], this.obrigatorio.value["pcd"], this.opcional.value["disponibilidade"], this.cidadesSelecionadasText, this.opcional.value["vagaInteresse"], this.opcional.value["niviInstrucao"], this.opcional.value["cnh"], pretensaoSalarial, this.opcional.value["telefone"])
-    console.log(response)
 
+    const response = await this.candidatoService.cadastroCandidato(id, this.obrigatorio.value["nome"], this.obrigatorio.value["nomeSocial"], this.obrigatorio.value["genero"], this.obrigatorio.value["cpf"], this.obrigatorio.value["dataNascimento"], this.obrigatorio.value["pcd"], this.opcional.value["disponibilidade"], this.cidadesSelecionadasText, this.opcional.value["vagaInteresse"], this.opcional.value["niviInstrucao"], this.opcional.value["cnh"], pretensaoSalarial, this.opcional.value["telefone"])
+    if(response.status == 404)
+      console.log("Já existe um candidato com este cpf")
 
     if (this.opcional.value["areas"] != null) {
       const responseArea = await this.candidatoService.cadastrarAreas(id, this.opcional.value["areas"])
-      console.log(responseArea)
     }
 
     if (this.opcional.value["curriculo"] != null) {
       if (this.selectedFile !== null) {
         try {
           const respostaCurriculo = await this.candidatoService.uploadFile(id, this.selectedFile);
-          console.log(respostaCurriculo);
         } catch (error) {
           console.error('Erro ao enviar arquivo:', error);
         }
@@ -335,13 +334,20 @@ export class CadastroCandidatoPage implements OnInit {
       }
     }
 
-
     if (response.status == 201) {
-      localStorage.removeItem('c-user')
-      this.email = ''
-      this.senha = ''
-      sessionStorage.clear()
-      this.navController.navigateRoot('login')
+      // Salva sessão do candidato
+      this.authService.login(id, 'C');
+    
+      // Limpa dados temporários
+      localStorage.removeItem('c-user');
+      this.email = '';
+      this.senha = '';
+      sessionStorage.clear();
+
+      this.presentToast("Cadastro realizado com sucesso!");
+    
+      // Redireciona para a home
+      this.navController.navigateRoot('/login');
     }
   }
 
@@ -385,14 +391,13 @@ export class CadastroCandidatoPage implements OnInit {
             text: 'OK',
             handler: async (data) => {
               if (data.outraArea) {
-
                 this.areaService.cadastrarArea(data.outraArea)
                 const newOption = { id: data.outraArea, nome: data.outraArea };
                 this.opcoes.push(newOption);
                 this.opcional.patchValue({
                   areas: [...selectedValues.filter((value: string) => value !== 'outro'), data.outraArea]
                 });
-                this.presentToast('Nova área de interesse adicionada com sucesso.');
+                this.presentToast('Nova área de interesse adicionada com sucesso!');
               }
             },
           },
@@ -403,39 +408,33 @@ export class CadastroCandidatoPage implements OnInit {
     }
   }
 
-  converterParaNumero(valorString: any){
-
+  converterParaNumero(valorString: any) {
     if (valorString == 'R$') {
       return null
     }
-
     let valorNumericoString = valorString.replace(/[^\d,.]/g, '');
     valorNumericoString = valorNumericoString.replace('.', '')
-
     const valorNumerico = parseFloat(valorNumericoString.replace(',', '.'));
-
-    // Verificar se o valor não é NaN (Not a Number)
     if (isNaN(valorNumerico)) {
-        throw new Error(`Valor "${valorString}" não pôde ser convertido para número.`);
+      throw new Error(`Valor "${valorString}" não pôde ser convertido para número.`);
     }
-
     return valorNumerico;
-}
-
-converterParaMoeda(valorNumerico: any){
-  if (isNaN(valorNumerico)) {
-      throw new Error(`Valor numerico não pôde ser convertido para um número`);
   }
 
-  const valorFormatado = valorNumerico.toFixed(2);
-  const partes = valorFormatado.split('.');
+  converterParaMoeda(valorNumerico: any) {
+    if (isNaN(valorNumerico)) {
+      throw new Error(`Valor numerico não pôde ser convertido para um número`);
+    }
+    const valorFormatado = valorNumerico.toFixed(2);
+    const partes = valorFormatado.split('.');
+    let parteInteira = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    let resultado = `R$ ${parteInteira},${partes[1]}`;
+    return resultado;
+  }
 
-  let parteInteira = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  validateCpf() {
+    this.cpfValid = cpf.isValid(this.obrigatorio.value["cpf"])
+  }
 
-  let resultado = `R$ ${parteInteira},${partes[1]}`;
-
-  return resultado;
 }
 
-
-}

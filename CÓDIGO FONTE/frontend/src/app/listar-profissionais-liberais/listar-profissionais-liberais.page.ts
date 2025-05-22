@@ -83,14 +83,12 @@ export class ListarProfissionaisLiberaisPage implements OnInit {
   }
   onRowClick(idConta: number) {
     this.selectedIdconta = idConta;
-    console.log('ID selecionado:', this.selectedIdconta);
     this.isSelected = true;
   }
 
   async carregarLista() {
     try {
       this.listaProfissionais = await this.profissionalLiberalService.buscarTodos();
-      console.log("LISTA:",this.listaProfissionais);
     } catch (error) {
       console.error('Erro ao carregar a lista de profissionais liberais:', error);
     }

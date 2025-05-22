@@ -12,24 +12,25 @@ export class AreaService {
 
   constructor(private http: HttpClient) { }
 
-  async buscarTodasAreas() {
-    const resposta = this.http.get<any[]>(this.urlBase+'/area/list')
-    return resposta
+  // BUSCA TODAS AS ÁREAS
+  buscarTodasAreas() {
+    return this.http.get<any[]>(this.urlBase + '/area/list');
   }
 
+  // CADASTRA UMA NOVA ÁREA
   async cadastrarArea(nome: string) {
     const api = axios.create({
       baseURL: this.urlBase
     });
-  
+
     const response = await api.post('/area/create', {
-      nome : nome
+      nome: nome
     });
-  
+
     return response;
   }
-  
 
+  // BUSCA UMA ÁREA PELO ID
   async buscarAreaPorID(id: string) {
     const api = axios.create({
       baseURL: this.urlBase
@@ -40,19 +41,21 @@ export class AreaService {
     return response
   }
 
-  async atualizarArea(id :string, nome : string){
+  // ATUALIZA UMA ÁREA EXISTENTE PELO ID
+  async atualizarArea(id: string, nome: string) {
     const api = axios.create({
       baseURL: this.urlBase
     });
 
-    const response = await api.put('/area/update/'+ id,{
-      nome : nome
+    const response = await api.put('/area/update/' + id, {
+      nome: nome
     })
 
     return response
   }
 
-  async excluir(id : string){
+  // EXCLUI UMA ÁREA PELO ID
+  async excluir(id: string) {
     const api = axios.create({
       baseURL: this.urlBase
     });
@@ -60,10 +63,10 @@ export class AreaService {
     const response = await api.delete(this.urlBase + '/area/delete/' + id)
 
     return response
-
   }
 
-  async getAreas(){
+  // OBTÉM A LISTA DE TODAS AS ÁREAS
+  async getAreas() {
     const api = axios.create({
       baseURL: this.urlBase
     });
@@ -71,5 +74,5 @@ export class AreaService {
     const response = await api.get('/area/list')
 
     return response.data
-}
+  }
 }

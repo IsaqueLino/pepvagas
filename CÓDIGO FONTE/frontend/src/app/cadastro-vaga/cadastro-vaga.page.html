@@ -113,12 +113,20 @@
 
         <ion-row>
           <ion-col>
-            <ion-item *ngIf="this.userType != 'E'">
+            <ion-item *ngIf="this.userType != 'E'&& this.userType != 'R'">
               <ion-select [(ngModel)]="vaga.idEmpresa" required="true" aria-label="Empresa" interface="popover"
                 label="Empresa">
                 <ion-select-option *ngFor="let empresa of this.empresas"
                   [value]="empresa.idconta">{{empresa.nomeEmpresa}}</ion-select-option>
               </ion-select>
+            </ion-item>
+          </ion-col>
+
+          <ion-col>
+            <ion-item>
+              <ion-toggle [(ngModel)]="vaga.ocultarNome" labelPlacement="end">
+                Ocultar dados da empresa
+              </ion-toggle>
             </ion-item>
           </ion-col>
 
@@ -155,6 +163,8 @@
           </ion-col>
         </ion-row>
         <ion-row>
+
+        
           <ion-col>
             <ion-item>
               <ion-input  [(ngModel)]="vaga.dataLimite" required="true" placeholder="Informe a data de encerramento da vaga"
@@ -162,9 +172,21 @@
             </ion-item>
           </ion-col>
           <ion-col>
-            <ion-item>
-              <ion-input email maxLength="50" required="true" [(ngModel)]="vaga.emailCurriculo" label="Email de Recebimento de Currículos"
-                type="email" labelPlacement="floating" placeholder="Informe o email de recebimento de currículos"></ion-input>
+            <ion-item [class.invalid]="emailInvalid">
+              <ion-input 
+                email 
+                maxLength="50" 
+                required="true" 
+                [(ngModel)]="vaga.emailCurriculo" 
+                label="Email de Recebimento de Currículos"
+                type="email" 
+                labelPlacement="floating" 
+                placeholder="Informe o email de recebimento de currículos"
+                (ionChange)="validateEmail()">
+              </ion-input>
+              <ion-note *ngIf="emailInvalid" color="danger" slot="error">
+                Por favor, insira um e-mail válido (exemplo: usuario&#64;dominio.com)
+              </ion-note>
             </ion-item>
           </ion-col>
         </ion-row>
@@ -183,7 +205,7 @@
             </ion-button>
           </ion-col>
           <ion-col>
-            <ion-button color="light" expand="block" class="pep" [routerLink]="['/home']">
+            <ion-button color="danger" expand="block" class="pep" [routerLink]="['/home']">
               Cancelar
             </ion-button>
           </ion-col>

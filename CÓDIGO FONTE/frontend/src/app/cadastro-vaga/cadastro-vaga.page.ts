@@ -5,6 +5,7 @@ import { AlertController, NavController, PopoverController, ToastController } fr
 import { AreaService } from '../services/area.service';
 import { EmpresaService } from '../services/empresa.service';
 import { VagaService } from '../services/vaga.service';
+import { RepresentanteService } from '../services/representante.service';
 import { MaskitoDirective, MaskitoPipe } from '@maskito/angular';
 import { MaskitoOptions, MaskitoElementPredicate } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
@@ -21,13 +22,17 @@ export class CadastroVagaPage implements OnInit {
   areas: any = []
   empresas: any = []
   userId: any = []
-  vaga: any = {}
+  vaga: any = {
+    ocultarNome: 'N' // Valor padrão 'N'
+  }
   userType: any = ''
 
   cidadesSelecionadas: string[] = []
   cidadeSelecionadasText: string = ''
 
   cidadeProcurada: any = ''
+
+  public emailInvalid: boolean = false;
 
   @ViewChild('cidadesPopover') cidadesPopover: any;
   isCidadesPopoverOpen: boolean = false;
@@ -57,7 +62,8 @@ export class CadastroVagaPage implements OnInit {
     private empresaService: EmpresaService,
     private vagaService: VagaService,
     private alertController: AlertController,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private representanteService: RepresentanteService
   ) { }
 
   ngOnInit() {
@@ -71,6 +77,11 @@ export class CadastroVagaPage implements OnInit {
 
     if (this.authService.getJwt() == null)
       this.navController.navigateRoot('login')
+  }
+
+  validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    this.emailInvalid = this.vaga.emailCurriculo ? !emailRegex.test(this.vaga.emailCurriculo) : false;
   }
 
   public mostrarCidades(e: Event) {
@@ -134,7 +145,6 @@ export class CadastroVagaPage implements OnInit {
 
   async carregarCidades() {
     this.cidadeService.getCidades().subscribe((data: any[]) => {
-      console.log(data)
       this.cidades = data.map((cidade: any) => cidade.nome);
       this.cidadesFiltro = [...this.cidades]
     });
@@ -155,7 +165,6 @@ export class CadastroVagaPage implements OnInit {
 
   async obterEmpresas() {
     this.empresas = await this.empresaService.getEmpresas()
-    console.log(this.empresas)
   }
 
   async showMessage(message: string) {
@@ -170,25 +179,26 @@ export class CadastroVagaPage implements OnInit {
 
   async onSubmit() {
 
-    if (this.vaga.salario == 'R$' || this.vaga.salario == '') {
-      this.showMessage("Atribua um salário para a vaga")
-      return
-    }
-
-    let vagaSalario = this.converterParaNumero(this.vaga.salario)
-
     if (await this.verifyData())
       return
+
+    let vagaSalario = this.converterParaNumero(this.vaga.salario)
 
     if (this.vaga.pcd == 1)
       this.vaga.pcd = true
     else
       this.vaga.pcd = false
 
-    if (this.userId && this.userType) {
-
-      if (this.userType == 'E')
-        this.vaga.idEmpresa = this.userId
+      if (this.userId && this.userType) {
+        if (this.userType == 'E') {
+            this.vaga.idEmpresa = Number(this.userId);
+        } else if (this.userType == 'R') {
+            this.vaga.idEmpresa = await this.representanteService.getEmpresaDoRepresentante(this.userId);
+            if (!this.vaga.idEmpresa) {
+                this.showMessage("Erro ao recuperar a empresa do representante.");
+                return;
+            }
+        }
 
       await this.vagaService.create({
         "idConta": +this.userId,
@@ -205,23 +215,44 @@ export class CadastroVagaPage implements OnInit {
         "site": this.vaga.site ?? null,
         "idArea": this.vaga.idArea.id ?? this.vaga.idArea.idArea,
         "emailCurriculo": this.vaga.emailCurriculo,
-        "idEmpresa": +this.vaga.idEmpresa
+        "idEmpresa": +this.vaga.idEmpresa,
+        "ocultarNome": this.vaga.ocultarNome
       }).then(response => {
         if (response.status == 201) {
 
           const imgResponse = this.vagaService.sendLogoAndBanner(response.data.idVaga, this.vaga.logo, this.vaga.banner)
 
-          this.showMessage("Vaga publicada com sucesso.")
+          this.showMessage("Vaga publicada com sucesso!")
           this.navController.navigateRoot('home')
         }
       })
-
-
-
     }
   }
 
   async verifyData() {
+    this.validateEmail();
+    
+    if (this.emailInvalid) {
+      this.showMessage("Por favor, insira um e-mail válido para recebimento de currículos");
+      return true;
+    }
+
+    const hoje = new Date();
+    const amanha = new Date(hoje);
+    amanha.setDate(hoje.getDate() + 1);
+    amanha.setHours(0, 0, 0, 0);
+
+    if (this.vaga.dataLimite == null) {
+      this.showMessage("Preencha a data de encerramento da vaga.");
+      return true;
+    } else {
+      const dataLimite = new Date(this.vaga.dataLimite);
+      if (isNaN(dataLimite.getTime()) || dataLimite < amanha) {
+        this.showMessage("Insira uma data de encerramento que esteja no futuro.");
+        return true;
+      }
+    }
+
     if (this.vaga.titulo == null || this.vaga.titulo.trim() == "") {
       this.showMessage("Preencha o título da vaga.")
     } else if (this.vaga.salario == null) {
@@ -235,15 +266,13 @@ export class CadastroVagaPage implements OnInit {
     } else if (this.vaga.modalidade == null) {
       this.showMessage("Preencha a modalidade da vaga.")
     } else if (this.vaga.idArea == null) {
-      this.showMessage("Preencha a area da vaga.")
+      this.showMessage("Preencha a área da vaga.")
     } else if (this.vaga.cidade == null) {
       this.showMessage("Preencha a cidade da vaga.")
-    } else if (this.vaga.idEmpresa == null && this.userType != "E") {
+    } else if (this.vaga.idEmpresa == null && this.userType != "E" && this.userType != "R") {
       this.showMessage("Preencha a empresa da vaga.")
     } else if (this.vaga.nivelInstrucao == null) {
       this.showMessage("Preencha o nível de instrução da vaga.")
-    } else if (this.vaga.dataLimite == null) {
-      this.showMessage("Preencha a data limite da vaga.")
     } else if (this.vaga.emailCurriculo == null) {
       this.showMessage("Preencha o email de currículos da vaga.")
     } else {
@@ -310,7 +339,7 @@ export class CadastroVagaPage implements OnInit {
                 // Atualiza as áreas selecionadas
                 this.vaga.idArea = newOption
                 // Exibe a mensagem de sucesso
-                this.showMessage('Nova área de interesse adicionada com sucesso.');
+                this.showMessage('Nova área de interesse adicionada com sucesso!');
               }
             },
           },

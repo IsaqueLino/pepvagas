@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { Representante } from "../database/models/Representante";
 import { AppDataSource } from "../database/data-source";
 import { Vaga } from "../database/models/Vaga";
+import { In, IsNull } from "typeorm";
 
 export default{
-
+    
+    // CRIA UM NOVO REPRESENTANTE
     async create(request: Request, response: Response) {
         try {
             const {
@@ -15,9 +17,9 @@ export default{
 
             const representanteRepository = AppDataSource.getRepository(Representante);
             const representanteExists = await representanteRepository.findOne({
-                where: { idconta },
+                where: { idconta, deletedAt: IsNull() },
             });
-            if (representanteExists && representanteExists.deletedAt==null) {
+            if (representanteExists) {
                 return response.status(409).json({ message: "Representante já cadastrado" });
             }
 
@@ -26,7 +28,6 @@ export default{
                 nome,
                 idEmpresa,
             });
-            console.log("New Representante informations:", representante);
             await representanteRepository.save(representante);
             console.log("Representante succesfully created!");
             return response.status(201).json(representante);
@@ -35,6 +36,7 @@ export default{
         }
     },
 
+    // RETORNA TODOS OS REPRESENTANTES, INCLUINDO OS DELETADOS
     async index(request: Request, response: Response) {
         const representanteRepository = AppDataSource.getRepository(Representante);
     
@@ -50,6 +52,7 @@ export default{
         }
     },
 
+    // ATUALIZA OS DADOS DE UM REPRESENTANTE EXISTENTE
     async update(request: Request, response: Response) {
         const {
             idconta,
@@ -65,7 +68,6 @@ export default{
             }
             representanteExists.nome = nome;
             representanteExists.idEmpresa = idEmpresa;
-            console.log("New Informations:", representanteExists);
 
             await representanteRepository.save(representanteExists);
             console.log("Succesfully Saved!");
@@ -75,38 +77,42 @@ export default{
         }
     },
 
+    // DELETA LOGICAMENTE UM REPRESENTANTE
     async delete(request: Request, response: Response) {
         try {
-            const { id } = request.params;
-            const representanteRepository = AppDataSource.getRepository(Representante);
-            const vagaRepository = AppDataSource.getRepository(Vaga);
-
-            const representante = await representanteRepository.findOneBy({ idconta: +id });
-    
-            if (!representante) {
-                return response.status(404).json({ message: "Representante não encontrado" });
-            }
-            
-            //Check if there are Vagas with this Representante
-            const vagasDoRepresentante = await representanteRepository.createQueryBuilder("representante")
-            .leftJoinAndSelect("representante.vagas", "vaga")
-            .where("representante.idconta = :id", { id: representante.idconta })
-            .getMany();
-
-            if (vagasDoRepresentante.length > 0) {
-                     return response.status(400).json({ message: "Não é possível deletar o representante. Existem vagas atreladas a ele." });
-            }
-    
-            representante.deletedAt = new Date();
-            await representanteRepository.save(representante);
-    
-            return response.status(200).json({ message: "Representante deletado" });
+          const { id } = request.params;
+          const representanteRepository = AppDataSource.getRepository(Representante);
+          const vagaRepository = AppDataSource.getRepository(Vaga);
+      
+          const representante = await representanteRepository.findOneBy({ idconta: +id });
+      
+          if (!representante) {
+            return response.status(404).json({ message: "Representante não encontrado" });
+          }
+      
+          // Verifica se há vagas ativas vinculadas ao representante
+          const vagasAtivas = await vagaRepository
+            .createQueryBuilder("vaga")
+            .where("vaga.idConta = :id", { id: representante.idconta })
+            .andWhere("vaga.deletedAt IS NULL")
+            .andWhere("vaga.data_limite >= CURRENT_DATE")
+            .getCount();
+      
+          if (vagasAtivas > 0) {
+            return response.status(400).json({ message: "Não é possível deletar o representante. Existem vagas ativas vinculadas a ele." });
+          }
+      
+          representante.deletedAt = new Date();
+          await representanteRepository.save(representante);
+      
+          return response.status(200).json({ message: "Representante desativado com sucesso!" });
         } catch (error) {
-            return response.status(500).json({ message: "Erro interno do servidor" });
+          console.error("Erro ao desativar representante:", error);
+          return response.status(500).json({ message: "Erro interno do servidor" });
         }
-    },
+      },      
     
-
+    // BUSCA UM REPRESENTANTE PELO ID
     async findById(request: Request, response: Response) {
         const { id } = request.params;
         const representanteRepository = AppDataSource.getRepository(Representante);
@@ -127,6 +133,26 @@ export default{
             console.error(error);
             return response.status(500).json({ message: "Erro interno do servidor" });
         }
-    }
+    },
+    
+    async getEmpresaByRepresentante(request: Request, response: Response) {
+        const { id } = request.params; 
+        const representanteRepository = AppDataSource.getRepository(Representante);
+    
+        try {
+            const representante = await representanteRepository.findOne({
+                where: { idconta: +id }, 
+                relations: ["idEmpresa"], 
+            });
+    
+            if (!representante || !representante.idEmpresa) {
+                return response.status(404).json({ message: "Empresa do representante não encontrada" });
+            }
+    
+            return response.status(200).json({ idEmpresa: representante.idEmpresa.idconta });
+        } catch (error) {
+            return response.status(500).json({ message: "Erro ao buscar empresa do representante", error });
+        }
+    },    
     
 }

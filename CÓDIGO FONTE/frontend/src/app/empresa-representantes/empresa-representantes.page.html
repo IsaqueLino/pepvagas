@@ -17,7 +17,6 @@
                     <tr>
                       <th>Nome</th>
                       <th>Email</th>
-                      <th>Empresa</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -27,7 +26,6 @@
                       [class.selected]="representante.idconta === selectedIdConta">
                       <td>{{ representante.nome }}</td>
                       <td>{{ representante.conta?.email }}</td>
-                      <td>{{ representante.idEmpresa.nomeEmpresa }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -37,7 +35,7 @@
               <ion-col>
                 <ion-button (click)="previousPage()" [disabled]="currentPage === 1">Anterior</ion-button>
                 <ion-button (click)="nextPage()" [disabled]="(currentPage * itemsPerPage) >= listaRepresentantes.length">Próximo</ion-button>
-                <ion-button class="butao" (click)="confirmarExclusao()" class="botao-cancelar" color="danger" fill="outline">Excluir</ion-button>
+                <ion-button class="butao" (click)="confirmarExclusao()" class="botao-cancelar" color="danger">Excluir</ion-button>
               </ion-col>
             </ion-row>
           </ion-grid>
@@ -49,7 +47,7 @@
               </ion-button>
             </ion-col>
             <ion-col size="6">
-              <ion-button [routerLink]="['/empresa-perfil']" color="light" expand="block">Voltar ao Perfil</ion-button>
+              <ion-button [routerLink]="['/home']" color="light" expand="block">Voltar ao Início</ion-button>
             </ion-col>
           </ion-row>
 

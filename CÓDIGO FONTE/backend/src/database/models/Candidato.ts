@@ -70,7 +70,10 @@ export class Candidato {
   tokenFirebase?: string;
 
   @Column("text", {name:"curriculo", nullable: true})
-  curriculo: string;
+  curriculo: string | null;
+
+  @DeleteDateColumn({ name: "deletedAt", nullable: true })
+  deletedAt: Date | null;
 
   @ManyToMany(() => Vaga, (vaga) => vaga.candidatos)
   @JoinTable({

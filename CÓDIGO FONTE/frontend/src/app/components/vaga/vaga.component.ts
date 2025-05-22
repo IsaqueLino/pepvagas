@@ -17,6 +17,7 @@ export class VagaComponent  implements OnInit {
   @Input() data: string = ''
   @Input() logo: any
   @Input() empresa: string = ''
+  @Input() ocultarNome: string = 'N';
   public tempoRestante = ''
 
   constructor() {
@@ -45,11 +46,13 @@ export class VagaComponent  implements OnInit {
       this.data = "Expira em " + diff + " dias"
     }
 
-    if(this.logo == ''){
-      this.logo = '/assets/vaga-logopadrao.svg'
+    if(this.logo == 'vaga-logopadrao.svg'){
+      this.logo = '/assets/confidencial.png'
     }else{
       this.logo =  environment.API+'/images/'+this.logo
     }
+
+
 
     this.salario = Intl.NumberFormat('pt-BR',{
       style: 'currency',

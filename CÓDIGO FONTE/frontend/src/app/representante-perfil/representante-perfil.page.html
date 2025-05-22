@@ -14,10 +14,7 @@
            readonly></ion-input>
         </ion-item>
       
-        <ion-item>
-          <ion-input type="password" label="Senha" labelPlacement="floating" value="..................."
-            readonly></ion-input>
-        </ion-item>
+       
       
         <ion-row>
           <ion-col>
@@ -41,10 +38,10 @@
               </ion-button>
             </ion-col>
             <ion-col size="6">
-              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" fill="outline" expand="block">
-                Desativar Conta
+              <ion-button id="open-action-sheet" class="botao-cancelar" color="danger" expand="block">
+                Excluir Conta
               </ion-button>
-              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja desativar sua conta?"
+              <ion-action-sheet trigger="open-action-sheet" header="Tem certeza que deseja excluir sua conta?"
               [buttons]="actionSheetButtons"></ion-action-sheet>
             </ion-col>
           </ion-row>

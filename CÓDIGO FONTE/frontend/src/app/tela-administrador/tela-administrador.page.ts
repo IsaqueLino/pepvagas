@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { IonModal, NavController, ToastController } from '@ionic/angular';
+import { AlertController, IonModal, NavController, ToastController } from '@ionic/angular';
 import { CandidatoService } from '../services/candidato.service';
 import { VagaService } from '../services/vaga.service';
 import { AdministradorService } from '../services/administrador.service';
@@ -40,9 +40,10 @@ export class TelaAdministradorPage implements OnInit {
     private toastController: ToastController,
     private adminService: AdministradorService,
     private formBuilder: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertController: AlertController,
   ) {
-    if(this.authService.getJwt() == null)
+    if (this.authService.getJwt() == null)
       this.navigationController.navigateRoot('login')
 
     this.adm = this.formBuilder.group({
@@ -75,7 +76,20 @@ export class TelaAdministradorPage implements OnInit {
   }
 
   async getAdmins() {
+    // Busca a lista de administradores
     this.admins = await this.adminService.getAdministradores();
+
+    // Para cada administrador, busca os detalhes da conta (incluindo email)
+    for (const admin of this.admins) {
+      try {
+        const contaDetails = await this.authService.getContaDetails(true, admin.idconta);
+        admin.email = contaDetails.email; // Adiciona o email ao objeto admin
+      } catch (error) {
+        console.error(`Erro ao buscar detalhes da conta para admin ${admin.idconta}:`, error);
+        admin.email = 'Indisponível'; // Valor padrão em caso de erro
+      }
+    }
+
     this.cdr.detectChanges();
   }
 
@@ -104,7 +118,6 @@ export class TelaAdministradorPage implements OnInit {
 
   onRowClick(idconta: number) {
     this.selectedIdconta = idconta;
-    console.log('ID do administrador selecionado:', this.selectedIdconta);
   }
 
   async validateAndOpenModal() {
@@ -139,72 +152,104 @@ export class TelaAdministradorPage implements OnInit {
     }
   }
 
-  async excluir() {
+  async confirmarExclusao() {
     if (this.selectedIdconta == null) {
-      const toast = await this.toastController.create({
-        message: 'Selecione um administrador para excluir',
-        duration: 2000,
-        position: 'bottom'
-      });
-      toast.present();
-      return
+      this.showMessage("Selecione um administrador para excluir", "warning");
+      return;
     }
 
-    let idString: string = String(this.selectedIdconta)
+    const alert = await this.alertController.create({
+      header: 'Confirmação',
+      message: 'Tem certeza de que deseja excluir este administrador?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          handler: () => {
+            this.excluirAdministrador();
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+
+  async excluirAdministrador() {
+    if (this.selectedIdconta == null) return;
+
+    let idString: string = String(this.selectedIdconta);
 
     if (idString == this.admin.idconta) {
       this.showMessage('Você não pode se excluir', 'danger');
       return;
     }
-    const resposta = this.adminService.excluir(idString)
 
-    console.log(resposta)
+    try {
+      await this.adminService.excluir(idString);
+      await this.getAdmins();
+      this.cdr.detectChanges();
 
-    this.getAdmins()
-    this.ngOnInit();
-
+      this.showMessage('Administrador excluído com sucesso!', 'success');
+      this.selectedIdconta = null;
+    } catch (error) {
+      console.error('Erro ao excluir administrador:', error);
+      this.showMessage('Erro ao excluir administrador. Tente novamente.', 'danger');
+    }
   }
 
-  async enviarAlteracao() {
 
+  async enviarAlteracao() {
     if (this.adm && this.adm.value["nome"] == null) {
       const toast = await this.toastController.create({
         message: 'O novo nome tem que ser informado para realizar a alteração',
         duration: 2000,
-        position: 'bottom'
+        position: 'bottom',
+        cssClass: 'custom-dark-toast'
       });
       toast.present();
-
-      return
+      return;
     }
 
     if (this.selectedIdconta !== null) {
+      let id: string = String(this.selectedIdconta);
 
-      let id: string = String(this.selectedIdconta)
+      try {
+        await this.adminService.alterar(id, this.adm.value["nome"]);
 
-      let resposta;
+        this.modal.dismiss(null, 'cancel');
 
-      resposta = this.adminService.alterar(id, this.adm.value["nome"])
+        await this.getAdmins(); // atualiza lista
+        this.ngOnInit();        // força o refresh
 
-      console.log(resposta)
-
-      this.modal.dismiss(null, 'cancel');
-
-      this.getAdmins()
-      this.ngOnInit();
-
+        this.showMessage('Administrador alterado com sucesso!');
+      } catch (error) {
+        this.showMessage('Erro ao alterar administrador.', 'danger');
+      }
     }
   }
-  async showMessage(message: string, color: string) {
+
+
+  ionViewWillEnter() {
+    this.getAdmins(); // Atualiza os dados sempre que entra na página
+  }
+
+
+  async showMessage(message: string, color: string = 'dark') {
     const toast = await this.toastController.create({
       message: message,
-      duration: 1500,
+      duration: 2000,
       position: 'top',
-      color: color
-    })
+      cssClass: 'custom-dark-toast' // classe personalizada
+    });
 
-    toast.present()
+    toast.present();
   }
+
 
   private checkTheme() {
     const theme = localStorage.getItem('theme')
